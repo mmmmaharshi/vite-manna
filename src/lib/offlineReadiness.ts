@@ -1,9 +1,9 @@
-const OFFLINE_READY_TIMEOUT_MS = 8_000;
 const REQUIRED_CACHE_URLS = ["/", "/bible.json"];
+const CACHE_CHECK_INTERVAL_MS = 250;
 
-function wait(timeoutMs: number) {
-  return new Promise<false>((resolve) => {
-    setTimeout(() => resolve(false), timeoutMs);
+function waitForNextCacheCheck() {
+  return new Promise<void>((resolve) => {
+    setTimeout(resolve, CACHE_CHECK_INTERVAL_MS);
   });
 }
 
@@ -20,8 +20,11 @@ export async function waitForOfflineReadiness() {
     return true;
   }
 
-  return Promise.race([
-    navigator.serviceWorker.ready.then(hasRequiredCacheEntries),
-    wait(OFFLINE_READY_TIMEOUT_MS),
-  ]);
+  await navigator.serviceWorker.ready;
+
+  while (!(await hasRequiredCacheEntries())) {
+    await waitForNextCacheCheck();
+  }
+
+  return true;
 }

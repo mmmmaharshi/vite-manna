@@ -6,6 +6,25 @@ import { VitePWA } from 'vite-plugin-pwa';
 
 // https://vite.dev/config/
 export default defineConfig({
+	build: {
+		rolldownOptions: {
+			output: {
+				manualChunks(id) {
+					if (id.includes('@heroui')) {
+						return 'heroui';
+					}
+
+					if (
+						id.includes('node_modules/react') ||
+						id.includes('node_modules/react-dom') ||
+						id.includes('node_modules/react-router')
+					) {
+						return 'vendor';
+					}
+				},
+			},
+		},
+	},
 	plugins: [
 		tailwindcss(),
 		react(),

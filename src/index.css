@@ -1,6 +1,32 @@
 @import "tailwindcss";
 @import "@heroui/styles";
 
+@keyframes splash-progress-slide {
+    from {
+        transform: translateX(-56px);
+    }
+
+    to {
+        transform: translateX(160px);
+    }
+}
+
+.splash-progress {
+    overflow: hidden;
+}
+
+.splash-progress__bar {
+    animation: splash-progress-slide 1150ms ease-in-out infinite;
+    transform-box: fill-box;
+    will-change: transform;
+}
+
+.splash-progress__bar--determinate {
+    animation: none;
+    transform: none;
+    will-change: width;
+}
+
 :root,
 .light,
 .default,

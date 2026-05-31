@@ -1,15 +1,16 @@
 import { useEffect, useState } from "react";
-import { useNavigate } from "react-router";
 
 import { initializeBible } from "../bible/initializeBible";
 import SplashView from "../components/SplashView";
 import { waitForOfflineReadiness } from "../lib/offlineReadiness";
+import App from "./App";
 
 const SplashScreen = () => {
-  const navigate = useNavigate();
-
-  const [progress, setProgress] = useState(0);
   const [error, setError] = useState<string | null>(null);
+  const [isReady, setIsReady] = useState(false);
+  const [isAppHydrated, setIsAppHydrated] = useState(false);
+  const [message, setMessage] = useState("Preparing Bible data...");
+  const [progress, setProgress] = useState<number | null>(0);
   const [attempt, setAttempt] = useState(0);
 
   useEffect(() => {
@@ -18,16 +19,45 @@ const SplashScreen = () => {
     const init = async () => {
       try {
         setError(null);
+        setIsReady(false);
+        setIsAppHydrated(false);
+        setMessage("Downloading Bible data...");
         setProgress(0);
 
-        await initializeBible((value) => {
-          if (mounted) {
-            setProgress(Math.round(value));
+        await initializeBible((nextProgress) => {
+          if (!mounted) {
+            return;
           }
+
+          const cappedProgress = Math.min(Math.round(nextProgress), 95);
+
+          setProgress(cappedProgress);
+
+          if (nextProgress < 75) {
+            setMessage(`Downloading Bible data... ${cappedProgress}%`);
+            return;
+          }
+
+          if (nextProgress < 90) {
+            setMessage("Preparing Bible data...");
+            return;
+          }
+
+          setMessage("Saving Bible for offline use...");
         });
+
+        if (mounted) {
+          setMessage("Preparing offline mode...");
+          setProgress(95);
+        }
+
         await waitForOfflineReadiness();
 
-        navigate("/app");
+        if (mounted) {
+          setMessage("Opening reader...");
+          setProgress(100);
+          setIsReady(true);
+        }
       } catch (err) {
         console.error("[Bible] Failed to initialize database", err);
 
@@ -42,14 +72,23 @@ const SplashScreen = () => {
     return () => {
       mounted = false;
     };
-  }, [attempt, navigate]);
+  }, [attempt]);
 
   return (
-    <SplashView
-      error={error}
-      progress={progress}
-      onRetry={() => setAttempt((value) => value + 1)}
-    />
+    <>
+      {isReady && (
+        <App showSplash={false} onHydrated={() => setIsAppHydrated(true)} />
+      )}
+
+      {!isAppHydrated && (
+          <SplashView
+            error={error}
+            message={message}
+            onRetry={() => setAttempt((value) => value + 1)}
+            progress={progress}
+          />
+      )}
+    </>
   );
 };
 

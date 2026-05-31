@@ -8,13 +8,18 @@ import {
   Typography,
 } from "@heroui/react";
 import { useEffect, useRef, useState } from "react";
+import { Navigate } from "react-router";
 
-import { getBooks, getReaderSnapshot } from "../bible/bibleRepository";
+import {
+  getReaderBootstrap,
+  getReaderSnapshot,
+} from "../bible/bibleRepository";
 import { getBibleBookName } from "../bible/books";
 import type { BibleVerse } from "../bible/db";
 import { useReaderLocation } from "../bible/useReaderLocation";
 import SplashView from "../components/SplashView";
 import { waitForOfflineReadiness } from "../lib/offlineReadiness";
+import { waitForFonts } from "../lib/waitForFonts";
 
 const MINIMUM_SPLASH_DURATION_MS = 500;
 
@@ -31,11 +36,18 @@ interface ReaderSnapshot {
   verses: BibleVerse[];
 }
 
-const App = () => {
+interface AppProps {
+  onHydrated?: () => void;
+  showSplash?: boolean;
+}
+
+const App = ({ onHydrated, showSplash = true }: AppProps) => {
   const [books, setBooks] = useState<BibleBook[]>([]);
   const [readerSnapshot, setReaderSnapshot] = useState<ReaderSnapshot | null>(
     null,
   );
+  const [hasLoadedBooks, setHasLoadedBooks] = useState(false);
+  const [areFontsReady, setAreFontsReady] = useState(false);
   const [isOfflineReady, setIsOfflineReady] = useState(false);
   const [isHydrated, setIsHydrated] = useState(false);
   const [isBookSelectOpen, setIsBookSelectOpen] = useState(false);
@@ -43,7 +55,23 @@ const App = () => {
   const activeChapterRef = useRef<HTMLButtonElement>(null);
   const chapterStripRef = useRef<HTMLDivElement>(null);
   const pendingBookRef = useRef<number | null>(null);
+  const hasBootstrappedRef = useRef(false);
   const { book, chapter, setBook, setChapter } = useReaderLocation();
+  const initialLocationRef = useRef({ book, chapter });
+
+  useEffect(() => {
+    let mounted = true;
+
+    void waitForFonts().then(() => {
+      if (mounted) {
+        setAreFontsReady(true);
+      }
+    });
+
+    return () => {
+      mounted = false;
+    };
+  }, []);
 
   useEffect(() => {
     let mounted = true;
@@ -61,29 +89,64 @@ const App = () => {
 
   useEffect(() => {
     let mounted = true;
+    const initialLocation = initialLocationRef.current;
 
-    void getBooks()
-      .then((bookSummaries) => {
-        if (mounted) {
-          setBooks(
-            bookSummaries.map((book) => ({
-              ...book,
-              name: getBibleBookName(book.id),
-            })),
-          );
+    hasBootstrappedRef.current = true;
+
+    void getReaderBootstrap(initialLocation.book, initialLocation.chapter)
+      .then(({ books: bookSummaries, snapshot }) => {
+        if (!mounted) {
+          return;
+        }
+
+        setBooks(
+          bookSummaries.map((book) => ({
+            ...book,
+            name: getBibleBookName(book.id),
+          })),
+        );
+        setReaderSnapshot(snapshot);
+        setHasLoadedBooks(true);
+
+        if (!snapshot) {
+          return;
+        }
+
+        if (snapshot.book !== initialLocation.book) {
+          setBook(snapshot.book);
+          return;
+        }
+
+        if (
+          snapshot.chapter !== undefined &&
+          snapshot.chapter !== initialLocation.chapter
+        ) {
+          setChapter(snapshot.chapter);
         }
       })
       .catch((error) => {
-        console.error("[Bible] Unable to load books", error);
+        console.error("[Bible] Unable to bootstrap reader", error);
+
+        if (mounted) {
+          setHasLoadedBooks(true);
+        }
       });
 
     return () => {
       mounted = false;
     };
-  }, []);
+  }, [setBook, setChapter]);
 
   useEffect(() => {
     let mounted = true;
+
+    if (!hasBootstrappedRef.current || !hasLoadedBooks) {
+      return;
+    }
+
+    if (readerSnapshot?.book === book && readerSnapshot.chapter === chapter) {
+      return;
+    }
 
     void getReaderSnapshot(book, chapter)
       .then((snapshot) => {
@@ -108,7 +171,7 @@ const App = () => {
     return () => {
       mounted = false;
     };
-  }, [book, chapter, setChapter]);
+  }, [book, chapter, hasLoadedBooks, readerSnapshot, setChapter]);
 
   useEffect(() => {
     if (books.length > 0 && !books.some((candidate) => candidate.id === book)) {
@@ -135,9 +198,13 @@ const App = () => {
   useEffect(() => {
     if (
       isHydrated ||
+      !areFontsReady ||
       !isOfflineReady ||
+      !hasLoadedBooks ||
       books.length === 0 ||
       !readerSnapshot ||
+      readerSnapshot.book !== book ||
+      readerSnapshot.chapter !== chapter ||
       readerSnapshot.chapters.length === 0 ||
       readerSnapshot.verses.length === 0
     ) {
@@ -150,10 +217,29 @@ const App = () => {
     );
 
     return () => clearTimeout(timeoutId);
-  }, [books, isHydrated, isOfflineReady, readerSnapshot]);
+  }, [
+    areFontsReady,
+    book,
+    books,
+    chapter,
+    hasLoadedBooks,
+    isHydrated,
+    isOfflineReady,
+    readerSnapshot,
+  ]);
+
+  useEffect(() => {
+    if (isHydrated) {
+      onHydrated?.();
+    }
+  }, [isHydrated, onHydrated]);
+
+  if (hasLoadedBooks && books.length === 0) {
+    return <Navigate to="/" replace />;
+  }
 
   if (!isHydrated) {
-    return <SplashView />;
+    return showSplash ? <SplashView /> : null;
   }
 
   return (

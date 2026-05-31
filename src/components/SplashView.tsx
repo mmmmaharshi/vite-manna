@@ -1,49 +1,44 @@
-import { Button, ProgressBar, Typography } from "@heroui/react";
+import { memo } from "react";
 
-import IconSVG from "../assets/icon";
+import SplashFrame from "./SplashFrame";
+import SplashProgress from "./SplashProgress";
 
 interface SplashViewProps {
   error?: string | null;
+  message?: string;
   onRetry?: () => void;
-  progress?: number;
+  progress?: number | null;
 }
 
-const SplashView = ({ error, onRetry, progress }: SplashViewProps) => (
-  <main className="h-svh w-full container mx-auto max-w-sm flex items-center justify-center px-6">
-    <div className="flex flex-col items-center justify-center w-full">
-      <IconSVG width={120} height={120} />
+const SplashView = ({
+  error,
+  message = "Preparing Manna...",
+  onRetry,
+  progress,
+}: SplashViewProps) => (
+  <SplashFrame>
+    <SplashProgress value={progress} />
 
-      <Typography.Heading level={1} className="font-black text-4xl">
-        Manna
-      </Typography.Heading>
+    <p className="mt-3 min-h-5 text-center text-sm text-muted">
+      {error ? "Setup paused" : message}
+    </p>
 
-      <ProgressBar
-        isIndeterminate={progress === undefined}
-        value={progress}
-        maxValue={100}
-        className="w-40 mt-4"
-        aria-label="Loading Bible"
-      >
-        <ProgressBar.Track>
-          <ProgressBar.Fill />
-        </ProgressBar.Track>
-      </ProgressBar>
+    {error && (
+      <div className="flex flex-col items-center gap-2 mt-2">
+        <p className="text-danger text-center text-sm">{error}</p>
 
-      {error && (
-        <div className="flex flex-col items-center gap-2 mt-3">
-          <Typography className="text-danger text-center text-sm">
-            {error}
-          </Typography>
-
-          {onRetry && (
-            <Button size="sm" onPress={onRetry}>
-              Retry
-            </Button>
-          )}
-        </div>
-      )}
-    </div>
-  </main>
+        {onRetry && (
+          <button
+            className="px-3 py-1.5 rounded-md bg-default text-default-foreground text-sm"
+            type="button"
+            onClick={onRetry}
+          >
+            Retry
+          </button>
+        )}
+      </div>
+    )}
+  </SplashFrame>
 );
 
-export default SplashView;
+export default memo(SplashView);
