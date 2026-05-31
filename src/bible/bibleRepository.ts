@@ -31,8 +31,19 @@ export function getVerses(book: number, chapter: number) {
   return db.verses.where("[book+chapter]").equals([book, chapter]).sortBy("verse");
 }
 
-export async function getReaderSnapshot(book: number, chapter: number) {
-  const chapters = await getChapterNumbers(book);
+function getContiguousChapterNumbers(chapterCount: number) {
+  return Array.from({ length: chapterCount }, (_, index) => index + 1);
+}
+
+export async function getReaderSnapshot(
+  book: number,
+  chapter: number,
+  chapterCount?: number,
+) {
+  const chapters =
+    chapterCount === undefined
+      ? await getChapterNumbers(book)
+      : getContiguousChapterNumbers(chapterCount);
   const selectedChapter = chapters.includes(chapter) ? chapter : chapters[0];
 
   return {

@@ -1,13 +1,12 @@
 import {
   Button,
-  Description,
   ListBox,
   ScrollShadow,
   Select,
   Surface,
   Typography,
 } from "@heroui/react";
-import { useEffect, useRef, useState } from "react";
+import { useEffect, useLayoutEffect, useRef, useState } from "react";
 import { Navigate } from "react-router";
 
 import {
@@ -54,10 +53,28 @@ const App = ({ onHydrated, showSplash = true }: AppProps) => {
   const [pendingBook, setPendingBook] = useState<number | null>(null);
   const activeChapterRef = useRef<HTMLButtonElement>(null);
   const chapterStripRef = useRef<HTMLDivElement>(null);
+  const chapterStripScrollByBookRef = useRef(new Map<number, number>());
   const pendingBookRef = useRef<number | null>(null);
   const hasBootstrappedRef = useRef(false);
+  const lastScrollRestoreKeyRef = useRef<string | null>(null);
   const { book, chapter, setBook, setChapter } = useReaderLocation();
   const initialLocationRef = useRef({ book, chapter });
+  const visibleBook = pendingBook ?? readerSnapshot?.book ?? book;
+  const visibleBookSummary = books.find(
+    (candidate) => candidate.id === visibleBook,
+  );
+  const visibleChapters =
+    readerSnapshot?.book !== book && visibleBookSummary
+      ? Array.from(
+          { length: visibleBookSummary.chapterCount },
+          (_, index) => index + 1,
+        )
+      : (readerSnapshot?.chapters ?? []);
+  const isReaderTransitioning = readerSnapshot?.book !== book;
+  const visibleChapter = isReaderTransitioning
+    ? 1
+    : (readerSnapshot?.chapter ?? chapter);
+  const shouldKeepBookSelectOpen = isBookSelectOpen || pendingBook !== null;
 
   useEffect(() => {
     let mounted = true;
@@ -148,15 +165,15 @@ const App = ({ onHydrated, showSplash = true }: AppProps) => {
       return;
     }
 
-    void getReaderSnapshot(book, chapter)
+    const selectedBook = books.find((candidate) => candidate.id === book);
+
+    void getReaderSnapshot(book, chapter, selectedBook?.chapterCount)
       .then((snapshot) => {
         if (mounted) {
           setReaderSnapshot(snapshot);
 
           if (pendingBookRef.current === snapshot.book) {
             pendingBookRef.current = null;
-            setPendingBook(null);
-            setIsBookSelectOpen(false);
           }
 
           if (snapshot.chapter !== undefined && snapshot.chapter !== chapter) {
@@ -171,7 +188,7 @@ const App = ({ onHydrated, showSplash = true }: AppProps) => {
     return () => {
       mounted = false;
     };
-  }, [book, chapter, hasLoadedBooks, readerSnapshot, setChapter]);
+  }, [book, books, chapter, hasLoadedBooks, readerSnapshot, setChapter]);
 
   useEffect(() => {
     if (books.length > 0 && !books.some((candidate) => candidate.id === book)) {
@@ -179,21 +196,78 @@ const App = ({ onHydrated, showSplash = true }: AppProps) => {
     }
   }, [book, books, setBook]);
 
-  useEffect(() => {
+  useLayoutEffect(() => {
     const activeChapter = activeChapterRef.current;
     const chapterStrip = chapterStripRef.current;
+    const renderedBook = isReaderTransitioning
+      ? visibleBook
+      : readerSnapshot?.book;
 
-    if (!activeChapter || !chapterStrip) {
+    if (
+      !isHydrated ||
+      !activeChapter ||
+      !chapterStrip ||
+      renderedBook === undefined
+    ) {
       return;
     }
 
-    chapterStrip.scrollTo({
-      behavior: "smooth",
-      left:
-        activeChapter.offsetLeft -
-        (chapterStrip.clientWidth - activeChapter.offsetWidth) / 2,
-    });
-  }, [readerSnapshot]);
+    const scrollRestoreKey = `${renderedBook}:${isReaderTransitioning ? "loading" : "ready"}`;
+
+    if (lastScrollRestoreKeyRef.current === scrollRestoreKey) {
+      return;
+    }
+
+    lastScrollRestoreKeyRef.current = scrollRestoreKey;
+
+    const savedScrollLeft =
+      pendingBook === renderedBook
+        ? chapterStripScrollByBookRef.current.get(renderedBook)
+        : undefined;
+
+    chapterStrip.scrollLeft =
+      savedScrollLeft ??
+      activeChapter.offsetLeft -
+        (chapterStrip.clientWidth - activeChapter.offsetWidth) / 2;
+
+    if (savedScrollLeft === undefined) {
+      activeChapter.scrollIntoView({
+        block: "nearest",
+        inline: "center",
+      });
+    }
+
+    if (!isReaderTransitioning && pendingBook === renderedBook) {
+      const frameId = requestAnimationFrame(() => {
+        setPendingBook(null);
+        setIsBookSelectOpen(false);
+      });
+
+      return () => cancelAnimationFrame(frameId);
+    }
+  }, [
+    isHydrated,
+    isReaderTransitioning,
+    pendingBook,
+    readerSnapshot,
+    visibleBook,
+    visibleChapter,
+    visibleChapters.length,
+  ]);
+
+  const rememberChapterStripScroll = () => {
+    const chapterStrip = chapterStripRef.current;
+    const snapshotBook = readerSnapshot?.book;
+
+    if (!chapterStrip || snapshotBook === undefined) {
+      return;
+    }
+
+    chapterStripScrollByBookRef.current.set(
+      snapshotBook,
+      chapterStrip.scrollLeft,
+    );
+  };
 
   useEffect(() => {
     if (
@@ -249,18 +323,22 @@ const App = ({ onHydrated, showSplash = true }: AppProps) => {
           <Select
             className="rounded-md overflow-auto"
             isDisabled={books.length === 0}
-            isOpen={isBookSelectOpen}
-            value={readerSnapshot?.book ?? book}
+            isOpen={shouldKeepBookSelectOpen}
+            value={visibleBook}
             variant="secondary"
             onOpenChange={(isOpen) => {
-              if (isOpen || pendingBook === null) {
-                setIsBookSelectOpen(isOpen);
+              if (pendingBook !== null) {
+                setIsBookSelectOpen(true);
+                return;
               }
+
+              setIsBookSelectOpen(isOpen);
             }}
             onChange={(bookId) => {
               if (bookId !== null) {
                 const nextBook = Number(bookId);
 
+                rememberChapterStripScroll();
                 pendingBookRef.current = nextBook;
                 setPendingBook(nextBook);
                 setIsBookSelectOpen(true);
@@ -270,12 +348,27 @@ const App = ({ onHydrated, showSplash = true }: AppProps) => {
           >
             <Select.Trigger>
               <Select.Value>
-                {() => getBibleBookName(readerSnapshot?.book ?? book)}
+                {({ isPlaceholder }) => {
+                  if (isPlaceholder) {
+                    return null;
+                  }
+
+                  return (
+                    <span className="flex flex-col gap-1">
+                      <span>{getBibleBookName(visibleBook)}</span>
+                      {visibleBookSummary && (
+                        <span className="text-xs text-muted">
+                          {visibleBookSummary.chapterCount} అధ్యాయాలు
+                        </span>
+                      )}
+                    </span>
+                  );
+                }}
               </Select.Value>
               <Select.Indicator />
             </Select.Trigger>
-            <Select.Popover>
-              <ListBox>
+            <Select.Popover className={"rounded-md"}>
+              <ListBox className="rounded-md!">
                 {books.map((book) => (
                   <ListBox.Item
                     id={book.id}
@@ -284,7 +377,9 @@ const App = ({ onHydrated, showSplash = true }: AppProps) => {
                   >
                     <div className="flex flex-col gap-1">
                       <span>{book.name}</span>
-                      <Description>{book.chapterCount} అధ్యాయాలు</Description>
+                      <span className="text-xs text-muted">
+                        {book.chapterCount} అధ్యాయాలు
+                      </span>
                     </div>
                     <ListBox.ItemIndicator />
                   </ListBox.Item>
@@ -293,27 +388,24 @@ const App = ({ onHydrated, showSplash = true }: AppProps) => {
             </Select.Popover>
           </Select>
 
-          {readerSnapshot && readerSnapshot.chapters.length > 0 && (
+          {visibleChapters.length > 0 && (
             <ScrollShadow
               ref={chapterStripRef}
               hideScrollBar
               orientation="horizontal"
+              onScroll={rememberChapterStripScroll}
             >
               <div className="flex gap-2 py-1">
-                {readerSnapshot.chapters.map((chapterNumber) => (
+                {visibleChapters.map((chapterNumber) => (
                   <Button
                     ref={
-                      readerSnapshot.chapter === chapterNumber
-                        ? activeChapterRef
-                        : null
+                      visibleChapter === chapterNumber ? activeChapterRef : null
                     }
                     key={chapterNumber}
                     size="md"
                     className="rounded-md"
                     variant={
-                      readerSnapshot.chapter === chapterNumber
-                        ? "primary"
-                        : "secondary"
+                      visibleChapter === chapterNumber ? "primary" : "secondary"
                     }
                     onPress={() => setChapter(chapterNumber)}
                   >
@@ -328,14 +420,15 @@ const App = ({ onHydrated, showSplash = true }: AppProps) => {
 
       <section className="max-w-sm w-full px-2 py-4 mx-auto">
         <ol className="flex flex-col gap-3 [content-visibility:auto]">
-          {readerSnapshot?.verses.map((verse) => (
-            <li key={verse.id}>
-              <Typography>
-                <sup className="me-1 text-xs text-muted">{verse.verse}</sup>
-                {verse.text}
-              </Typography>
-            </li>
-          ))}
+          {!isReaderTransitioning &&
+            readerSnapshot?.verses.map((verse) => (
+              <li key={verse.id}>
+                <Typography className="text-sm">
+                  <sup className="me-1 text-xs text-muted">{verse.verse}</sup>
+                  {verse.text}
+                </Typography>
+              </li>
+            ))}
         </ol>
       </section>
     </main>

@@ -1,4 +1,4 @@
-import { useCallback, useEffect, useMemo } from "react";
+import { useCallback, useEffect, useMemo, useRef } from "react";
 import { useSearchParams } from "react-router";
 
 const STORAGE_KEY = "manna.reader-location";
@@ -10,7 +10,12 @@ interface ReaderLocation {
 }
 
 interface StoredReaderLocation extends ReaderLocation {
+  chaptersByBook?: Record<string, number>;
   version: number;
+}
+
+interface PersistedReaderLocation extends ReaderLocation {
+  chaptersByBook: Record<string, number>;
 }
 
 function parsePositiveInteger(value: string | null) {
@@ -19,40 +24,76 @@ function parsePositiveInteger(value: string | null) {
   return Number.isInteger(parsed) && parsed > 0 ? parsed : null;
 }
 
-function loadPersistedLocation(): ReaderLocation {
+function parseChaptersByBook(value: unknown) {
+  if (!value || typeof value !== "object") {
+    return {};
+  }
+
+  const chaptersByBook: Record<string, number> = {};
+
+  for (const [book, chapter] of Object.entries(value)) {
+    const parsedBook = parsePositiveInteger(book);
+    const parsedChapter = parsePositiveInteger(String(chapter));
+
+    if (parsedBook !== null && parsedChapter !== null) {
+      chaptersByBook[String(parsedBook)] = parsedChapter;
+    }
+  }
+
+  return chaptersByBook;
+}
+
+function getRememberedChapter(
+  chaptersByBook: Record<string, number>,
+  book: number,
+) {
+  return chaptersByBook[String(book)] ?? 1;
+}
+
+function loadPersistedLocation(): PersistedReaderLocation {
   try {
     const value = JSON.parse(
       localStorage.getItem(STORAGE_KEY) ?? "",
     ) as StoredReaderLocation;
 
+    const chaptersByBook = parseChaptersByBook(value.chaptersByBook);
+
     if (value.version !== STORAGE_VERSION) {
-      return { book: 1, chapter: 1 };
+      return { book: 1, chapter: 1, chaptersByBook };
     }
 
     const book = parsePositiveInteger(String(value.book));
     const chapter = parsePositiveInteger(String(value.chapter));
 
     if (book !== null && chapter !== null) {
-      return { book, chapter };
+      return {
+        book,
+        chapter,
+        chaptersByBook: {
+          ...chaptersByBook,
+          [book]: chapter,
+        },
+      };
     }
   } catch {
     // Use the canonical starting location when storage is unavailable or invalid.
   }
 
-  return { book: 1, chapter: 1 };
+  return { book: 1, chapter: 1, chaptersByBook: {} };
 }
 
 export function useReaderLocation() {
   const [searchParams, setSearchParams] = useSearchParams();
   const persistedLocation = useMemo(() => loadPersistedLocation(), []);
+  const chaptersByBookRef = useRef({ ...persistedLocation.chaptersByBook });
   const urlBook = parsePositiveInteger(searchParams.get("book"));
   const urlChapter = parsePositiveInteger(searchParams.get("chapter"));
   const book = urlBook ?? persistedLocation.book;
   const chapter =
     urlChapter ??
-    (urlBook === null || urlBook === persistedLocation.book
+    (urlBook === null
       ? persistedLocation.chapter
-      : 1);
+      : getRememberedChapter(chaptersByBookRef.current, urlBook));
 
   const updateLocation = useCallback(
     (location: ReaderLocation) => {
@@ -72,10 +113,17 @@ export function useReaderLocation() {
   }, [book, chapter, updateLocation, urlBook, urlChapter]);
 
   useEffect(() => {
+    chaptersByBookRef.current[String(book)] = chapter;
+
     try {
       localStorage.setItem(
         STORAGE_KEY,
-        JSON.stringify({ book, chapter, version: STORAGE_VERSION }),
+        JSON.stringify({
+          book,
+          chapter,
+          chaptersByBook: chaptersByBookRef.current,
+          version: STORAGE_VERSION,
+        }),
       );
     } catch {
       // URL state remains authoritative when storage is unavailable.
@@ -83,7 +131,11 @@ export function useReaderLocation() {
   }, [book, chapter]);
 
   const setBook = useCallback(
-    (nextBook: number) => updateLocation({ book: nextBook, chapter: 1 }),
+    (nextBook: number) =>
+      updateLocation({
+        book: nextBook,
+        chapter: getRememberedChapter(chaptersByBookRef.current, nextBook),
+      }),
     [updateLocation],
   );
   const setChapter = useCallback(
