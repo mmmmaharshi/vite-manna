@@ -1,4 +1,5 @@
-import { db, type BibleVerse } from "./db";
+import { countVerses, putVerses } from "./bibleRepository";
+import type { BibleVerse } from "./db";
 
 const BIBLE_URL = "/bible.json";
 
@@ -14,7 +15,7 @@ interface BibleResponse {
 }
 
 export async function initializeBible(onProgress?: (progress: number) => void) {
-  const count = await db.verses.count();
+  const count = await countVerses();
 
   if (count > 0) {
     onProgress?.(100);
@@ -105,7 +106,7 @@ export async function initializeBible(onProgress?: (progress: number) => void) {
   const BATCH_SIZE = 1000;
 
   for (let i = 0; i < verses.length; i += BATCH_SIZE) {
-    await db.verses.bulkPut(verses.slice(i, i + BATCH_SIZE));
+    await putVerses(verses.slice(i, i + BATCH_SIZE));
 
     const saveProgress =
       90 + (Math.min(i + BATCH_SIZE, verses.length) / verses.length) * 10;

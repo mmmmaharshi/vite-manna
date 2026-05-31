@@ -29,6 +29,10 @@ class BibleDB extends Dexie {
     this.version(4).stores({
       verses: "id, book",
     });
+
+    this.version(5).stores({
+      verses: "id, book, [book+chapter]",
+    });
   }
 }
 

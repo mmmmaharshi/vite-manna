@@ -1,13 +1,14 @@
 import { Navigate } from "react-router";
 
 import { useBibleStatus } from "../bible/useBibleStatus";
+import SplashView from "../components/SplashView";
 import SplashScreen from "./SplashScreen";
 
 const EntryRoute = () => {
   const status = useBibleStatus();
 
   if (status === "checking") {
-    return null;
+    return <SplashView />;
   }
 
   if (status === "ready") {

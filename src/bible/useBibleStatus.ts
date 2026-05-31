@@ -1,6 +1,6 @@
 import { useEffect, useState } from "react";
 
-import { db } from "./db";
+import { countVerses } from "./bibleRepository";
 
 export type BibleStatus = "checking" | "ready" | "missing";
 
@@ -10,8 +10,7 @@ export function useBibleStatus() {
   useEffect(() => {
     let mounted = true;
 
-    void db.verses
-      .count()
+    void countVerses()
       .then((count) => {
         if (mounted) {
           setStatus(count > 0 ? "ready" : "missing");
