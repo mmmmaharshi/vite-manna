@@ -3,6 +3,7 @@ import { useNavigate } from "react-router";
 
 import { initializeBible } from "../bible/initializeBible";
 import SplashView from "../components/SplashView";
+import { waitForOfflineReadiness } from "../lib/offlineReadiness";
 
 const SplashScreen = () => {
   const navigate = useNavigate();
@@ -24,6 +25,7 @@ const SplashScreen = () => {
             setProgress(Math.round(value));
           }
         });
+        await waitForOfflineReadiness();
 
         navigate("/app");
       } catch (err) {

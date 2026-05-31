@@ -7,17 +7,14 @@ import {
   Surface,
   Typography,
 } from "@heroui/react";
-import { useEffect, useMemo, useRef, useState } from "react";
+import { useEffect, useRef, useState } from "react";
 
-import {
-  getBooks,
-  getChapterNumbers,
-  getVerses,
-} from "../bible/bibleRepository";
+import { getBooks, getReaderSnapshot } from "../bible/bibleRepository";
 import { getBibleBookName } from "../bible/books";
 import type { BibleVerse } from "../bible/db";
 import { useReaderLocation } from "../bible/useReaderLocation";
 import SplashView from "../components/SplashView";
+import { waitForOfflineReadiness } from "../lib/offlineReadiness";
 
 const MINIMUM_SPLASH_DURATION_MS = 500;
 
@@ -27,21 +24,39 @@ interface BibleBook {
   name: string;
 }
 
-interface BibleChapters {
-  book: number | null;
-  values: number[];
+interface ReaderSnapshot {
+  book: number;
+  chapter: number | undefined;
+  chapters: number[];
+  verses: BibleVerse[];
 }
 
 const App = () => {
   const [books, setBooks] = useState<BibleBook[]>([]);
-  const [chapters, setChapters] = useState<BibleChapters>({
-    book: null,
-    values: [],
-  });
-  const [verses, setVerses] = useState<BibleVerse[]>([]);
+  const [readerSnapshot, setReaderSnapshot] = useState<ReaderSnapshot | null>(
+    null,
+  );
+  const [isOfflineReady, setIsOfflineReady] = useState(false);
   const [isHydrated, setIsHydrated] = useState(false);
+  const [isBookSelectOpen, setIsBookSelectOpen] = useState(false);
+  const [pendingBook, setPendingBook] = useState<number | null>(null);
   const activeChapterRef = useRef<HTMLButtonElement>(null);
+  const chapterStripRef = useRef<HTMLDivElement>(null);
   const { book, chapter, setBook, setChapter } = useReaderLocation();
+
+  useEffect(() => {
+    let mounted = true;
+
+    void waitForOfflineReadiness().then(() => {
+      if (mounted) {
+        setIsOfflineReady(true);
+      }
+    });
+
+    return () => {
+      mounted = false;
+    };
+  }, []);
 
   useEffect(() => {
     let mounted = true;
@@ -69,32 +84,32 @@ const App = () => {
   useEffect(() => {
     let mounted = true;
 
-    void getChapterNumbers(book)
-      .then((chapterNumbers) => {
+    void getReaderSnapshot(book, chapter)
+      .then((snapshot) => {
         if (mounted) {
-          setChapters({
-            book,
-            values: chapterNumbers,
+          setReaderSnapshot(snapshot);
+          setPendingBook((currentPendingBook) => {
+            if (currentPendingBook === snapshot.book) {
+              setIsBookSelectOpen(false);
+              return null;
+            }
+
+            return currentPendingBook;
           });
+
+          if (snapshot.chapter !== undefined && snapshot.chapter !== chapter) {
+            setChapter(snapshot.chapter);
+          }
         }
       })
       .catch((error) => {
-        console.error("[Bible] Unable to load chapters", error);
-
-        if (mounted) {
-          setChapters({ book, values: [] });
-        }
+        console.error("[Bible] Unable to load reader snapshot", error);
       });
 
     return () => {
       mounted = false;
     };
-  }, [book]);
-
-  const visibleChapters = useMemo(
-    () => (chapters.book === book ? chapters.values : []),
-    [book, chapters],
-  );
+  }, [book, chapter, setChapter]);
 
   useEffect(() => {
     if (books.length > 0 && !books.some((candidate) => candidate.id === book)) {
@@ -103,47 +118,29 @@ const App = () => {
   }, [book, books, setBook]);
 
   useEffect(() => {
-    if (visibleChapters.length > 0 && !visibleChapters.includes(chapter)) {
-      setChapter(visibleChapters[0]);
+    const activeChapter = activeChapterRef.current;
+    const chapterStrip = chapterStripRef.current;
+
+    if (!activeChapter || !chapterStrip) {
+      return;
     }
-  }, [chapter, setChapter, visibleChapters]);
 
-  useEffect(() => {
-    activeChapterRef.current?.scrollIntoView({
+    chapterStrip.scrollTo({
       behavior: "smooth",
-      block: "nearest",
-      inline: "center",
+      left:
+        activeChapter.offsetLeft -
+        (chapterStrip.clientWidth - activeChapter.offsetWidth) / 2,
     });
-  }, [chapter, visibleChapters]);
-
-  useEffect(() => {
-    let mounted = true;
-
-    void getVerses(book, chapter)
-      .then((chapterVerses) => {
-        if (mounted) {
-          setVerses(chapterVerses);
-        }
-      })
-      .catch((error) => {
-        console.error("[Bible] Unable to load verses", error);
-
-        if (mounted) {
-          setVerses([]);
-        }
-      });
-
-    return () => {
-      mounted = false;
-    };
-  }, [book, chapter]);
+  }, [readerSnapshot]);
 
   useEffect(() => {
     if (
       isHydrated ||
+      !isOfflineReady ||
       books.length === 0 ||
-      visibleChapters.length === 0 ||
-      verses.length === 0
+      !readerSnapshot ||
+      readerSnapshot.chapters.length === 0 ||
+      readerSnapshot.verses.length === 0
     ) {
       return;
     }
@@ -154,7 +151,7 @@ const App = () => {
     );
 
     return () => clearTimeout(timeoutId);
-  }, [books, isHydrated, verses, visibleChapters]);
+  }, [books, isHydrated, isOfflineReady, readerSnapshot]);
 
   if (!isHydrated) {
     return <SplashView />;
@@ -167,16 +164,28 @@ const App = () => {
           <Select
             className={"rounded-md overflow-auto"}
             isDisabled={books.length === 0}
-            value={book}
+            isOpen={isBookSelectOpen}
+            value={readerSnapshot?.book ?? book}
             variant="secondary"
+            onOpenChange={(isOpen) => {
+              if (isOpen || pendingBook === null) {
+                setIsBookSelectOpen(isOpen);
+              }
+            }}
             onChange={(bookId) => {
               if (bookId !== null) {
-                setBook(Number(bookId));
+                const nextBook = Number(bookId);
+
+                setPendingBook(nextBook);
+                setIsBookSelectOpen(true);
+                setBook(nextBook);
               }
             }}
           >
             <Select.Trigger>
-              <Select.Value>{() => getBibleBookName(book)}</Select.Value>
+              <Select.Value>
+                {() => getBibleBookName(readerSnapshot?.book ?? book)}
+              </Select.Value>
               <Select.Indicator />
             </Select.Trigger>
             <Select.Popover>
@@ -198,17 +207,27 @@ const App = () => {
             </Select.Popover>
           </Select>
 
-          {visibleChapters.length > 0 && (
-            <ScrollShadow hideScrollBar orientation="horizontal">
+          {readerSnapshot && readerSnapshot.chapters.length > 0 && (
+            <ScrollShadow
+              ref={chapterStripRef}
+              hideScrollBar
+              orientation="horizontal"
+            >
               <div className="flex gap-2 py-1">
-                {visibleChapters.map((chapterNumber) => (
+                {readerSnapshot.chapters.map((chapterNumber) => (
                   <Button
-                    ref={chapter === chapterNumber ? activeChapterRef : null}
+                    ref={
+                      readerSnapshot.chapter === chapterNumber
+                        ? activeChapterRef
+                        : null
+                    }
                     key={chapterNumber}
                     size="md"
                     className={"rounded-md"}
                     variant={
-                      chapter === chapterNumber ? "primary" : "secondary"
+                      readerSnapshot.chapter === chapterNumber
+                        ? "primary"
+                        : "secondary"
                     }
                     onPress={() => setChapter(chapterNumber)}
                   >
@@ -223,7 +242,7 @@ const App = () => {
 
       <section className="max-w-sm w-full px-2 py-4 mx-auto">
         <ol className="flex flex-col gap-3">
-          {verses.map((verse) => (
+          {readerSnapshot?.verses.map((verse) => (
             <li key={verse.id}>
               <Typography>
                 <sup className="me-1 text-xs text-muted">{verse.verse}</sup>
