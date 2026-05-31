@@ -2,10 +2,15 @@ import { useCallback, useEffect, useMemo } from "react";
 import { useSearchParams } from "react-router";
 
 const STORAGE_KEY = "manna.reader-location";
+const STORAGE_VERSION = 1;
 
 interface ReaderLocation {
   book: number;
   chapter: number;
+}
+
+interface StoredReaderLocation extends ReaderLocation {
+  version: number;
 }
 
 function parsePositiveInteger(value: string | null) {
@@ -16,7 +21,14 @@ function parsePositiveInteger(value: string | null) {
 
 function loadPersistedLocation(): ReaderLocation {
   try {
-    const value = JSON.parse(localStorage.getItem(STORAGE_KEY) ?? "");
+    const value = JSON.parse(
+      localStorage.getItem(STORAGE_KEY) ?? "",
+    ) as StoredReaderLocation;
+
+    if (value.version !== STORAGE_VERSION) {
+      return { book: 1, chapter: 1 };
+    }
+
     const book = parsePositiveInteger(String(value.book));
     const chapter = parsePositiveInteger(String(value.chapter));
 
@@ -61,7 +73,10 @@ export function useReaderLocation() {
 
   useEffect(() => {
     try {
-      localStorage.setItem(STORAGE_KEY, JSON.stringify({ book, chapter }));
+      localStorage.setItem(
+        STORAGE_KEY,
+        JSON.stringify({ book, chapter, version: STORAGE_VERSION }),
+      );
     } catch {
       // URL state remains authoritative when storage is unavailable.
     }

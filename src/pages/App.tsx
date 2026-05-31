@@ -42,6 +42,7 @@ const App = () => {
   const [pendingBook, setPendingBook] = useState<number | null>(null);
   const activeChapterRef = useRef<HTMLButtonElement>(null);
   const chapterStripRef = useRef<HTMLDivElement>(null);
+  const pendingBookRef = useRef<number | null>(null);
   const { book, chapter, setBook, setChapter } = useReaderLocation();
 
   useEffect(() => {
@@ -88,14 +89,12 @@ const App = () => {
       .then((snapshot) => {
         if (mounted) {
           setReaderSnapshot(snapshot);
-          setPendingBook((currentPendingBook) => {
-            if (currentPendingBook === snapshot.book) {
-              setIsBookSelectOpen(false);
-              return null;
-            }
 
-            return currentPendingBook;
-          });
+          if (pendingBookRef.current === snapshot.book) {
+            pendingBookRef.current = null;
+            setPendingBook(null);
+            setIsBookSelectOpen(false);
+          }
 
           if (snapshot.chapter !== undefined && snapshot.chapter !== chapter) {
             setChapter(snapshot.chapter);
@@ -162,7 +161,7 @@ const App = () => {
       <Surface className="py-2.5 pt-3.5 border border-b">
         <div className="max-w-sm flex flex-col gap-2 w-full px-2 mx-auto">
           <Select
-            className={"rounded-md overflow-auto"}
+            className="rounded-md overflow-auto"
             isDisabled={books.length === 0}
             isOpen={isBookSelectOpen}
             value={readerSnapshot?.book ?? book}
@@ -176,6 +175,7 @@ const App = () => {
               if (bookId !== null) {
                 const nextBook = Number(bookId);
 
+                pendingBookRef.current = nextBook;
                 setPendingBook(nextBook);
                 setIsBookSelectOpen(true);
                 setBook(nextBook);
@@ -223,7 +223,7 @@ const App = () => {
                     }
                     key={chapterNumber}
                     size="md"
-                    className={"rounded-md"}
+                    className="rounded-md"
                     variant={
                       readerSnapshot.chapter === chapterNumber
                         ? "primary"
@@ -241,7 +241,7 @@ const App = () => {
       </Surface>
 
       <section className="max-w-sm w-full px-2 py-4 mx-auto">
-        <ol className="flex flex-col gap-3">
+        <ol className="flex flex-col gap-3 [content-visibility:auto]">
           {readerSnapshot?.verses.map((verse) => (
             <li key={verse.id}>
               <Typography>
