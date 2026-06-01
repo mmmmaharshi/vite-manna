@@ -147,7 +147,6 @@ const ChapterStrip = ({
             }
             key={chapterNumber}
             size="md"
-            className="rounded-md"
             variant={
               visibleChapter === chapterNumber ? "primary" : "secondary"
             }

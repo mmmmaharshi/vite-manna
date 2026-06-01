@@ -49,7 +49,47 @@ function parseChaptersByBook(value: unknown): Record<number, number> {
   return result;
 }
 
+function readUrlLocation() {
+  if (typeof window === "undefined") {
+    return null;
+  }
+
+  const params = new URLSearchParams(window.location.search);
+  const book = parsePositiveInteger(params.get("book"));
+  const chapter = parsePositiveInteger(params.get("chapter"));
+
+  if (book === null || chapter === null) {
+    return null;
+  }
+
+  return { book, chapter };
+}
+
 function loadInitialState() {
+  const fromUrl = readUrlLocation();
+
+  if (fromUrl !== null) {
+    let chaptersByBook: Record<number, number> = {};
+
+    try {
+      const stored = JSON.parse(
+        localStorage.getItem(STORAGE_KEY) ?? "",
+      ) as StoredLocation;
+
+      if (stored.version === STORAGE_VERSION) {
+        chaptersByBook = parseChaptersByBook(stored.chaptersByBook);
+      }
+    } catch {
+      // Keep the URL-derived book/chapter when localStorage is unreadable.
+    }
+
+    return {
+      book: fromUrl.book,
+      chapter: fromUrl.chapter,
+      chaptersByBook: { ...chaptersByBook, [fromUrl.book]: fromUrl.chapter },
+    };
+  }
+
   let book = 1;
   let chapter = 1;
   let chaptersByBook: Record<number, number> = {};

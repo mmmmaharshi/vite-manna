@@ -8,43 +8,11 @@ const URL_PARAM_CHAPTER = "chapter";
 const STORAGE_KEY = "manna.reader-location";
 const STORAGE_VERSION = 1;
 
-function parsePositiveInteger(value: string | null) {
-  const parsed = Number(value);
-
-  return Number.isInteger(parsed) && parsed > 0 ? parsed : null;
-}
-
-function readUrlLocation(searchParams: URLSearchParams) {
-  const book = parsePositiveInteger(searchParams.get(URL_PARAM_BOOK));
-  const chapter = parsePositiveInteger(searchParams.get(URL_PARAM_CHAPTER));
-
-  if (book === null || chapter === null) {
-    return null;
-  }
-
-  return { book, chapter };
-}
-
 export function useUrlSync() {
   const [searchParams, setSearchParams] = useSearchParams();
   const book = useReaderStore((state) => state.book);
   const chapter = useReaderStore((state) => state.chapter);
-  const setBook = useReaderStore((state) => state.setBook);
-  const setChapter = useReaderStore((state) => state.setChapter);
   const chaptersByBook = useReaderStore((state) => state.chaptersByBook);
-
-  useEffect(() => {
-    const fromUrl = readUrlLocation(searchParams);
-
-    if (fromUrl !== null) {
-      if (fromUrl.book !== book) {
-        setBook(fromUrl.book);
-      }
-      if (fromUrl.chapter !== chapter) {
-        setChapter(fromUrl.chapter);
-      }
-    }
-  }, [book, chapter, searchParams, setBook, setChapter]);
 
   useEffect(() => {
     const next = new URLSearchParams(searchParams);
