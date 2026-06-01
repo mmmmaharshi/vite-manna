@@ -47,20 +47,12 @@ const ReaderScreen = () => {
       : (snapshot?.chapters ?? []);
   const visibleChapter = isReaderTransitioning ? 1 : chapter;
 
-  const isReaderReady =
-    hasLoadedBooks &&
-    books.length > 0 &&
-    !!snapshot &&
-    snapshot.book === book &&
-    snapshot.chapters.length > 0 &&
-    snapshot.verses.length > 0;
-
-  if (hasLoadedBooks && books.length === 0) {
-    return <Navigate to="/" replace />;
+  if (!hasLoadedBooks) {
+    return <SplashView message="Preparing reader..." progress={null} />;
   }
 
-  if (!isReaderReady) {
-    return <SplashView message="Preparing reader..." progress={null} />;
+  if (books.length === 0) {
+    return <Navigate to="/" replace />;
   }
 
   return (
