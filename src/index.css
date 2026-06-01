@@ -66,8 +66,8 @@
     --warning-foreground: oklch(15% 0.0336 61.69);
 
     /* Border Radius */
-    --radius: 0.5rem;
-    --field-radius: 0.125rem;
+    --radius: 0.125rem;
+    --field-radius: 0.75rem;
 
     /* Font Family */
     --font-sans: "Google Sans Variable";
