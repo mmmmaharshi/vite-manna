@@ -25,6 +25,12 @@ function buildShareText(verses: BibleVerse[], book: number, chapter: number) {
     .join("\n");
 }
 
+function canNativeShare() {
+  return (
+    typeof navigator !== "undefined" && typeof navigator.share === "function"
+  );
+}
+
 async function copyToClipboard(text: string) {
   if (navigator.clipboard?.writeText) {
     await navigator.clipboard.writeText(text);
@@ -52,6 +58,7 @@ const VerseActionBar = ({ verses }: VerseActionBarProps) => {
   const chapter = useReaderStore((state) => state.chapter);
 
   const [copyState, setCopyState] = useState<CopyState>("idle");
+  const [shareState, setShareState] = useState<CopyState>("idle");
 
   useEffect(() => {
     if (copyState === "idle") {
@@ -61,6 +68,15 @@ const VerseActionBar = ({ verses }: VerseActionBarProps) => {
     const timeout = setTimeout(() => setCopyState("idle"), 1600);
     return () => clearTimeout(timeout);
   }, [copyState]);
+
+  useEffect(() => {
+    if (shareState === "idle") {
+      return;
+    }
+
+    const timeout = setTimeout(() => setShareState("idle"), 1600);
+    return () => clearTimeout(timeout);
+  }, [shareState]);
 
   if (!isSelectionMode) {
     return null;
@@ -88,7 +104,7 @@ const VerseActionBar = ({ verses }: VerseActionBarProps) => {
       return;
     }
 
-    if (navigator.share) {
+    if (canNativeShare()) {
       try {
         await navigator.share({ text });
         return;
@@ -99,7 +115,12 @@ const VerseActionBar = ({ verses }: VerseActionBarProps) => {
       }
     }
 
-    await handleCopy();
+    try {
+      await copyToClipboard(text);
+      setShareState("copied");
+    } catch {
+      setShareState("error");
+    }
   };
 
   const copyLabel =
@@ -108,6 +129,13 @@ const VerseActionBar = ({ verses }: VerseActionBarProps) => {
       : copyState === "error"
         ? "Copy failed"
         : "Copy";
+
+  const shareLabel =
+    shareState === "copied"
+      ? "Copied"
+      : shareState === "error"
+        ? "Share failed"
+        : "Share";
 
   return (
     <div
@@ -123,7 +151,7 @@ const VerseActionBar = ({ verses }: VerseActionBarProps) => {
             variant="secondary"
             onPress={handleShare}
           >
-            Share
+            {shareLabel}
           </Button>
           <Button
             size="sm"
