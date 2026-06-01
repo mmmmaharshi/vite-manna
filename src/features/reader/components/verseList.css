@@ -1,0 +1,13 @@
+@keyframes manna-permalink-flash {
+    from {
+        box-shadow: inset 0 0 0 2px var(--accent);
+    }
+
+    to {
+        box-shadow: inset 0 0 0 2px transparent;
+    }
+}
+
+.animate-permalink-flash {
+    animation: manna-permalink-flash 1.2s ease-out;
+}

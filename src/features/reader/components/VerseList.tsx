@@ -3,6 +3,7 @@ import { Typography } from "@heroui/react";
 
 import { useReaderStore } from "../store/readerStore";
 import type { BibleVerse } from "../../../shared/bible";
+import "./verseList.css";
 
 interface VerseListProps {
   verses: BibleVerse[];
@@ -40,7 +41,7 @@ const VerseList = ({ verses }: VerseListProps) => {
       return;
     }
 
-    target.scrollIntoView({ block: "center" });
+    target.scrollIntoView({ block: "center", behavior: "smooth" });
     lastScrolledVerseRef.current = permalinkVerse;
   }, [permalinkVerse, verses]);
 
@@ -63,6 +64,7 @@ const VerseList = ({ verses }: VerseListProps) => {
                 isSelected
                   ? "bg-accent/15 hover:bg-accent/20"
                   : "hover:bg-surface-secondary",
+                isPermalink ? "animate-permalink-flash" : "",
               ].join(" ")}
               onClick={() => toggleVerseSelection(verse.id)}
             >
