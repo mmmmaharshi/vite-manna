@@ -1,5 +1,5 @@
 import { useEffect, useState } from "react";
-import { Button, Surface } from "@heroui/react";
+import { Button, Surface, toast } from "@heroui/react";
 
 import { getBibleBookName, type BibleVerse } from "../../../shared/bible";
 import { useReaderStore } from "../store/readerStore";
@@ -58,7 +58,6 @@ const VerseActionBar = ({ verses }: VerseActionBarProps) => {
   const chapter = useReaderStore((state) => state.chapter);
 
   const [copyState, setCopyState] = useState<CopyState>("idle");
-  const [shareState, setShareState] = useState<CopyState>("idle");
 
   useEffect(() => {
     if (copyState === "idle") {
@@ -68,15 +67,6 @@ const VerseActionBar = ({ verses }: VerseActionBarProps) => {
     const timeout = setTimeout(() => setCopyState("idle"), 1600);
     return () => clearTimeout(timeout);
   }, [copyState]);
-
-  useEffect(() => {
-    if (shareState === "idle") {
-      return;
-    }
-
-    const timeout = setTimeout(() => setShareState("idle"), 1600);
-    return () => clearTimeout(timeout);
-  }, [shareState]);
 
   if (!isSelectionMode) {
     return null;
@@ -104,22 +94,20 @@ const VerseActionBar = ({ verses }: VerseActionBarProps) => {
       return;
     }
 
-    if (canNativeShare()) {
-      try {
-        await navigator.share({ text });
-        return;
-      } catch (error) {
-        if (error instanceof DOMException && error.name === "AbortError") {
-          return;
-        }
-      }
+    if (!canNativeShare()) {
+      toast("Sharing isn't supported on this device", {
+        variant: "warning",
+      });
+      return;
     }
 
     try {
-      await copyToClipboard(text);
-      setShareState("copied");
-    } catch {
-      setShareState("error");
+      await navigator.share({ text });
+    } catch (error) {
+      if (error instanceof DOMException && error.name === "AbortError") {
+        return;
+      }
+      toast("Share failed", { variant: "danger" });
     }
   };
 
@@ -129,13 +117,6 @@ const VerseActionBar = ({ verses }: VerseActionBarProps) => {
       : copyState === "error"
         ? "Copy failed"
         : "Copy";
-
-  const shareLabel =
-    shareState === "copied"
-      ? "Copied"
-      : shareState === "error"
-        ? "Share failed"
-        : "Share";
 
   return (
     <div
@@ -151,7 +132,7 @@ const VerseActionBar = ({ verses }: VerseActionBarProps) => {
             variant="secondary"
             onPress={handleShare}
           >
-            {shareLabel}
+            Share
           </Button>
           <Button
             size="sm"
