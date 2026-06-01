@@ -1,4 +1,3 @@
-import { useEffect, useState } from "react";
 import { Button, Surface, toast } from "@heroui/react";
 
 import { getBibleBookName, type BibleVerse } from "../../../shared/bible";
@@ -7,8 +6,6 @@ import { useReaderStore } from "../store/readerStore";
 interface VerseActionBarProps {
   verses: BibleVerse[];
 }
-
-type CopyState = "idle" | "copied" | "error";
 
 function formatReference(book: number, chapter: number) {
   return `${getBibleBookName(book)} ${chapter}`;
@@ -57,17 +54,6 @@ const VerseActionBar = ({ verses }: VerseActionBarProps) => {
   const book = useReaderStore((state) => state.book);
   const chapter = useReaderStore((state) => state.chapter);
 
-  const [copyState, setCopyState] = useState<CopyState>("idle");
-
-  useEffect(() => {
-    if (copyState === "idle") {
-      return;
-    }
-
-    const timeout = setTimeout(() => setCopyState("idle"), 1600);
-    return () => clearTimeout(timeout);
-  }, [copyState]);
-
   if (!isSelectionMode) {
     return null;
   }
@@ -83,9 +69,9 @@ const VerseActionBar = ({ verses }: VerseActionBarProps) => {
 
     try {
       await copyToClipboard(text);
-      setCopyState("copied");
+      toast("Copied to clipboard", { variant: "success" });
     } catch {
-      setCopyState("error");
+      toast("Copy failed", { variant: "danger" });
     }
   };
 
@@ -111,13 +97,6 @@ const VerseActionBar = ({ verses }: VerseActionBarProps) => {
     }
   };
 
-  const copyLabel =
-    copyState === "copied"
-      ? "Copied"
-      : copyState === "error"
-        ? "Copy failed"
-        : "Copy";
-
   return (
     <div
       className="fixed inset-x-0 bottom-0 z-40 px-3 pb-[max(0.75rem,env(safe-area-inset-bottom))] pt-3 pointer-events-none"
@@ -128,21 +107,51 @@ const VerseActionBar = ({ verses }: VerseActionBarProps) => {
         </span>
         <div className="ml-auto flex items-center gap-1.5">
           <Button
+            aria-label="Share"
+            isIconOnly
             size="sm"
             variant="secondary"
             onPress={handleShare}
           >
-            Share
+            <svg
+              aria-hidden="true"
+              className="h-4 w-4"
+              fill="none"
+              stroke="currentColor"
+              strokeLinecap="round"
+              strokeLinejoin="round"
+              strokeWidth={2}
+              viewBox="0 0 24 24"
+            >
+              <path d="M4 12v8a2 2 0 0 0 2 2h12a2 2 0 0 0 2-2v-8" />
+              <polyline points="16 6 12 2 8 6" />
+              <line x1="12" y1="2" x2="12" y2="15" />
+            </svg>
           </Button>
           <Button
+            aria-label="Copy"
+            isIconOnly
             size="sm"
             variant="primary"
             onPress={handleCopy}
           >
-            {copyLabel}
+            <svg
+              aria-hidden="true"
+              className="h-4 w-4"
+              fill="none"
+              stroke="currentColor"
+              strokeLinecap="round"
+              strokeLinejoin="round"
+              strokeWidth={2}
+              viewBox="0 0 24 24"
+            >
+              <rect x="9" y="9" width="13" height="13" rx="2" ry="2" />
+              <path d="M5 15H4a2 2 0 0 1-2-2V4a2 2 0 0 1 2-2h9a2 2 0 0 1 2 2v1" />
+            </svg>
           </Button>
           <Button
             aria-label="Clear selection"
+            isIconOnly
             size="sm"
             variant="tertiary"
             onPress={clearVerseSelection}
