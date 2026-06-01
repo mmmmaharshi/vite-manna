@@ -22,6 +22,15 @@ function buildShareText(verses: BibleVerse[], book: number, chapter: number) {
     .join("\n");
 }
 
+function buildPermalinkUrl(book: number, chapter: number, verse: number) {
+  const url = new URL(window.location.href);
+  url.searchParams.set("book", String(book));
+  url.searchParams.set("chapter", String(chapter));
+  url.searchParams.set("verse", String(verse));
+  url.hash = "";
+  return url.toString();
+}
+
 function canNativeShare() {
   return (
     typeof navigator !== "undefined" && typeof navigator.share === "function"
@@ -51,6 +60,9 @@ const VerseActionBar = ({ verses }: VerseActionBarProps) => {
   const clearVerseSelection = useReaderStore(
     (state) => state.clearVerseSelection,
   );
+  const setPermalinkVerse = useReaderStore(
+    (state) => state.setPermalinkVerse,
+  );
   const book = useReaderStore((state) => state.book);
   const chapter = useReaderStore((state) => state.chapter);
 
@@ -61,6 +73,8 @@ const VerseActionBar = ({ verses }: VerseActionBarProps) => {
   const selectedSet = new Set(selectedVerseIds);
   const selectedVerses = verses.filter((verse) => selectedSet.has(verse.id));
   const text = buildShareText(selectedVerses, book, chapter);
+  const singleSelectedVerse =
+    selectedVerses.length === 1 ? selectedVerses[0] : null;
 
   const handleCopy = async () => {
     if (selectedVerses.length === 0) {
@@ -97,6 +111,23 @@ const VerseActionBar = ({ verses }: VerseActionBarProps) => {
     }
   };
 
+  const handleCopyLink = async () => {
+    if (singleSelectedVerse === null) {
+      return;
+    }
+
+    const link = buildPermalinkUrl(book, chapter, singleSelectedVerse.verse);
+
+    setPermalinkVerse(singleSelectedVerse.verse);
+
+    try {
+      await copyToClipboard(link);
+      toast("Link copied", { variant: "success" });
+    } catch {
+      toast("Copy failed", { variant: "danger" });
+    }
+  };
+
   return (
     <div
       className="fixed inset-x-0 bottom-0 z-40 px-3 pb-[max(0.75rem,env(safe-area-inset-bottom))] pt-3 pointer-events-none"
@@ -106,6 +137,29 @@ const VerseActionBar = ({ verses }: VerseActionBarProps) => {
           {selectedVerseIds.length} selected
         </span>
         <div className="ml-auto flex items-center gap-1.5">
+          {singleSelectedVerse !== null && (
+            <Button
+              aria-label="Copy link"
+              isIconOnly
+              size="sm"
+              variant="tertiary"
+              onPress={handleCopyLink}
+            >
+              <svg
+                aria-hidden="true"
+                className="h-4 w-4"
+                fill="none"
+                stroke="currentColor"
+                strokeLinecap="round"
+                strokeLinejoin="round"
+                strokeWidth={2}
+                viewBox="0 0 24 24"
+              >
+                <path d="M10 13a5 5 0 0 0 7.54.54l3-3a5 5 0 0 0-7.07-7.07l-1.72 1.71" />
+                <path d="M14 11a5 5 0 0 0-7.54-.54l-3 3a5 5 0 0 0 7.07 7.07l1.71-1.71" />
+              </svg>
+            </Button>
+          )}
           <Button
             aria-label="Share"
             isIconOnly

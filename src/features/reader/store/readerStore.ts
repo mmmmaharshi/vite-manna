@@ -8,6 +8,7 @@ export interface ReaderState {
   chaptersByBook: Record<number, number>;
   selectedVerseIds: number[];
   isSelectionMode: boolean;
+  permalinkVerse: number | null;
 
   setBook: (book: number) => void;
   setChapter: (chapter: number) => void;
@@ -16,6 +17,7 @@ export interface ReaderState {
   clearPendingBook: () => void;
   toggleVerseSelection: (verseId: number) => void;
   clearVerseSelection: () => void;
+  setPermalinkVerse: (verse: number | null) => void;
 }
 
 const STORAGE_KEY = "manna.reader-location";
@@ -69,8 +71,18 @@ function readUrlLocation() {
   return { book, chapter };
 }
 
+function readUrlVerse() {
+  if (typeof window === "undefined") {
+    return null;
+  }
+
+  const params = new URLSearchParams(window.location.search);
+  return parsePositiveInteger(params.get("verse"));
+}
+
 function loadInitialState() {
   const fromUrl = readUrlLocation();
+  const permalinkVerse = readUrlVerse();
 
   if (fromUrl !== null) {
     let chaptersByBook: Record<number, number> = {};
@@ -91,6 +103,7 @@ function loadInitialState() {
       book: fromUrl.book,
       chapter: fromUrl.chapter,
       chaptersByBook: { ...chaptersByBook, [fromUrl.book]: fromUrl.chapter },
+      permalinkVerse,
     };
   }
 
@@ -119,7 +132,7 @@ function loadInitialState() {
     // Use the canonical starting location when storage is unavailable or invalid.
   }
 
-  return { book, chapter, chaptersByBook };
+  return { book, chapter, chaptersByBook, permalinkVerse };
 }
 
 function rememberChapter(
@@ -139,6 +152,7 @@ export const useReaderStore = create<ReaderState>((set, get) => ({
   chaptersByBook: initial.chaptersByBook,
   selectedVerseIds: [],
   isSelectionMode: false,
+  permalinkVerse: initial.permalinkVerse,
 
   setBook: (book) => {
     const { chaptersByBook } = get();
@@ -148,6 +162,7 @@ export const useReaderStore = create<ReaderState>((set, get) => ({
       chapter: rememberChapter(chaptersByBook, book),
       selectedVerseIds: [],
       isSelectionMode: false,
+      permalinkVerse: null,
     });
   },
 
@@ -159,11 +174,16 @@ export const useReaderStore = create<ReaderState>((set, get) => ({
       chaptersByBook: { ...chaptersByBook, [book]: chapter },
       selectedVerseIds: [],
       isSelectionMode: false,
+      permalinkVerse: null,
     });
   },
 
   selectBook: (bookId) => {
-    set({ pendingBook: bookId, isBookSelectOpen: true });
+    set({
+      pendingBook: bookId,
+      isBookSelectOpen: true,
+      permalinkVerse: null,
+    });
     get().setBook(bookId);
   },
 
@@ -208,6 +228,14 @@ export const useReaderStore = create<ReaderState>((set, get) => ({
     }
 
     set({ selectedVerseIds: [], isSelectionMode: false });
+  },
+
+  setPermalinkVerse: (verse) => {
+    if (get().permalinkVerse === verse) {
+      return;
+    }
+
+    set({ permalinkVerse: verse });
   },
 }));
 

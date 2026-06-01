@@ -1,3 +1,4 @@
+import { useLayoutEffect, useRef } from "react";
 import { Typography } from "@heroui/react";
 
 import { useReaderStore } from "../store/readerStore";
@@ -12,16 +13,48 @@ const VerseList = ({ verses }: VerseListProps) => {
   const toggleVerseSelection = useReaderStore(
     (state) => state.toggleVerseSelection,
   );
+  const permalinkVerse = useReaderStore((state) => state.permalinkVerse);
+
+  const permalinkRef = useRef<HTMLLIElement | null>(null);
+  const lastScrolledVerseRef = useRef<number | null>(null);
 
   const selectedSet = new Set(selectedVerseIds);
+
+  useLayoutEffect(() => {
+    if (permalinkVerse === null) {
+      lastScrolledVerseRef.current = null;
+      return;
+    }
+
+    if (lastScrolledVerseRef.current === permalinkVerse) {
+      return;
+    }
+
+    if (!verses.some((verse) => verse.verse === permalinkVerse)) {
+      return;
+    }
+
+    const target = permalinkRef.current;
+
+    if (target === null) {
+      return;
+    }
+
+    target.scrollIntoView({ block: "center" });
+    lastScrolledVerseRef.current = permalinkVerse;
+  }, [permalinkVerse, verses]);
 
   return (
     <ol className="flex flex-col gap-1 [content-visibility:auto]">
       {verses.map((verse) => {
         const isSelected = selectedSet.has(verse.id);
+        const isPermalink = verse.verse === permalinkVerse;
 
         return (
-          <li key={verse.id}>
+          <li
+            key={verse.id}
+            ref={isPermalink ? permalinkRef : null}
+          >
             <button
               type="button"
               aria-pressed={isSelected}
