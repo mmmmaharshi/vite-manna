@@ -45,16 +45,13 @@ const ReaderScreen = () => {
           (_, index) => index + 1,
         )
       : (snapshot?.chapters ?? []);
-  const visibleChapter = isReaderTransitioning
-    ? 1
-    : (snapshot?.chapter ?? chapter);
+  const visibleChapter = isReaderTransitioning ? 1 : chapter;
 
   const isReaderReady =
     hasLoadedBooks &&
     books.length > 0 &&
     !!snapshot &&
     snapshot.book === book &&
-    snapshot.chapter === chapter &&
     snapshot.chapters.length > 0 &&
     snapshot.verses.length > 0;
 
