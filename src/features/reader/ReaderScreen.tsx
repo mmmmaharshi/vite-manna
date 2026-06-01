@@ -59,7 +59,7 @@ const ReaderScreen = () => {
 
   return (
     <main>
-      <Surface className="py-2.5 pt-3.5 border border-b">
+      <Surface className="sticky top-0 z-30 bg-surface py-2.5 pt-3.5 border border-b">
         <div className="max-w-sm flex flex-col gap-2 w-full px-2 mx-auto">
           <BookSelect
             books={books}
