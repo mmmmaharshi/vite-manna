@@ -8,7 +8,6 @@ interface VerseListProps {
 }
 
 const VerseList = ({ verses }: VerseListProps) => {
-  const isSelectionMode = useReaderStore((state) => state.isSelectionMode);
   const selectedVerseIds = useReaderStore((state) => state.selectedVerseIds);
   const toggleVerseSelection = useReaderStore(
     (state) => state.toggleVerseSelection,
@@ -25,41 +24,15 @@ const VerseList = ({ verses }: VerseListProps) => {
           <li key={verse.id}>
             <button
               type="button"
-              aria-pressed={isSelectionMode ? isSelected : undefined}
+              aria-pressed={isSelected}
               className={[
-                "flex w-full items-start gap-2 rounded-md px-2 py-1.5 text-left transition-colors",
-                "hover:bg-surface-secondary",
+                "block w-full rounded-md px-2 py-1.5 text-left transition-colors",
                 isSelected
-                  ? "bg-accent/10 hover:bg-accent/15"
-                  : "bg-transparent",
+                  ? "bg-accent/15 hover:bg-accent/20"
+                  : "hover:bg-surface-secondary",
               ].join(" ")}
               onClick={() => toggleVerseSelection(verse.id)}
             >
-              {isSelectionMode && (
-                <span
-                  aria-hidden="true"
-                  className={[
-                    "mt-0.5 flex h-5 w-5 shrink-0 items-center justify-center rounded-full border-2 transition-colors",
-                    isSelected
-                      ? "border-accent bg-accent text-accent-foreground"
-                      : "border-default-300 bg-transparent",
-                  ].join(" ")}
-                >
-                  {isSelected && (
-                    <svg
-                      className="h-3 w-3"
-                      fill="none"
-                      stroke="currentColor"
-                      strokeLinecap="round"
-                      strokeLinejoin="round"
-                      strokeWidth={3}
-                      viewBox="0 0 16 16"
-                    >
-                      <polyline points="3 8 7 12 13 4" />
-                    </svg>
-                  )}
-                </span>
-              )}
               <Typography className="text-sm">
                 <sup className="me-1 text-xs text-muted">{verse.verse}</sup>
                 {verse.text}
