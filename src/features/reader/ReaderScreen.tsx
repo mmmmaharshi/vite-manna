@@ -7,6 +7,7 @@ import { useBooks } from "./hooks/useBooks";
 import { useReaderSnapshot } from "./hooks/useReaderSnapshot";
 import BookSelect from "./components/BookSelect";
 import ChapterStrip from "./components/ChapterStrip";
+import VerseActionBar from "./components/VerseActionBar";
 import VerseList from "./components/VerseList";
 import { useReaderStore } from "./store/readerStore";
 import { useUrlSync } from "./useUrlSync";
@@ -17,6 +18,7 @@ const ReaderScreen = () => {
   const book = useReaderStore((state) => state.book);
   const chapter = useReaderStore((state) => state.chapter);
   const pendingBook = useReaderStore((state) => state.pendingBook);
+  const isSelectionMode = useReaderStore((state) => state.isSelectionMode);
   const setBook = useReaderStore((state) => state.setBook);
   const setChapter = useReaderStore((state) => state.setChapter);
 
@@ -74,11 +76,18 @@ const ReaderScreen = () => {
         </div>
       </Surface>
 
-      <section className="max-w-sm w-full px-2 py-4 mx-auto">
+      <section
+        className={[
+          "max-w-sm w-full px-2 py-4 mx-auto",
+          isSelectionMode ? "pb-24" : "",
+        ].join(" ")}
+      >
         {!isReaderTransitioning && snapshot && (
           <VerseList verses={snapshot.verses} />
         )}
       </section>
+
+      {snapshot && <VerseActionBar verses={snapshot.verses} />}
     </main>
   );
 };

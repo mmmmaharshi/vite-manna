@@ -6,12 +6,16 @@ export interface ReaderState {
   pendingBook: number | null;
   isBookSelectOpen: boolean;
   chaptersByBook: Record<number, number>;
+  selectedVerseIds: number[];
+  isSelectionMode: boolean;
 
   setBook: (book: number) => void;
   setChapter: (chapter: number) => void;
   selectBook: (bookId: number) => void;
   setBookSelectOpen: (open: boolean) => void;
   clearPendingBook: () => void;
+  toggleVerseSelection: (verseId: number) => void;
+  clearVerseSelection: () => void;
 }
 
 const STORAGE_KEY = "manna.reader-location";
@@ -133,6 +137,8 @@ export const useReaderStore = create<ReaderState>((set, get) => ({
   pendingBook: null,
   isBookSelectOpen: false,
   chaptersByBook: initial.chaptersByBook,
+  selectedVerseIds: [],
+  isSelectionMode: false,
 
   setBook: (book) => {
     const { chaptersByBook } = get();
@@ -140,6 +146,8 @@ export const useReaderStore = create<ReaderState>((set, get) => ({
     set({
       book,
       chapter: rememberChapter(chaptersByBook, book),
+      selectedVerseIds: [],
+      isSelectionMode: false,
     });
   },
 
@@ -149,6 +157,8 @@ export const useReaderStore = create<ReaderState>((set, get) => ({
     set({
       chapter,
       chaptersByBook: { ...chaptersByBook, [book]: chapter },
+      selectedVerseIds: [],
+      isSelectionMode: false,
     });
   },
 
@@ -172,6 +182,32 @@ export const useReaderStore = create<ReaderState>((set, get) => ({
     }
 
     set({ pendingBook: null, isBookSelectOpen: false });
+  },
+
+  toggleVerseSelection: (verseId) => {
+    const { selectedVerseIds, isSelectionMode } = get();
+
+    if (!isSelectionMode) {
+      set({ isSelectionMode: true, selectedVerseIds: [verseId] });
+      return;
+    }
+
+    const next = selectedVerseIds.includes(verseId)
+      ? selectedVerseIds.filter((id) => id !== verseId)
+      : [...selectedVerseIds, verseId];
+
+    set({
+      selectedVerseIds: next,
+      isSelectionMode: next.length > 0,
+    });
+  },
+
+  clearVerseSelection: () => {
+    if (!get().isSelectionMode && get().selectedVerseIds.length === 0) {
+      return;
+    }
+
+    set({ selectedVerseIds: [], isSelectionMode: false });
   },
 }));
 
