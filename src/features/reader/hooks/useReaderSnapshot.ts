@@ -1,0 +1,47 @@
+import { useEffect, useState } from "react";
+
+import { getReaderSnapshot } from "../../../shared/bible";
+import { useReaderStore } from "../store/readerStore";
+import type { ReaderSnapshot } from "../types";
+
+export function useReaderSnapshot(
+  book: number,
+  chapter: number,
+  chapterCount?: number,
+): ReaderSnapshot | null {
+  const [snapshot, setSnapshot] = useState<ReaderSnapshot | null>(null);
+
+  useEffect(() => {
+    let mounted = true;
+
+    void getReaderSnapshot(book, chapter, chapterCount)
+      .then((next) => {
+        if (!mounted) {
+          return;
+        }
+
+        setSnapshot(next);
+
+        const { setChapter, clearPendingBook } = useReaderStore.getState();
+
+        if (next.chapter !== undefined && next.chapter !== chapter) {
+          setChapter(next.chapter);
+        }
+
+        if (
+          useReaderStore.getState().pendingBook === next.book
+        ) {
+          clearPendingBook();
+        }
+      })
+      .catch((error) => {
+        console.error("[Bible] Unable to load reader snapshot", error);
+      });
+
+    return () => {
+      mounted = false;
+    };
+  }, [book, chapter, chapterCount]);
+
+  return snapshot;
+}

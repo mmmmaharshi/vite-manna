@@ -1,6 +1,6 @@
 import { Typography } from "@heroui/react";
 
-import type { BibleVerse } from "../bible/db";
+import type { BibleVerse } from "../../../shared/bible";
 
 interface VerseListProps {
   verses: BibleVerse[];

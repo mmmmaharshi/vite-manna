@@ -1,0 +1,140 @@
+import { create } from "zustand";
+
+export interface ReaderState {
+  book: number;
+  chapter: number;
+  pendingBook: number | null;
+  isBookSelectOpen: boolean;
+  chaptersByBook: Record<number, number>;
+
+  setBook: (book: number) => void;
+  setChapter: (chapter: number) => void;
+  selectBook: (bookId: number) => void;
+  setBookSelectOpen: (open: boolean) => void;
+  clearPendingBook: () => void;
+}
+
+const STORAGE_KEY = "manna.reader-location";
+const STORAGE_VERSION = 1;
+
+interface StoredLocation {
+  book?: number;
+  chapter?: number;
+  chaptersByBook?: Record<string, number>;
+  version?: number;
+}
+
+function parsePositiveInteger(value: string | null) {
+  const parsed = Number(value);
+
+  return Number.isInteger(parsed) && parsed > 0 ? parsed : null;
+}
+
+function parseChaptersByBook(value: unknown): Record<number, number> {
+  if (!value || typeof value !== "object") {
+    return {};
+  }
+
+  const result: Record<number, number> = {};
+
+  for (const [book, chapter] of Object.entries(value)) {
+    const parsedBook = parsePositiveInteger(book);
+    const parsedChapter = parsePositiveInteger(String(chapter));
+
+    if (parsedBook !== null && parsedChapter !== null) {
+      result[parsedBook] = parsedChapter;
+    }
+  }
+
+  return result;
+}
+
+function loadInitialState() {
+  let book = 1;
+  let chapter = 1;
+  let chaptersByBook: Record<number, number> = {};
+
+  try {
+    const stored = JSON.parse(localStorage.getItem(STORAGE_KEY) ?? "") as StoredLocation;
+
+    if (stored.version === STORAGE_VERSION) {
+      const storedBook = parsePositiveInteger(String(stored.book));
+      const storedChapter = parsePositiveInteger(String(stored.chapter));
+      const storedChaptersByBook = parseChaptersByBook(stored.chaptersByBook);
+
+      if (storedBook !== null && storedChapter !== null) {
+        book = storedBook;
+        chapter = storedChapter;
+        chaptersByBook = {
+          ...storedChaptersByBook,
+          [storedBook]: storedChapter,
+        };
+      }
+    }
+  } catch {
+    // Use the canonical starting location when storage is unavailable or invalid.
+  }
+
+  return { book, chapter, chaptersByBook };
+}
+
+function rememberChapter(
+  chaptersByBook: Record<number, number>,
+  book: number,
+) {
+  return chaptersByBook[book] ?? 1;
+}
+
+const initial = loadInitialState();
+
+export const useReaderStore = create<ReaderState>((set, get) => ({
+  book: initial.book,
+  chapter: initial.chapter,
+  pendingBook: null,
+  isBookSelectOpen: false,
+  chaptersByBook: initial.chaptersByBook,
+
+  setBook: (book) => {
+    const { chaptersByBook } = get();
+
+    set({
+      book,
+      chapter: rememberChapter(chaptersByBook, book),
+    });
+  },
+
+  setChapter: (chapter) => {
+    const { book, chaptersByBook } = get();
+
+    set({
+      chapter,
+      chaptersByBook: { ...chaptersByBook, [book]: chapter },
+    });
+  },
+
+  selectBook: (bookId) => {
+    set({ pendingBook: bookId, isBookSelectOpen: true });
+    get().setBook(bookId);
+  },
+
+  setBookSelectOpen: (open) => {
+    if (get().pendingBook !== null) {
+      set({ isBookSelectOpen: true });
+      return;
+    }
+
+    set({ isBookSelectOpen: open });
+  },
+
+  clearPendingBook: () => {
+    if (get().pendingBook === null) {
+      return;
+    }
+
+    set({ pendingBook: null, isBookSelectOpen: false });
+  },
+}));
+
+export function getReaderStoreState() {
+  return useReaderStore.getState();
+}

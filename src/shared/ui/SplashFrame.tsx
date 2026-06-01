@@ -1,6 +1,6 @@
 import type { ReactNode } from "react";
 
-import IconSVG from "../assets/icon";
+import IconSVG from "../../assets/icon";
 
 interface SplashFrameProps {
   children?: ReactNode;

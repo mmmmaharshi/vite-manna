@@ -1,5 +1,4 @@
-import { countVerses, putVerses } from "./bibleRepository";
-import type { BibleVerse } from "./db";
+import { countVerses, putVerses, type BibleVerse } from "../../shared/bible";
 
 const BIBLE_URL = "/bible.json";
 
@@ -43,7 +42,6 @@ export async function initializeBible(onProgress?: (progress: number) => void) {
     const { done, value } = await reader.read();
 
     if (done) break;
-
     chunks.push(value);
     received += value.length;
 

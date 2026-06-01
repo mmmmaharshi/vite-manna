@@ -1,10 +1,10 @@
 import { useEffect, useState } from "react";
 
-import { countVerses } from "./bibleRepository";
+import { countVerses } from "../../../shared/bible";
 
 export type BibleStatus = "checking" | "ready" | "missing";
 
-export function useBibleStatus() {
+export function useBibleStatus(): BibleStatus {
   const [status, setStatus] = useState<BibleStatus>("checking");
 
   useEffect(() => {
