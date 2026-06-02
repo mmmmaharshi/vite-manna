@@ -14,6 +14,11 @@ export interface UseBooksResult {
 let cachedBooks: BibleBook[] = [];
 let cachedLoaded = false;
 
+export function setBooksCache(books: BibleBook[]) {
+  cachedBooks = books;
+  cachedLoaded = true;
+}
+
 export function useBooks(): UseBooksResult {
   const [books, setBooks] = useState<BibleBook[]>(cachedBooks);
   const [hasLoadedBooks, setHasLoadedBooks] = useState(cachedLoaded);

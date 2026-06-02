@@ -1,9 +1,12 @@
 import { useEffect, useState } from "react";
 
 import { initializeBible, useBibleStatus } from "../features/setup";
-import { getBooks } from "../shared/bible";
+import { getBibleBookName, getReaderBootstrap, getReaderSnapshot } from "../shared/bible";
 import { waitForOfflineReadiness } from "../shared/lib/offlineReadiness";
 import { waitForFonts } from "../shared/lib/waitForFonts";
+import { useReaderStore } from "../features/reader/store/readerStore";
+import { setBooksCache } from "../features/reader/hooks/useBooks";
+import { setPreloadedSnapshot } from "../features/reader/hooks/useReaderSnapshot";
 
 const MINIMUM_SPLASH_DURATION_MS = 500;
 const PROGRESS_MESSAGE_DOWNLOADING = "Downloading Bible data...";
@@ -43,6 +46,7 @@ export function useAppShell(): ShellStatus {
   const [attempt, setAttempt] = useState(0);
   const [isBibleComplete, setIsBibleComplete] = useState(false);
   const [areBooksReady, setAreBooksReady] = useState(false);
+  const [isSnapshotReady, setIsSnapshotReady] = useState(false);
 
   const bibleStatus = useBibleStatus();
 
@@ -118,11 +122,19 @@ export function useAppShell(): ShellStatus {
 
     let mounted = true;
 
-    void getBooks()
-      .then(() => {
-        if (mounted) {
-          setAreBooksReady(true);
+    void getReaderBootstrap(1, 1)
+      .then(({ books: bookSummaries }) => {
+        if (!mounted) {
+          return;
         }
+
+        const mapped = bookSummaries.map((book) => ({
+          ...book,
+          name: getBibleBookName(book.id),
+        }));
+
+        setBooksCache(mapped);
+        setAreBooksReady(true);
       })
       .catch(() => {
         if (mounted) {
@@ -135,8 +147,41 @@ export function useAppShell(): ShellStatus {
     };
   }, [bibleStatus, isBibleComplete, areBooksReady]);
 
+  useEffect(() => {
+    if (!areBooksReady) {
+      return;
+    }
+
+    if (isSnapshotReady) {
+      return;
+    }
+
+    let mounted = true;
+
+    const { book, chapter } = useReaderStore.getState();
+
+    void getReaderSnapshot(book, chapter)
+      .then((snapshot) => {
+        if (!mounted) {
+          return;
+        }
+
+        setPreloadedSnapshot(snapshot);
+        setIsSnapshotReady(true);
+      })
+      .catch(() => {
+        if (mounted) {
+          setIsSnapshotReady(true);
+        }
+      });
+
+    return () => {
+      mounted = false;
+    };
+  }, [areBooksReady, isSnapshotReady]);
+
   const isShellReady =
-    (bibleStatus === "ready" || isBibleComplete) && areFontsReady && isOfflineReady && areBooksReady;
+    (bibleStatus === "ready" || isBibleComplete) && areFontsReady && isOfflineReady && areBooksReady && isSnapshotReady;
 
   useEffect(() => {
     if (!isShellReady || downloadError !== null) {

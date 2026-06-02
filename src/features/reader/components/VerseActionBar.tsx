@@ -1,5 +1,5 @@
 import { ArrowUpFromSquare, Copy, Link as LinkIcon, Xmark } from "@gravity-ui/icons";
-import { Button, Surface, toast } from "@heroui/react";
+import { Button, ButtonGroup, Surface, toast, Tooltip } from "@heroui/react";
 
 import { getBibleBookName, type BibleVerse } from "../../../shared/bible";
 import { useReaderStore } from "../store/readerStore";
@@ -84,7 +84,7 @@ const VerseActionBar = ({ verses }: VerseActionBarProps) => {
 
     try {
       await copyToClipboard(text);
-      toast("Copied to clipboard", { variant: "success" });
+      toast("Verses copied to clipboard", { variant: "success" });
     } catch {
       toast("Copy failed", { variant: "danger" });
     }
@@ -123,7 +123,7 @@ const VerseActionBar = ({ verses }: VerseActionBarProps) => {
 
     try {
       await copyToClipboard(link);
-      toast("Link copied", { variant: "success" });
+      toast("Verse permalink copied", { variant: "success" });
     } catch {
       toast("Copy failed", { variant: "danger" });
     }
@@ -133,50 +133,57 @@ const VerseActionBar = ({ verses }: VerseActionBarProps) => {
     <div
       className="fixed inset-x-0 bottom-0 z-40 px-3 pb-[max(0.75rem,env(safe-area-inset-bottom))] pt-3 pointer-events-none"
     >
-      <Surface className="mx-auto flex w-full max-w-sm items-center gap-2 rounded-lg border border-b bg-surface px-3 py-2 shadow-lg pointer-events-auto">
+      <Surface className="mx-auto flex w-full max-w-sm items-center gap-2 border px-3 py-2 shadow-lg pointer-events-auto">
         <span className="text-sm font-medium tabular-nums">
           {selectedVerseIds.length} selected
         </span>
-        <div className="ml-auto flex items-center gap-1.5">
+        <ButtonGroup className="ml-auto" size="sm" variant="tertiary">
           {singleSelectedVerse !== null && (
-            <Button
-              aria-label="Copy link"
-              isIconOnly
-              size="sm"
-              variant="tertiary"
-              onPress={handleCopyLink}
-            >
-              <LinkIcon aria-hidden="true" className="h-4 w-4" />
-            </Button>
+            <Tooltip delay={0}>
+              <Button
+                aria-label="Copy link"
+                isIconOnly
+                onPress={handleCopyLink}
+              >
+                <LinkIcon aria-hidden="true" className="h-4 w-4" />
+              </Button>
+              <Tooltip.Content placement="top">Copy Verse Permalink</Tooltip.Content>
+            </Tooltip>
           )}
-          <Button
-            aria-label="Share"
-            isIconOnly
-            size="sm"
-            variant="secondary"
-            onPress={handleShare}
-          >
-            <ArrowUpFromSquare aria-hidden="true" className="h-4 w-4" />
-          </Button>
-          <Button
-            aria-label="Copy"
-            isIconOnly
-            size="sm"
-            variant="primary"
-            onPress={handleCopy}
-          >
-            <Copy aria-hidden="true" className="h-4 w-4" />
-          </Button>
-          <Button
-            aria-label="Clear selection"
-            isIconOnly
-            size="sm"
-            variant="tertiary"
-            onPress={clearVerseSelection}
-          >
-            <Xmark aria-hidden="true" className="h-4 w-4" />
-          </Button>
-        </div>
+          <Tooltip delay={0}>
+            <Button
+              aria-label="Share"
+              isIconOnly
+              onPress={handleShare}
+            >
+              <ArrowUpFromSquare aria-hidden="true" className="h-4 w-4" />
+              <ButtonGroup.Separator />
+            </Button>
+            <Tooltip.Content placement="top">Share Verse</Tooltip.Content>
+          </Tooltip>
+          <Tooltip delay={0}>
+            <Button
+              aria-label="Copy"
+              isIconOnly
+              onPress={handleCopy}
+            >
+              <Copy aria-hidden="true" className="h-4 w-4" />
+              <ButtonGroup.Separator />
+            </Button>
+            <Tooltip.Content placement="top">Copy Verse</Tooltip.Content>
+          </Tooltip>
+          <Tooltip delay={0}>
+            <Button
+              aria-label="Clear selection"
+              isIconOnly
+              onPress={clearVerseSelection}
+            >
+              <ButtonGroup.Separator />
+              <Xmark aria-hidden="true" className="h-4 w-4" />
+            </Button>
+            <Tooltip.Content placement="top">Clear Selection</Tooltip.Content>
+          </Tooltip>
+        </ButtonGroup>
       </Surface>
     </div>
   );

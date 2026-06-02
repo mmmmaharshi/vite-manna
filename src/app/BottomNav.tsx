@@ -15,7 +15,7 @@ const TABS: { id: TabId; label: string; Icon: typeof Book }[] = [
 ];
 
 const BottomNav = ({ activeTab, onTabChange }: BottomNavProps) => (
-  <Surface className="fixed inset-x-0 bottom-0 z-20 border-t border bg-surface pb-[max(0.25rem,env(safe-area-inset-bottom))]">
+  <Surface className="fixed inset-x-0 bottom-0 z-20 border-t border pb-[max(0.25rem,env(safe-area-inset-bottom))]">
     <div className="flex items-center justify-around">
       {TABS.map(({ id, label, Icon }) => {
         const isActive = id === activeTab;
