@@ -1,6 +1,7 @@
 import { useCallback, useEffect, useState } from "react";
 
 const THEME_KEY = "theme";
+type ThemeMode = "light" | "dark" | "system";
 type Theme = "light" | "dark";
 
 function getSystemTheme(): Theme {
@@ -8,53 +9,55 @@ function getSystemTheme(): Theme {
   return window.matchMedia("(prefers-color-scheme: dark)").matches ? "dark" : "light";
 }
 
-function getStoredTheme(): Theme | null {
+function getStoredMode(): ThemeMode | null {
   try {
     const stored = localStorage.getItem(THEME_KEY);
-    if (stored === "light" || stored === "dark") return stored;
+    if (stored === "light" || stored === "dark" || stored === "system") return stored;
   } catch { /* noop */ }
   return null;
+}
+
+function getEffectiveMode(): ThemeMode {
+  return getStoredMode() ?? "system";
+}
+
+function resolveTheme(mode: ThemeMode): Theme {
+  return mode === "system" ? getSystemTheme() : mode;
 }
 
 function applyTheme(theme: Theme) {
   document.documentElement.classList.toggle("dark", theme === "dark");
 }
 
-function getTheme(): Theme {
-  return getStoredTheme() ?? getSystemTheme();
-}
-
 export function useTheme() {
-  const [theme, setThemeState] = useState<Theme>(getTheme);
+  const [mode, setModeState] = useState<ThemeMode>(getEffectiveMode);
+  const resolvedTheme = resolveTheme(mode);
 
   useEffect(() => {
-    applyTheme(theme);
-  }, [theme]);
+    applyTheme(resolvedTheme);
+  }, [resolvedTheme]);
 
   useEffect(() => {
     const mq = window.matchMedia("(prefers-color-scheme: dark)");
     const onChange = () => {
-      if (getStoredTheme() === null) {
-        const next = mq.matches ? "dark" : "light";
-        setThemeState(next);
+      const stored = getStoredMode();
+      if (stored === "system" || stored === null) {
+        setModeState("system");
       }
     };
     mq.addEventListener("change", onChange);
     return () => mq.removeEventListener("change", onChange);
   }, []);
 
-  const toggleTheme = useCallback(() => {
-    setThemeState((prev) => {
-      const next: Theme = prev === "dark" ? "light" : "dark";
-      try { localStorage.setItem(THEME_KEY, next); } catch { /* noop */ }
-      return next;
-    });
+  const setMode = useCallback((m: ThemeMode) => {
+    try { localStorage.setItem(THEME_KEY, m); } catch { /* noop */ }
+    setModeState(m);
   }, []);
 
-  const setTheme = useCallback((t: Theme) => {
-    try { localStorage.setItem(THEME_KEY, t); } catch { /* noop */ }
-    setThemeState(t);
-  }, []);
-
-  return { theme, toggleTheme, setTheme, isDark: theme === "dark" };
+  return {
+    mode,
+    resolvedTheme,
+    isDark: resolvedTheme === "dark",
+    setMode,
+  };
 }

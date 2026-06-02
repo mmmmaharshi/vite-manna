@@ -4,8 +4,19 @@ import { Button, Surface, Typography } from "@heroui/react";
 
 import { useTheme } from "../../shared/hooks/useTheme";
 
+const OPTIONS: { mode: "light" | "dark" | "system"; label: string; Icon: typeof Sun }[] = [
+  { mode: "light", label: "Light", Icon: Sun },
+  { mode: "dark", label: "Dark", Icon: Moon },
+  { mode: "system", label: "System", Icon: () => (
+    <svg className="h-4 w-4" viewBox="0 0 16 16" fill="currentColor">
+      <circle cx="8" cy="8" r="3" />
+      <path d="M8 1v2M8 13v2M2.05 2.05l1.41 1.41M12.54 12.54l1.41 1.41M1 8h2M13 8h2M2.05 13.95l1.41-1.41M12.54 3.46l1.41-1.41" stroke="currentColor" strokeWidth="1.3" fill="none" strokeLinecap="round" />
+    </svg>
+  )},
+];
+
 const SettingsPage = () => {
-  const { isDark, toggleTheme } = useTheme();
+  const { mode, setMode } = useTheme();
 
   useEffect(() => { window.scrollTo(0, 0); }, []);
 
@@ -18,24 +29,22 @@ const SettingsPage = () => {
       </Surface>
 
       <section className="max-w-md w-full px-2 py-4 mx-auto flex flex-col gap-2">
-        <Surface className="flex items-center justify-between p-3">
-          <div>
-            <Typography className="text-sm font-medium">Dark Mode</Typography>
-            <Typography.Paragraph size="sm" color="muted">
-              Switch between light and dark appearance
-            </Typography.Paragraph>
+        <Surface className="p-3">
+          <Typography className="text-sm font-medium mb-2">Appearance</Typography>
+          <div className="flex gap-2">
+            {OPTIONS.map(({ mode: m, label, Icon }) => (
+              <Button
+                key={m}
+                variant={mode === m ? "primary" : "secondary"}
+                size="sm"
+                className="flex-1"
+                onPress={() => setMode(m)}
+              >
+                <Icon aria-hidden="true" className="h-4 w-4" />
+                {label}
+              </Button>
+            ))}
           </div>
-          <Button
-            aria-label={isDark ? "Switch to light mode" : "Switch to dark mode"}
-            isIconOnly
-            size="sm"
-            variant="tertiary"
-            onPress={toggleTheme}
-          >
-            {isDark
-              ? <Sun aria-hidden="true" className="h-4 w-4" />
-              : <Moon aria-hidden="true" className="h-4 w-4" />}
-          </Button>
         </Surface>
       </section>
     </main>
