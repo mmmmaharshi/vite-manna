@@ -40,6 +40,7 @@ export function useAppShell(): ShellStatus {
   const [downloadProgress, setDownloadProgress] = useState(0);
   const [downloadError, setDownloadError] = useState<string | null>(null);
   const [attempt, setAttempt] = useState(0);
+  const [isBibleComplete, setIsBibleComplete] = useState(false);
 
   const bibleStatus = useBibleStatus();
 
@@ -88,6 +89,7 @@ export function useAppShell(): ShellStatus {
       .then(() => {
         if (mounted) {
           setDownloadProgress(0);
+          setIsBibleComplete(true);
         }
       })
       .catch((error) => {
@@ -104,14 +106,14 @@ export function useAppShell(): ShellStatus {
   }, [attempt, bibleStatus, downloadError]);
 
   const isShellReady =
-    bibleStatus === "ready" && areFontsReady && isOfflineReady;
+    (bibleStatus === "ready" || isBibleComplete) && areFontsReady && isOfflineReady;
 
   useEffect(() => {
     if (!isShellReady || downloadError !== null) {
       return;
     }
 
-    if (bibleStatus !== "ready" || downloadProgress !== 0) {
+    if (downloadProgress !== 0) {
       return;
     }
 
@@ -126,7 +128,6 @@ export function useAppShell(): ShellStatus {
 
     return () => clearTimeout(timeoutId);
   }, [
-    bibleStatus,
     downloadError,
     downloadProgress,
     isMinSplashElapsed,
@@ -143,7 +144,7 @@ export function useAppShell(): ShellStatus {
     return { kind: "error", message: downloadError, onRetry: retry };
   }
 
-  if (bibleStatus === "missing") {
+  if (bibleStatus === "missing" && !isBibleComplete) {
     return {
       kind: "progress",
       message: progressMessage(downloadProgress),
