@@ -5,6 +5,7 @@ import { ReaderScreen } from "../features/reader";
 import { useReaderStore } from "../features/reader/store/readerStore";
 import BookmarksPage from "../features/bookmarks/BookmarksPage";
 import SearchPage from "../features/search/SearchPage";
+import SettingsPage from "../features/settings/SettingsPage";
 import BottomNav from "./BottomNav";
 import type { TabId } from "./BottomNav";
 
@@ -38,6 +39,7 @@ const TabLayout = () => {
       {activeTab === "bookmarks" && (
         <BookmarksPage onNavigateToReader={() => setActiveTab("reader")} />
       )}
+      {activeTab === "settings" && <SettingsPage />}
       <BottomNav activeTab={activeTab} onTabChange={handleTabChange} />
     </div>
   );
