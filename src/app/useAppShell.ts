@@ -1,6 +1,7 @@
 import { useEffect, useState } from "react";
 
 import { initializeBible, useBibleStatus } from "../features/setup";
+import { getBooks } from "../shared/bible";
 import { waitForOfflineReadiness } from "../shared/lib/offlineReadiness";
 import { waitForFonts } from "../shared/lib/waitForFonts";
 
@@ -41,6 +42,7 @@ export function useAppShell(): ShellStatus {
   const [downloadError, setDownloadError] = useState<string | null>(null);
   const [attempt, setAttempt] = useState(0);
   const [isBibleComplete, setIsBibleComplete] = useState(false);
+  const [areBooksReady, setAreBooksReady] = useState(false);
 
   const bibleStatus = useBibleStatus();
 
@@ -105,8 +107,36 @@ export function useAppShell(): ShellStatus {
     };
   }, [attempt, bibleStatus, downloadError]);
 
+  useEffect(() => {
+    if (bibleStatus !== "ready" && !isBibleComplete) {
+      return;
+    }
+
+    if (areBooksReady) {
+      return;
+    }
+
+    let mounted = true;
+
+    void getBooks()
+      .then(() => {
+        if (mounted) {
+          setAreBooksReady(true);
+        }
+      })
+      .catch(() => {
+        if (mounted) {
+          setAreBooksReady(true);
+        }
+      });
+
+    return () => {
+      mounted = false;
+    };
+  }, [bibleStatus, isBibleComplete, areBooksReady]);
+
   const isShellReady =
-    (bibleStatus === "ready" || isBibleComplete) && areFontsReady && isOfflineReady;
+    (bibleStatus === "ready" || isBibleComplete) && areFontsReady && isOfflineReady && areBooksReady;
 
   useEffect(() => {
     if (!isShellReady || downloadError !== null) {

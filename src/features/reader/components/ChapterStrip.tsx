@@ -146,7 +146,7 @@ const ChapterStrip = ({
               visibleChapter === chapterNumber ? activeChapterRef : null
             }
             key={chapterNumber}
-            size="md"
+            size="sm"
             variant={
               visibleChapter === chapterNumber ? "primary" : "secondary"
             }

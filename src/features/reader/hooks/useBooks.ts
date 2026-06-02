@@ -11,11 +11,18 @@ export interface UseBooksResult {
   hasLoadedBooks: boolean;
 }
 
+let cachedBooks: BibleBook[] = [];
+let cachedLoaded = false;
+
 export function useBooks(): UseBooksResult {
-  const [books, setBooks] = useState<BibleBook[]>([]);
-  const [hasLoadedBooks, setHasLoadedBooks] = useState(false);
+  const [books, setBooks] = useState<BibleBook[]>(cachedBooks);
+  const [hasLoadedBooks, setHasLoadedBooks] = useState(cachedLoaded);
 
   useEffect(() => {
+    if (cachedLoaded) {
+      return;
+    }
+
     let mounted = true;
 
     void getReaderBootstrap(1, 1)
@@ -24,18 +31,21 @@ export function useBooks(): UseBooksResult {
           return;
         }
 
-        setBooks(
-          bookSummaries.map((book) => ({
-            ...book,
-            name: getBibleBookName(book.id),
-          })),
-        );
+        const mapped = bookSummaries.map((book) => ({
+          ...book,
+          name: getBibleBookName(book.id),
+        }));
+
+        cachedBooks = mapped;
+        cachedLoaded = true;
+        setBooks(mapped);
         setHasLoadedBooks(true);
       })
       .catch((error) => {
         console.error("[Bible] Unable to load books", error);
 
         if (mounted) {
+          cachedLoaded = true;
           setHasLoadedBooks(true);
         }
       });

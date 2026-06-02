@@ -8,7 +8,7 @@ const SearchPage = () => (
         <Typography className="text-lg font-semibold">Search</Typography>
       </div>
     </Surface>
-    <section className="max-w-sm w-full px-2 py-24 mx-auto flex flex-col items-center gap-4 text-center">
+    <section className="max-w-sm w-full px-2 py-24 mx-auto flex flex-col items-center gap-2 text-center">
       <Magnifier className="h-12 w-12 text-muted" />
       <Typography className="text-base font-medium">Search Bible</Typography>
       <Typography className="text-sm text-muted">

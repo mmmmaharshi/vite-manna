@@ -2,7 +2,6 @@ import { useEffect } from "react";
 import { Surface } from "@heroui/react";
 import { Navigate } from "react-router";
 
-import { SplashView } from "../../shared/ui";
 import { useBooks } from "./hooks/useBooks";
 import { useReaderSnapshot } from "./hooks/useReaderSnapshot";
 import BookSelect from "./components/BookSelect";
@@ -55,11 +54,7 @@ const ReaderScreen = () => {
             : []));
   const visibleChapter = isReaderTransitioning ? 1 : chapter;
 
-  if (!hasLoadedBooks) {
-    return <SplashView message="Preparing reader..." progress={null} />;
-  }
-
-  if (books.length === 0) {
+  if (hasLoadedBooks && books.length === 0) {
     return <Navigate to="/" replace />;
   }
 

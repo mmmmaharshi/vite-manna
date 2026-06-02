@@ -1,5 +1,5 @@
 import { Book, Bookmark, Magnifier } from "@gravity-ui/icons";
-import { Button } from "@heroui/react";
+import { Button, Surface } from "@heroui/react";
 
 export type TabId = "reader" | "search" | "bookmarks";
 
@@ -15,14 +15,14 @@ const TABS: { id: TabId; label: string; Icon: typeof Book }[] = [
 ];
 
 const BottomNav = ({ activeTab, onTabChange }: BottomNavProps) => (
-  <nav className="fixed inset-x-0 bottom-0 z-20 border-t border-border bg-surface pb-[max(0.25rem,env(safe-area-inset-bottom))]">
+  <Surface className="fixed inset-x-0 bottom-0 z-20 border-t border bg-surface pb-[max(0.25rem,env(safe-area-inset-bottom))]">
     <div className="flex items-center justify-around">
       {TABS.map(({ id, label, Icon }) => {
         const isActive = id === activeTab;
         return (
           <Button
             key={id}
-            variant="tertiary"
+            variant="ghost"
             className="flex h-auto min-w-0 flex-col gap-0.5 px-4 py-1.5"
             onPress={() => onTabChange(id)}
           >
@@ -36,7 +36,7 @@ const BottomNav = ({ activeTab, onTabChange }: BottomNavProps) => (
         );
       })}
     </div>
-  </nav>
+  </Surface>
 );
 
 export default BottomNav;

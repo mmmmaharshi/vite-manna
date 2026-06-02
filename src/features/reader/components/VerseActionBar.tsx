@@ -133,7 +133,7 @@ const VerseActionBar = ({ verses }: VerseActionBarProps) => {
     <div
       className="fixed inset-x-0 bottom-0 z-40 px-3 pb-[max(0.75rem,env(safe-area-inset-bottom))] pt-3 pointer-events-none"
     >
-      <Surface className="mx-auto flex w-full max-w-sm items-center gap-2 rounded-lg border border-border bg-surface px-3 py-2 shadow-lg pointer-events-auto">
+      <Surface className="mx-auto flex w-full max-w-sm items-center gap-2 rounded-lg border border-b bg-surface px-3 py-2 shadow-lg pointer-events-auto">
         <span className="text-sm font-medium tabular-nums">
           {selectedVerseIds.length} selected
         </span>

@@ -1,4 +1,4 @@
-import "@fontsource-variable/google-sans/wght.css";
+import "./assets/fonts/google-sans-telugu-latin.css";
 import { ToastProvider, toastQueue } from "@heroui/react";
 import { createRoot } from "react-dom/client";
 import { BrowserRouter } from "react-router";
