@@ -1,4 +1,4 @@
-import { useCallback, useSyncExternalStore } from "react";
+import { useCallback, useEffect, useState } from "react";
 
 const THEME_KEY = "theme";
 type Theme = "light" | "dark";
@@ -24,28 +24,36 @@ function getTheme(): Theme {
   return getStoredTheme() ?? getSystemTheme();
 }
 
-function subscribe(callback: () => void) {
-  const mq = window.matchMedia("(prefers-color-scheme: dark)");
-  mq.addEventListener("change", callback);
-  return () => mq.removeEventListener("change", callback);
-}
-
-function getSnapshot(): Theme {
-  return getTheme();
-}
-
 export function useTheme() {
-  const theme = useSyncExternalStore(subscribe, getSnapshot, getSnapshot);
+  const [theme, setThemeState] = useState<Theme>(getTheme);
+
+  useEffect(() => {
+    applyTheme(theme);
+  }, [theme]);
+
+  useEffect(() => {
+    const mq = window.matchMedia("(prefers-color-scheme: dark)");
+    const onChange = () => {
+      if (getStoredTheme() === null) {
+        const next = mq.matches ? "dark" : "light";
+        setThemeState(next);
+      }
+    };
+    mq.addEventListener("change", onChange);
+    return () => mq.removeEventListener("change", onChange);
+  }, []);
 
   const toggleTheme = useCallback(() => {
-    const next: Theme = theme === "dark" ? "light" : "dark";
-    try { localStorage.setItem(THEME_KEY, next); } catch { /* noop */ }
-    applyTheme(next);
-  }, [theme]);
+    setThemeState((prev) => {
+      const next: Theme = prev === "dark" ? "light" : "dark";
+      try { localStorage.setItem(THEME_KEY, next); } catch { /* noop */ }
+      return next;
+    });
+  }, []);
 
   const setTheme = useCallback((t: Theme) => {
     try { localStorage.setItem(THEME_KEY, t); } catch { /* noop */ }
-    applyTheme(t);
+    setThemeState(t);
   }, []);
 
   return { theme, toggleTheme, setTheme, isDark: theme === "dark" };
