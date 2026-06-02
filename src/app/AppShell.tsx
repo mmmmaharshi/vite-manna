@@ -1,6 +1,6 @@
-import { ReaderScreen } from "../features/reader";
 import { SplashView } from "../shared/ui";
 
+import TabLayout from "./TabLayout";
 import { useAppShell } from "./useAppShell";
 
 const AppShell = () => {
@@ -21,7 +21,7 @@ const AppShell = () => {
     return <SplashView />;
   }
 
-  return <ReaderScreen />;
+  return <TabLayout />;
 };
 
 export default AppShell;
