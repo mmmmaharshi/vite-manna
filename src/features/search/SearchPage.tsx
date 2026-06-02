@@ -54,7 +54,7 @@ const SearchPage = ({ onNavigateToReader }: SearchPageProps) => {
         </div>
       </Surface>
 
-      <div className="max-w-md w-full px-2 mx-auto pt-3 pb-1">
+      <div className="max-w-md w-full px-2 mx-auto pt-2">
         <SearchField
           value={query}
           onChange={setQuery}

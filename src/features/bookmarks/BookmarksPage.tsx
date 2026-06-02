@@ -178,7 +178,7 @@ const BookmarksPage = ({ onNavigateToReader }: BookmarksPageProps) => {
 
       {/* Bottom action bar */}
       {bookmarks.length > 0 && filtered.length > 0 && (
-        <div className="max-w-md w-full px-2 mx-auto pt-1 pb-20 flex gap-2 justify-center">
+        <div className="max-w-md w-full px-2 mx-auto py-4 flex gap-2 justify-center">
           <Button size="sm" variant="tertiary" onPress={handleClearAll}>
             <TrashBin aria-hidden="true" className="h-4 w-4" />
             Delete All
