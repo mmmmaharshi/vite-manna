@@ -68,7 +68,7 @@ const VerseList = ({ verses }: VerseListProps) => {
                   ? "bg-accent/15 hover:bg-accent/20"
                   : "hover:bg-surface-secondary",
                 isPermalink ? "animate-permalink-flash" : "",
-                isBookmarked ? "bg-amber-100/90" : "",
+                isBookmarked ? "bg-amber-100/90 dark:bg-amber-900/60" : "",
               ].join(" ")}
               onClick={() => toggleVerseSelection(verse.id)}
             >
