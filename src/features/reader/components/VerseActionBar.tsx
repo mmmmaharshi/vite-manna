@@ -1,7 +1,8 @@
-import { ArrowUpFromSquare, Copy, Link as LinkIcon, Xmark } from "@gravity-ui/icons";
+import { ArrowUpFromSquare, Bookmark as BookmarkIcon, BookmarkFill, Copy, Link as LinkIcon, Xmark } from "@gravity-ui/icons";
 import { Button, ButtonGroup, Surface, toast, Tooltip } from "@heroui/react";
 
 import { getBibleBookName, type BibleVerse } from "../../../shared/bible";
+import { useBookmarks } from "../../bookmarks/hooks/useBookmarks";
 import { useReaderStore } from "../store/readerStore";
 
 interface VerseActionBarProps {
@@ -66,11 +67,13 @@ const VerseActionBarInner = ({ verses }: VerseActionBarProps) => {
   const book = useReaderStore((state) => state.book);
   const chapter = useReaderStore((state) => state.chapter);
 
+  const { bookmarkedIds, toggle } = useBookmarks();
   const selectedSet = new Set(selectedVerseIds);
   const selectedVerses = verses.filter((verse) => selectedSet.has(verse.id));
   const text = buildShareText(selectedVerses, book, chapter);
   const singleSelectedVerse =
     selectedVerses.length === 1 ? selectedVerses[0] : null;
+  const allSelectedBookmarked = selectedVerses.every((v) => bookmarkedIds.has(v.id));
 
   const handleCopy = async () => {
     if (selectedVerses.length === 0) {
@@ -81,7 +84,7 @@ const VerseActionBarInner = ({ verses }: VerseActionBarProps) => {
       await copyToClipboard(text);
       toast("Verses copied to clipboard", { variant: "success" });
     } catch {
-      toast("Copy failed", { variant: "danger" });
+      toast("Failed to copy verses", { variant: "danger" });
     }
   };
 
@@ -103,8 +106,16 @@ const VerseActionBarInner = ({ verses }: VerseActionBarProps) => {
       if (error instanceof DOMException && error.name === "AbortError") {
         return;
       }
-      toast("Share failed", { variant: "danger" });
+      toast("Failed to share verses", { variant: "danger" });
     }
+  };
+
+  const handleToggleBookmark = () => {
+    for (const verse of selectedVerses) {
+      toggle(verse);
+    }
+
+    clearVerseSelection();
   };
 
   const handleCopyLink = async () => {
@@ -120,7 +131,7 @@ const VerseActionBarInner = ({ verses }: VerseActionBarProps) => {
       await copyToClipboard(link);
       toast("Verse permalink copied", { variant: "success" });
     } catch {
-      toast("Copy failed", { variant: "danger" });
+      toast("Failed to copy link", { variant: "danger" });
     }
   };
 
@@ -166,6 +177,21 @@ const VerseActionBarInner = ({ verses }: VerseActionBarProps) => {
               <ButtonGroup.Separator />
             </Button>
             <Tooltip.Content placement="top">Copy Verse</Tooltip.Content>
+          </Tooltip>
+          <Tooltip delay={0}>
+            <Button
+              aria-label={allSelectedBookmarked ? "Remove bookmark" : "Bookmark"}
+              isIconOnly
+              onPress={handleToggleBookmark}
+            >
+              <ButtonGroup.Separator />
+              {allSelectedBookmarked
+                ? <BookmarkFill aria-hidden="true" className="h-4 w-4" />
+                : <BookmarkIcon aria-hidden="true" className="h-4 w-4" />}
+            </Button>
+            <Tooltip.Content placement="top">
+              {allSelectedBookmarked ? "Remove Bookmark" : "Bookmark"}
+            </Tooltip.Content>
           </Tooltip>
           <Tooltip delay={0}>
             <Button

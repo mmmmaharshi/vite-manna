@@ -1,4 +1,4 @@
-import { db, type BibleVerse } from "./db";
+import { db, type BibleVerse, type Bookmark } from "./db";
 
 export function countVerses() {
   return db.verses.count();
@@ -10,7 +10,6 @@ export async function getBooks() {
 
   for (const verse of verses) {
     const chapterNumbers = chapterNumbersByBook.get(verse.book) ?? new Set();
-
     chapterNumbers.add(verse.chapter);
     chapterNumbersByBook.set(verse.book, chapterNumbers);
   }
@@ -23,7 +22,6 @@ export async function getBooks() {
 
 export async function getChapterNumbers(book: number) {
   const verses = await db.verses.where("book").equals(book).toArray();
-
   return [...new Set(verses.map((verse) => verse.chapter))];
 }
 
@@ -61,7 +59,6 @@ export async function getReaderBootstrap(book: number, chapter: number) {
 
   for (const verse of verses) {
     const chapterNumbers = chapterNumbersByBook.get(verse.book) ?? new Set();
-
     chapterNumbers.add(verse.chapter);
     chapterNumbersByBook.set(verse.book, chapterNumbers);
   }
@@ -104,4 +101,64 @@ export async function getReaderBootstrap(book: number, chapter: number) {
 
 export function putVerses(verses: BibleVerse[]) {
   return db.verses.bulkPut(verses);
+}
+
+/* ───── Bookmark CRUD ───── */
+
+export function addBookmark(verse: BibleVerse) {
+  return db.bookmarks.put({
+    verseId: verse.id,
+    book: verse.book,
+    chapter: verse.chapter,
+    verse: verse.verse,
+    text: verse.text,
+    createdAt: Date.now(),
+  });
+}
+
+export function removeBookmark(verseId: number) {
+  return db.bookmarks.delete(verseId);
+}
+
+export function clearBookmarks() {
+  return db.bookmarks.clear();
+}
+
+export function getBookmarks() {
+  return db.bookmarks.orderBy("createdAt").reverse().toArray();
+}
+
+export async function getBookmarkedVerseIds(): Promise<Set<number>> {
+  const ids = await db.bookmarks.orderBy("verseId").keys();
+  return new Set(ids as number[]);
+}
+
+export function isBookmarked(verseId: number) {
+  return db.bookmarks.get(verseId).then((entry) => entry !== undefined);
+}
+
+export async function getBookmarkedChapters(book: number): Promise<Set<number>> {
+  const entries = await db.bookmarks.where("book").equals(book).toArray();
+  return new Set(entries.map((e) => e.chapter));
+}
+
+export async function searchBookmarksByText(query: string): Promise<Bookmark[]> {
+  const all = await db.bookmarks.toArray();
+  const q = query.toLowerCase();
+  return all.filter((bm) => bm.text.toLowerCase().includes(q));
+}
+
+export function updateBookmarkNote(verseId: number, note: string) {
+  return db.bookmarks.update(verseId, { note });
+}
+
+export function updateBookmarkTags(verseId: number, tags: string[]) {
+  return db.bookmarks.update(verseId, { tags });
+}
+
+export function searchVerses(query: string) {
+  return db.verses
+    .filter((v) => v.text.toLowerCase().includes(query.toLowerCase()))
+    .limit(50)
+    .toArray();
 }

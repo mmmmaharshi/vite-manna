@@ -1,6 +1,7 @@
 import { useLayoutEffect, useRef } from "react";
 import { Typography } from "@heroui/react";
 
+import { useBookmarks } from "../../bookmarks/hooks/useBookmarks";
 import { useReaderStore } from "../store/readerStore";
 import type { BibleVerse } from "../../../shared/bible";
 import "./verseList.css";
@@ -19,6 +20,7 @@ const VerseList = ({ verses }: VerseListProps) => {
   const permalinkRef = useRef<HTMLLIElement | null>(null);
   const lastScrolledVerseRef = useRef<number | null>(null);
 
+  const { bookmarkedIds } = useBookmarks();
   const selectedSet = new Set(selectedVerseIds);
 
   useLayoutEffect(() => {
@@ -50,6 +52,7 @@ const VerseList = ({ verses }: VerseListProps) => {
       {verses.map((verse) => {
         const isSelected = selectedSet.has(verse.id);
         const isPermalink = verse.verse === permalinkVerse;
+        const isBookmarked = bookmarkedIds.has(verse.id);
 
         return (
           <li
@@ -65,6 +68,7 @@ const VerseList = ({ verses }: VerseListProps) => {
                   ? "bg-accent/15 hover:bg-accent/20"
                   : "hover:bg-surface-secondary",
                 isPermalink ? "animate-permalink-flash" : "",
+                isBookmarked ? "bg-amber-100/90" : "",
               ].join(" ")}
               onClick={() => toggleVerseSelection(verse.id)}
             >

@@ -1,14 +1,11 @@
-import {
-  useLayoutEffect,
-  useRef,
-  type RefObject,
-} from "react";
+import { useLayoutEffect, useMemo, useRef, type RefObject } from "react";
 import { Button, ScrollShadow } from "@heroui/react";
 
+import { useBookmarks } from "../../bookmarks/hooks/useBookmarks";
 import { useReaderStore } from "../store/readerStore";
 
 interface ChapterStripProps {
-    chapters: number[];
+  chapters: number[];
   currentBook: number;
   isReaderTransitioning: boolean;
   onSelectChapter: (chapter: number) => void;
@@ -35,22 +32,16 @@ function useChapterStripScroll({
   const clearPendingBook = useReaderStore((state) => state.clearPendingBook);
 
   useLayoutEffect(() => {
-    if (isReaderTransitioning) {
-      return;
-    }
+    if (isReaderTransitioning) return;
 
     const activeChapter = activeChapterRef.current;
     const chapterStrip = chapterStripRef.current;
 
-    if (!activeChapter || !chapterStrip) {
-      return;
-    }
+    if (!activeChapter || !chapterStrip) return;
 
     const scrollRestoreKey = `${currentBook}:ready`;
 
-    if (lastScrollRestoreKeyRef.current === scrollRestoreKey) {
-      return;
-    }
+    if (lastScrollRestoreKeyRef.current === scrollRestoreKey) return;
 
     lastScrollRestoreKeyRef.current = scrollRestoreKey;
 
@@ -77,15 +68,11 @@ function useChapterStripScroll({
   ]);
 
   useLayoutEffect(() => {
-    if (isReaderTransitioning) {
-      return;
-    }
+    if (isReaderTransitioning) return;
 
     const pendingBook = useReaderStore.getState().pendingBook;
 
-    if (pendingBook === null || pendingBook !== currentBook) {
-      return;
-    }
+    if (pendingBook === null || pendingBook !== currentBook) return;
 
     const frameId = requestAnimationFrame(() => {
       clearPendingBook();
@@ -103,11 +90,7 @@ function useChapterStripScroll({
   return {
     rememberChapterStripScroll: () => {
       const chapterStrip = chapterStripRef.current;
-
-      if (!chapterStrip) {
-        return;
-      }
-
+      if (!chapterStrip) return;
       scrollByBookRef.current.set(currentBook, chapterStrip.scrollLeft);
     },
   };
@@ -123,6 +106,16 @@ const ChapterStrip = ({
   const chapterStripRef = useRef<HTMLDivElement>(null);
   const activeChapterRef = useRef<HTMLButtonElement>(null);
 
+  const { bookmarks } = useBookmarks();
+
+  const bookmarkedChapters = useMemo(() => {
+    const set = new Set<number>();
+    for (const bm of bookmarks) {
+      if (bm.book === currentBook) set.add(bm.chapter);
+    }
+    return set;
+  }, [bookmarks, currentBook]);
+
   const { rememberChapterStripScroll } = useChapterStripScroll({
     activeChapterRef,
     chapterStripRef,
@@ -132,9 +125,7 @@ const ChapterStrip = ({
     visibleChaptersLength: chapters.length,
   });
 
-  if (chapters.length === 0) {
-    return null;
-  }
+  if (chapters.length === 0) return null;
 
   return (
     <ScrollShadow
@@ -146,9 +137,7 @@ const ChapterStrip = ({
       <div className="flex gap-2 py-1">
         {chapters.map((chapterNumber) => (
           <Button
-            ref={
-              visibleChapter === chapterNumber ? activeChapterRef : null
-            }
+            ref={visibleChapter === chapterNumber ? activeChapterRef : null}
             key={chapterNumber}
             size="sm"
             variant={
@@ -157,6 +146,9 @@ const ChapterStrip = ({
             onPress={() => onSelectChapter(chapterNumber)}
           >
             {chapterNumber}
+            {bookmarkedChapters.has(chapterNumber) && (
+              <span className="absolute -bottom-0.5 left-1/2 -translate-x-1/2 h-1 w-1 rounded-full bg-accent" />
+            )}
           </Button>
         ))}
       </div>

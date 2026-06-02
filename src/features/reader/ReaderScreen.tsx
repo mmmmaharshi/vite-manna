@@ -26,6 +26,10 @@ const ReaderScreen = () => {
     }
   }, [book, books, setBook]);
 
+  useEffect(() => {
+    window.scrollTo(0, 0);
+  }, [book, chapter]);
+
   const selectedBookSummary = books.find((candidate) => candidate.id === book);
   const snapshot = useReaderSnapshot(
     book,

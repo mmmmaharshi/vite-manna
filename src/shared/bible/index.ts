@@ -1,5 +1,5 @@
 export { getBibleBookName, BIBLE_BOOK_NAMES } from "./books";
-export { db, type BibleVerse } from "./db";
+export { db, type BibleVerse, type Bookmark } from "./db";
 export {
   countVerses,
   getBooks,
@@ -8,4 +8,15 @@ export {
   getReaderSnapshot,
   getReaderBootstrap,
   putVerses,
+  addBookmark,
+  removeBookmark,
+  clearBookmarks,
+  getBookmarks,
+  getBookmarkedVerseIds,
+  getBookmarkedChapters,
+  isBookmarked,
+  searchBookmarksByText,
+  updateBookmarkNote,
+  updateBookmarkTags,
+  searchVerses,
 } from "./bibleRepository";

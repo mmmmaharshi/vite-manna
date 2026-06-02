@@ -32,8 +32,12 @@ const TabLayout = () => {
       <div className={activeTab === "reader" ? "" : "hidden"}>
         <ReaderScreen />
       </div>
-      {activeTab === "search" && <SearchPage />}
-      {activeTab === "bookmarks" && <BookmarksPage />}
+      {activeTab === "search" && (
+        <SearchPage onNavigateToReader={() => setActiveTab("reader")} />
+      )}
+      {activeTab === "bookmarks" && (
+        <BookmarksPage onNavigateToReader={() => setActiveTab("reader")} />
+      )}
       <BottomNav activeTab={activeTab} onTabChange={handleTabChange} />
     </div>
   );
