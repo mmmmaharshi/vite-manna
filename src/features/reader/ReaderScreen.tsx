@@ -61,7 +61,7 @@ const ReaderScreen = () => {
   return (
     <main className="pb-16">
       <Surface className="sticky top-0 z-30 py-2.5 pt-3.5 border border-b">
-        <div className="max-w-sm flex flex-col gap-2 w-full px-2 mx-auto">
+        <div className="max-w-md flex flex-col gap-2 w-full px-2 mx-auto">
           <BookSelect
             books={books}
             value={visibleBook}
@@ -79,7 +79,7 @@ const ReaderScreen = () => {
 
       <section
         className={[
-          "max-w-sm w-full px-2 py-4 mx-auto",
+          "max-w-md w-full px-2 py-4 mx-auto",
           isSelectionMode ? "pb-24" : "",
         ].join(" ")}
       >

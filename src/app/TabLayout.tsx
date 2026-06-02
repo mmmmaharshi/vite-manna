@@ -10,7 +10,7 @@ const TabLayout = () => {
   const [activeTab, setActiveTab] = useState<TabId>("reader");
 
   return (
-    <div className="min-h-dvh">
+    <div className="min-h-dvh max-w-md mx-auto">
       {activeTab === "reader" && <ReaderScreen />}
       {activeTab === "search" && <SearchPage />}
       {activeTab === "bookmarks" && <BookmarksPage />}
