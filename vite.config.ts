@@ -53,8 +53,22 @@ export default defineConfig({
 			},
 			registerType: 'autoUpdate',
 			workbox: {
-				globPatterns: ['**/*.{css,js,html,svg,json,woff2}'],
-				maximumFileSizeToCacheInBytes: 15 * 1024 * 1024,
+				globPatterns: ['**/*.{css,js,html,svg,woff2}'],
+				globIgnores: ['**/bible.json'],
+				maximumFileSizeToCacheInBytes: 5 * 1024 * 1024,
+				runtimeCaching: [
+					{
+						urlPattern: /bible\.json$/,
+						handler: 'CacheFirst',
+						options: {
+							cacheName: 'bible-data',
+							expiration: {
+								maxEntries: 1,
+								maxAgeSeconds: 60 * 60 * 24 * 365,
+							},
+						},
+					},
+				],
 			},
 		}),
 	],

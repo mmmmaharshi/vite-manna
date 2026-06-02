@@ -4,6 +4,7 @@ import { createRoot } from "react-dom/client";
 import { BrowserRouter } from "react-router";
 
 import { RootRoutes } from "./app";
+import ErrorBoundary from "./shared/ui/ErrorBoundary";
 import "./index.css";
 
 if (typeof history !== "undefined" && "scrollRestoration" in history) {
@@ -21,6 +22,8 @@ initTheme();
 createRoot(document.getElementById("root")!).render(
   <BrowserRouter>
     <ToastProvider placement="top" queue={toastQueue} />
-    <RootRoutes />
+    <ErrorBoundary>
+      <RootRoutes />
+    </ErrorBoundary>
   </BrowserRouter>,
 );

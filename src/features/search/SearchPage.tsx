@@ -50,7 +50,7 @@ const SearchPage = ({ onNavigateToReader }: SearchPageProps) => {
     <main className="min-h-dvh">
       <Surface className="sticky top-0 z-30 py-3 border border-b">
         <div className="max-w-md w-full px-2 mx-auto">
-          <Typography.Heading level={4}>Search</Typography.Heading>
+          <Typography.Heading level={1} className="text-xl">Search</Typography.Heading>
         </div>
       </Surface>
 
@@ -72,7 +72,7 @@ const SearchPage = ({ onNavigateToReader }: SearchPageProps) => {
 
       {!searched ? (
         <section className="max-w-md w-full px-2 py-24 mx-auto flex flex-col items-center gap-2 text-center">
-          <Magnifier className="h-12 w-12 text-muted" />
+          <Magnifier aria-hidden="true" className="h-12 w-12 text-muted" />
           <Typography className="text-base font-medium">Search Bible</Typography>
           <Typography.Paragraph size="sm" color="muted">
             Search verses by keyword
@@ -117,7 +117,7 @@ const SearchPage = ({ onNavigateToReader }: SearchPageProps) => {
                   >
                     {isBm
                       ? <BookmarkFill aria-hidden="true" className="h-4 w-4 text-accent" />
-                      : <BookmarkFill aria-hidden="true" className="h-4 w-4 text-muted/40" />}
+                      : <BookmarkFill aria-hidden="true" className="h-4 w-4 text-muted/60" />}
                   </Button>
                   <Tooltip.Content placement="top">{isBm ? "Remove Bookmark" : "Bookmark"}</Tooltip.Content>
                 </Tooltip>

@@ -1,6 +1,7 @@
 import { useEffect } from "react";
 import { Button, Surface, Typography } from "@heroui/react";
 
+import { getBibleBookName } from "../../shared/bible";
 import { useBooks } from "./hooks/useBooks";
 import { useReaderSnapshot } from "./hooks/useReaderSnapshot";
 import BookSelect from "./components/BookSelect";
@@ -94,6 +95,7 @@ const ReaderScreen = () => {
           "max-w-md w-full px-2 py-4 mx-auto",
           isSelectionMode ? "pb-24" : "",
         ].join(" ")}
+        aria-label={selectedBookSummary ? `${getBibleBookName(selectedBookSummary.id)} ${chapter}` : "Bible reader"}
       >
         {snapshot && (
           <VerseList verses={snapshot.verses} />

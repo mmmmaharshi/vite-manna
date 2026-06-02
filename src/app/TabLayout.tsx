@@ -1,13 +1,14 @@
-import { useCallback, useState } from "react";
+import { lazy, Suspense, useCallback, useState } from "react";
 import { useSearchParams } from "react-router";
 
 import { ReaderScreen } from "../features/reader";
 import { useReaderStore } from "../features/reader/store/readerStore";
-import BookmarksPage from "../features/bookmarks/BookmarksPage";
-import SearchPage from "../features/search/SearchPage";
-import SettingsPage from "../features/settings/SettingsPage";
 import BottomNav from "./BottomNav";
 import type { TabId } from "./BottomNav";
+
+const BookmarksPage = lazy(() => import("../features/bookmarks/BookmarksPage"));
+const SearchPage = lazy(() => import("../features/search/SearchPage"));
+const SettingsPage = lazy(() => import("../features/settings/SettingsPage"));
 
 const TabLayout = () => {
   const [activeTab, setActiveTab] = useState<TabId>("reader");
@@ -34,12 +35,20 @@ const TabLayout = () => {
         <ReaderScreen />
       </div>
       {activeTab === "search" && (
-        <SearchPage onNavigateToReader={() => setActiveTab("reader")} />
+        <Suspense fallback={null}>
+          <SearchPage onNavigateToReader={() => setActiveTab("reader")} />
+        </Suspense>
       )}
       {activeTab === "bookmarks" && (
-        <BookmarksPage onNavigateToReader={() => setActiveTab("reader")} />
+        <Suspense fallback={null}>
+          <BookmarksPage onNavigateToReader={() => setActiveTab("reader")} />
+        </Suspense>
       )}
-      {activeTab === "settings" && <SettingsPage />}
+      {activeTab === "settings" && (
+        <Suspense fallback={null}>
+          <SettingsPage />
+        </Suspense>
+      )}
       <BottomNav activeTab={activeTab} onTabChange={handleTabChange} />
     </div>
   );

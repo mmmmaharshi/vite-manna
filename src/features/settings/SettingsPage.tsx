@@ -24,7 +24,7 @@ const SettingsPage = () => {
     <main className="min-h-dvh">
       <Surface className="sticky top-0 z-30 bg-surface py-3 border border-b">
         <div className="max-w-md w-full px-2 mx-auto">
-          <Typography.Heading level={4}>Settings</Typography.Heading>
+          <Typography.Heading level={1} className="text-xl">Settings</Typography.Heading>
         </div>
       </Surface>
 

@@ -148,7 +148,7 @@ const ChapterStrip = ({
           >
             {chapterNumber}
             {bookmarkedChapters.has(chapterNumber) && (
-              <span className="absolute -bottom-0.5 left-1/2 -translate-x-1/2 h-1 w-1 rounded-full bg-accent" />
+              <span className="absolute -bottom-0.5 left-1/2 -translate-x-1/2 h-1 w-1 rounded-full bg-accent" role="img" aria-label="Bookmarked" />
             )}
           </Button>
         ))}

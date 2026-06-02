@@ -87,7 +87,7 @@ const BookmarksPage = ({ onNavigateToReader }: BookmarksPageProps) => {
       <Surface className="sticky top-0 z-30 bg-surface py-3 border border-b">
         <div className="max-w-md w-full px-2 mx-auto flex flex-col gap-2">
           <div className="flex items-center justify-between">
-            <Typography.Heading level={4}>Bookmarks</Typography.Heading>
+            <Typography.Heading level={1} className="text-xl">Bookmarks</Typography.Heading>
 
           </div>
         </div>
@@ -117,7 +117,7 @@ const BookmarksPage = ({ onNavigateToReader }: BookmarksPageProps) => {
       {/* Empty state */}
       {bookmarks.length === 0 ? (
         <section className="max-w-md w-full px-2 py-24 mx-auto flex flex-col items-center gap-4 text-center">
-          <Bookmark className="h-12 w-12 text-muted" />
+          <Bookmark aria-hidden="true" className="h-12 w-12 text-muted" />
           <Typography className="text-base font-medium">No bookmarks yet</Typography>
           <Typography.Paragraph size="sm" color="muted">
             Bookmark verses to quickly find them later

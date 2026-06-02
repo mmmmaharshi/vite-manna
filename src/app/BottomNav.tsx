@@ -24,7 +24,7 @@ const BottomNav = ({ activeTab, onTabChange }: BottomNavProps) => (
           <Button
             key={id}
             variant="ghost"
-            className="flex h-auto min-w-0 flex-col gap-0.5 px-4 py-1.5"
+            className="flex h-auto min-w-0 flex-col gap-0.5 px-4 py-3 min-h-12"
             onPress={() => onTabChange(id)}
           >
             <Icon className={`h-5 w-5 ${isActive ? "text-accent" : "text-muted"}`} />
