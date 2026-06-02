@@ -19,6 +19,7 @@ const BookSelect = ({ books, value, visibleBookSummary }: BookSelectProps) => {
 
   return (
     <Select
+      aria-label="Select book"
       className="rounded-md overflow-auto"
       isDisabled={books.length === 0}
       isOpen={isBookSelectOpen}
