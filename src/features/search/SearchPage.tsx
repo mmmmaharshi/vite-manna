@@ -1,6 +1,6 @@
-import { useEffect, useState } from "react";
-import { BookmarkFill, Magnifier, Xmark } from "@gravity-ui/icons";
-import { Button, Input, Surface, Typography } from "@heroui/react";
+import { useEffect, useRef, useState } from "react";
+import { BookmarkFill, Magnifier } from "@gravity-ui/icons";
+import { Button, SearchField, Surface, Typography } from "@heroui/react";
 
 import { getBibleBookName, searchVerses, type BibleVerse } from "../../shared/bible";
 import { useBookmarks } from "../bookmarks/hooks/useBookmarks";
@@ -18,14 +18,23 @@ const SearchPage = ({ onNavigateToReader }: SearchPageProps) => {
   const [query, setQuery] = useState("");
   const [results, setResults] = useState<BibleVerse[]>([]);
   const [searched, setSearched] = useState(false);
+  const timerRef = useRef<ReturnType<typeof setTimeout> | null>(null);
   const { bookmarkedIds, toggle } = useBookmarks();
 
-  const handleSearch = async () => {
-    if (!query.trim()) return;
-    const verses = await searchVerses(query.trim());
-    setResults(verses);
-    setSearched(true);
-  };
+  useEffect(() => {
+    if (timerRef.current) clearTimeout(timerRef.current);
+    if (!query.trim()) {
+      setResults([]);
+      setSearched(false);
+      return;
+    }
+    timerRef.current = setTimeout(async () => {
+      const verses = await searchVerses(query.trim());
+      setResults(verses);
+      setSearched(true);
+    }, 300);
+    return () => { if (timerRef.current) clearTimeout(timerRef.current); };
+  }, [query]);
 
   const handleNavigate = (verse: BibleVerse) => {
     const store = useReaderStore.getState();
@@ -40,27 +49,26 @@ const SearchPage = ({ onNavigateToReader }: SearchPageProps) => {
   return (
     <main className="min-h-dvh">
       <Surface className="sticky top-0 z-30 py-3 border border-b">
-        <div className="max-w-md w-full px-2 mx-auto flex flex-col gap-2">
+        <div className="max-w-md w-full px-2 mx-auto">
           <Typography.Heading level={4}>Search</Typography.Heading>
-          <div className="flex gap-2">
-            <Input
-              className="flex-1"
-              placeholder="Search verses..."
-              value={query}
-              onChange={(e) => setQuery(e.target.value)}
-              onKeyDown={(e) => { if (e.key === "Enter") handleSearch(); }}
-            />
-            {query && (
-              <Button isIconOnly size="sm" variant="tertiary" onPress={() => { setQuery(""); setResults([]); setSearched(false); }}>
-                <Xmark aria-hidden="true" className="h-4 w-4" />
-              </Button>
-            )}
-            <Button size="sm" variant="primary" onPress={handleSearch}>
-              <Magnifier aria-hidden="true" className="h-4 w-4" />
-            </Button>
-          </div>
         </div>
       </Surface>
+
+      <div className="max-w-md w-full px-2 mx-auto pt-3 pb-1">
+        <SearchField
+          value={query}
+          onChange={setQuery}
+          onClear={() => { setResults([]); setSearched(false); }}
+          fullWidth
+          aria-label="Search verses"
+        >
+          <SearchField.Group>
+            <SearchField.SearchIcon />
+            <SearchField.Input placeholder="Search verses..." />
+            <SearchField.ClearButton />
+          </SearchField.Group>
+        </SearchField>
+      </div>
 
       {!searched ? (
         <section className="max-w-md w-full px-2 py-24 mx-auto flex flex-col items-center gap-2 text-center">
