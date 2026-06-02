@@ -39,14 +39,20 @@ const ReaderScreen = () => {
   const visibleBookSummary = books.find(
     (candidate) => candidate.id === visibleBook,
   );
-  const isReaderTransitioning = snapshot?.book !== book;
+  const isReaderTransitioning = snapshot !== null && snapshot.book !== book;
   const visibleChapters =
     isReaderTransitioning && visibleBookSummary
       ? Array.from(
           { length: visibleBookSummary.chapterCount },
           (_, index) => index + 1,
         )
-      : (snapshot?.chapters ?? []);
+      : (snapshot?.chapters ??
+          (visibleBookSummary
+            ? Array.from(
+                { length: visibleBookSummary.chapterCount },
+                (_, index) => index + 1,
+              )
+            : []));
   const visibleChapter = isReaderTransitioning ? 1 : chapter;
 
   if (!hasLoadedBooks) {
