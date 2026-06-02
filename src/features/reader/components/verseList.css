@@ -8,6 +8,8 @@
     }
 }
 
-.animate-permalink-flash {
-    animation: manna-permalink-flash 1.2s ease-out;
+@media (prefers-reduced-motion: no-preference) {
+    .animate-permalink-flash {
+        animation: manna-permalink-flash 1.2s ease-out;
+    }
 }

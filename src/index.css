@@ -15,10 +15,12 @@
     overflow: hidden;
 }
 
-.splash-progress__bar {
-    animation: splash-progress-slide 1150ms ease-in-out infinite;
-    transform-box: fill-box;
-    will-change: transform;
+@media (prefers-reduced-motion: no-preference) {
+    .splash-progress__bar {
+        animation: splash-progress-slide 1150ms ease-in-out infinite;
+        transform-box: fill-box;
+        will-change: transform;
+    }
 }
 
 .splash-progress__bar--determinate {
