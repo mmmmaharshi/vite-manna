@@ -139,6 +139,7 @@ const ChapterStrip = ({
           <Button
             ref={visibleChapter === chapterNumber ? activeChapterRef : null}
             key={chapterNumber}
+            aria-label={`Chapter ${chapterNumber}`}
             size="sm"
             variant={
               visibleChapter === chapterNumber ? "primary" : "secondary"

@@ -17,7 +17,7 @@ const TABS: { id: TabId; label: string; Icon: typeof Book }[] = [
 
 const BottomNav = ({ activeTab, onTabChange }: BottomNavProps) => (
   <Surface className="max-w-md mx-auto fixed inset-x-0 bottom-0 z-20 border-t border pb-[max(0.25rem,env(safe-area-inset-bottom))]">
-    <div className="flex items-center justify-around">
+    <nav aria-label="Main navigation" className="flex items-center justify-around">
       {TABS.map(({ id, label, Icon }) => {
         const isActive = id === activeTab;
         return (
@@ -36,7 +36,7 @@ const BottomNav = ({ activeTab, onTabChange }: BottomNavProps) => (
           </Button>
         );
       })}
-    </div>
+    </nav>
   </Surface>
 );
 
