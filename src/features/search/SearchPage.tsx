@@ -1,6 +1,6 @@
 import { useEffect, useRef, useState } from "react";
 import { BookmarkFill, Magnifier } from "@gravity-ui/icons";
-import { Button, SearchField, Surface, Typography } from "@heroui/react";
+import { Button, SearchField, Surface, Tooltip, Typography } from "@heroui/react";
 
 import { getBibleBookName, searchVerses, type BibleVerse } from "../../shared/bible";
 import { useBookmarks } from "../bookmarks/hooks/useBookmarks";
@@ -106,18 +106,21 @@ const SearchPage = ({ onNavigateToReader }: SearchPageProps) => {
                     {verse.text}
                   </Typography.Paragraph>
                 </button>
-                <Button
-                  aria-label={isBm ? "Remove bookmark" : "Bookmark"}
-                  isIconOnly
-                  size="sm"
-                  variant="tertiary"
-                  className="shrink-0 mt-0.5"
-                  onPress={() => toggle(verse)}
-                >
-                  {isBm
-                    ? <BookmarkFill aria-hidden="true" className="h-4 w-4 text-accent" />
-                    : <BookmarkFill aria-hidden="true" className="h-4 w-4 text-muted/40" />}
-                </Button>
+                <Tooltip delay={0}>
+                  <Button
+                    aria-label={isBm ? "Remove bookmark" : "Bookmark"}
+                    isIconOnly
+                    size="sm"
+                    variant="tertiary"
+                    className="shrink-0 mt-0.5"
+                    onPress={() => toggle(verse)}
+                  >
+                    {isBm
+                      ? <BookmarkFill aria-hidden="true" className="h-4 w-4 text-accent" />
+                      : <BookmarkFill aria-hidden="true" className="h-4 w-4 text-muted/40" />}
+                  </Button>
+                  <Tooltip.Content placement="top">{isBm ? "Remove Bookmark" : "Bookmark"}</Tooltip.Content>
+                </Tooltip>
               </Surface>
             );
           })}

@@ -5,7 +5,7 @@ import {
   Copy,
   TrashBin,
 } from "@gravity-ui/icons";
-import { Button, ScrollShadow, Surface, toast, Typography } from "@heroui/react";
+import { Button, ScrollShadow, Surface, toast, Tooltip, Typography } from "@heroui/react";
 
 import { getBibleBookName, type Bookmark as BookmarkType } from "../../shared/bible";
 import { useReaderStore } from "../reader/store/readerStore";
@@ -143,19 +143,25 @@ const BookmarksPage = ({ onNavigateToReader }: BookmarksPageProps) => {
                   </Typography>
                 </button>
                 <div className="flex gap-0.5 shrink-0">
-                  <Button isIconOnly size="sm" variant="tertiary"
-                    aria-label="Copy verse"
-                    onPress={() => {
-                      navigator.clipboard.writeText(`${formatRef(bm.book, bm.chapter, bm.verse)} ${bm.text}`)
-                        .then(() => toast("Verse copied to clipboard", { variant: "success" }));
-                    }}>
-                    <Copy aria-hidden="true" className="h-3.5 w-3.5 text-muted" />
-                  </Button>
-                  <Button isIconOnly size="sm" variant="tertiary"
-                    aria-label="Remove bookmark"
-                    onPress={() => removeWithUndo(bm)}>
-                    <TrashBin aria-hidden="true" className="h-3.5 w-3.5 text-muted" />
-                  </Button>
+                  <Tooltip delay={0}>
+                    <Button isIconOnly size="sm" variant="tertiary"
+                      aria-label="Copy verse"
+                      onPress={() => {
+                        navigator.clipboard.writeText(`${formatRef(bm.book, bm.chapter, bm.verse)} ${bm.text}`)
+                          .then(() => toast("Verse copied to clipboard", { variant: "success" }));
+                      }}>
+                      <Copy aria-hidden="true" className="h-3.5 w-3.5 text-muted" />
+                    </Button>
+                    <Tooltip.Content placement="top">Copy Verse</Tooltip.Content>
+                  </Tooltip>
+                  <Tooltip delay={0}>
+                    <Button isIconOnly size="sm" variant="tertiary"
+                      aria-label="Remove bookmark"
+                      onPress={() => removeWithUndo(bm)}>
+                      <TrashBin aria-hidden="true" className="h-3.5 w-3.5 text-muted" />
+                    </Button>
+                    <Tooltip.Content placement="top">Remove Bookmark</Tooltip.Content>
+                  </Tooltip>
                 </div>
               </div>
 
