@@ -55,8 +55,7 @@ async function copyToClipboard(text: string) {
   document.body.removeChild(textarea);
 }
 
-const VerseActionBar = ({ verses }: VerseActionBarProps) => {
-  const isSelectionMode = useReaderStore((state) => state.isSelectionMode);
+const VerseActionBarInner = ({ verses }: VerseActionBarProps) => {
   const selectedVerseIds = useReaderStore((state) => state.selectedVerseIds);
   const clearVerseSelection = useReaderStore(
     (state) => state.clearVerseSelection,
@@ -66,10 +65,6 @@ const VerseActionBar = ({ verses }: VerseActionBarProps) => {
   );
   const book = useReaderStore((state) => state.book);
   const chapter = useReaderStore((state) => state.chapter);
-
-  if (!isSelectionMode) {
-    return null;
-  }
 
   const selectedSet = new Set(selectedVerseIds);
   const selectedVerses = verses.filter((verse) => selectedSet.has(verse.id));
@@ -133,7 +128,7 @@ const VerseActionBar = ({ verses }: VerseActionBarProps) => {
     <div
       className="fixed inset-x-0 bottom-0 z-40 px-3 pb-[max(0.75rem,env(safe-area-inset-bottom))] pt-3 pointer-events-none"
     >
-      <Surface className="mx-auto flex w-full max-w-sm items-center gap-2 border px-3 py-2 shadow-lg pointer-events-auto">
+      <Surface className="mx-auto flex w-full  items-center gap-2 border px-3 py-2 shadow-lg pointer-events-auto">
         <span className="text-sm font-medium tabular-nums">
           {selectedVerseIds.length} selected
         </span>
@@ -187,6 +182,16 @@ const VerseActionBar = ({ verses }: VerseActionBarProps) => {
       </Surface>
     </div>
   );
+};
+
+const VerseActionBar = ({ verses }: VerseActionBarProps) => {
+  const isSelectionMode = useReaderStore((state) => state.isSelectionMode);
+
+  if (!isSelectionMode) {
+    return null;
+  }
+
+  return <VerseActionBarInner verses={verses} />;
 };
 
 export default VerseActionBar;

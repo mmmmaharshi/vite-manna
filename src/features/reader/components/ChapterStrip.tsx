@@ -8,7 +8,7 @@ import { Button, ScrollShadow } from "@heroui/react";
 import { useReaderStore } from "../store/readerStore";
 
 interface ChapterStripProps {
-  chapters: number[];
+    chapters: number[];
   currentBook: number;
   isReaderTransitioning: boolean;
   onSelectChapter: (chapter: number) => void;
@@ -35,6 +35,10 @@ function useChapterStripScroll({
   const clearPendingBook = useReaderStore((state) => state.clearPendingBook);
 
   useLayoutEffect(() => {
+    if (isReaderTransitioning) {
+      return;
+    }
+
     const activeChapter = activeChapterRef.current;
     const chapterStrip = chapterStripRef.current;
 
@@ -42,7 +46,7 @@ function useChapterStripScroll({
       return;
     }
 
-    const scrollRestoreKey = `${currentBook}:${isReaderTransitioning ? "loading" : "ready"}`;
+    const scrollRestoreKey = `${currentBook}:ready`;
 
     if (lastScrollRestoreKeyRef.current === scrollRestoreKey) {
       return;

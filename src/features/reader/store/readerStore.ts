@@ -1,5 +1,8 @@
 import { create } from "zustand";
 
+const PENDING_BOOK_SAFETY_TIMEOUT = 15_000;
+const MAX_REASONABLE_ID = 200;
+
 export interface ReaderState {
   book: number;
   chapter: number;
@@ -18,6 +21,7 @@ export interface ReaderState {
   toggleVerseSelection: (verseId: number) => void;
   clearVerseSelection: () => void;
   setPermalinkVerse: (verse: number | null) => void;
+  reset: () => void;
 }
 
 const STORAGE_KEY = "manna.reader-location";
@@ -33,7 +37,7 @@ interface StoredLocation {
 function parsePositiveInteger(value: string | null) {
   const parsed = Number(value);
 
-  return Number.isInteger(parsed) && parsed > 0 ? parsed : null;
+  return Number.isInteger(parsed) && parsed > 0 && parsed <= MAX_REASONABLE_ID ? parsed : null;
 }
 
 function parseChaptersByBook(value: unknown): Record<number, number> {
@@ -169,13 +173,18 @@ export const useReaderStore = create<ReaderState>((set, get) => ({
   setChapter: (chapter) => {
     const { book, chaptersByBook } = get();
 
-    set({
+    const next: Partial<ReaderState> = {
       chapter,
-      chaptersByBook: { ...chaptersByBook, [book]: chapter },
       selectedVerseIds: [],
       isSelectionMode: false,
       permalinkVerse: null,
-    });
+    };
+
+    if (chaptersByBook[book] !== chapter) {
+      next.chaptersByBook = { ...chaptersByBook, [book]: chapter };
+    }
+
+    set(next);
   },
 
   selectBook: (bookId) => {
@@ -185,6 +194,13 @@ export const useReaderStore = create<ReaderState>((set, get) => ({
       permalinkVerse: null,
     });
     get().setBook(bookId);
+
+    setTimeout(() => {
+      const { pendingBook } = get();
+      if (pendingBook === bookId) {
+        set({ pendingBook: null, isBookSelectOpen: false });
+      }
+    }, PENDING_BOOK_SAFETY_TIMEOUT);
   },
 
   setBookSelectOpen: (open) => {
@@ -236,6 +252,20 @@ export const useReaderStore = create<ReaderState>((set, get) => ({
     }
 
     set({ permalinkVerse: verse });
+  },
+
+  reset: () => {
+    const fresh = loadInitialState();
+    set({
+      book: fresh.book,
+      chapter: fresh.chapter,
+      pendingBook: null,
+      isBookSelectOpen: false,
+      chaptersByBook: fresh.chaptersByBook,
+      selectedVerseIds: [],
+      isSelectionMode: false,
+      permalinkVerse: fresh.permalinkVerse,
+    });
   },
 }));
 

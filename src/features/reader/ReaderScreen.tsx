@@ -1,6 +1,5 @@
 import { useEffect } from "react";
-import { Surface } from "@heroui/react";
-import { Navigate } from "react-router";
+import { Button, Surface, Typography } from "@heroui/react";
 
 import { useBooks } from "./hooks/useBooks";
 import { useReaderSnapshot } from "./hooks/useReaderSnapshot";
@@ -55,7 +54,16 @@ const ReaderScreen = () => {
   const visibleChapter = isReaderTransitioning ? 1 : chapter;
 
   if (hasLoadedBooks && books.length === 0) {
-    return <Navigate to="/" replace />;
+    return (
+      <main className="flex flex-col items-center justify-center gap-4 px-4 pb-16 min-h-dvh">
+        <Typography className="text-center">
+          Unable to load Bible books. Please try again.
+        </Typography>
+        <Button variant="primary" onPress={() => window.location.reload()}>
+          Retry
+        </Button>
+      </main>
+    );
   }
 
   return (
@@ -83,8 +91,19 @@ const ReaderScreen = () => {
           isSelectionMode ? "pb-24" : "",
         ].join(" ")}
       >
-        {!isReaderTransitioning && snapshot && (
+        {snapshot && (
           <VerseList verses={snapshot.verses} />
+        )}
+        {!snapshot && hasLoadedBooks && (
+          <div className="flex flex-col gap-3" aria-busy="true">
+            {Array.from({ length: 8 }, (_, i) => (
+              <div
+                key={i}
+                className="h-5 rounded bg-surface-secondary animate-pulse"
+                style={{ width: `${60 + Math.random() * 35}%` }}
+              />
+            ))}
+          </div>
         )}
       </section>
 

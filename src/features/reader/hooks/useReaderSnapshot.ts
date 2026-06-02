@@ -48,7 +48,12 @@ export function useReaderSnapshot(
         }
       })
       .catch((error) => {
+        if (!mounted) {
+          return;
+        }
         console.error("[Bible] Unable to load reader snapshot", error);
+        setSnapshot(null);
+        useReaderStore.getState().clearPendingBook();
       });
 
     return () => {

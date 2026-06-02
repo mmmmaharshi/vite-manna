@@ -46,7 +46,7 @@ const VerseList = ({ verses }: VerseListProps) => {
   }, [permalinkVerse, verses]);
 
   return (
-    <ol className="flex flex-col gap-1 [content-visibility:auto]">
+    <ol className="flex flex-col gap-1">
       {verses.map((verse) => {
         const isSelected = selectedSet.has(verse.id);
         const isPermalink = verse.verse === permalinkVerse;
