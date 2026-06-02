@@ -5,9 +5,29 @@
         <link rel="icon" type="image/svg+xml" href="/favicon.svg" />
         <meta name="viewport" content="width=device-width, initial-scale=1.0" />
         <title>మన్నా - తెలుగు బైబిల్</title>
+        <script>
+            (function(){var t;try{t=localStorage.getItem("theme")}catch(e){}var d=t==="dark"||(t!=="light"&&window.matchMedia("(prefers-color-scheme: dark)").matches);document.documentElement.classList.toggle("dark",d)})();
+        </script>
+        <style>
+            :root,.light{--background:oklch(97.02% 0.002 262.87);--foreground:oklch(21.03% 0.002 262.87);--default:oklch(94% 0.002 262.87)}.dark{--background:oklch(12% 0.002 262.87);--foreground:oklch(99.11% 0.002 262.87);--default:oklch(27.4% 0.002 262.87);color-scheme:dark}.html-splash{position:fixed;inset:0;z-index:9999;display:flex;align-items:center;justify-content:center;background:var(--background,#fff)}.html-splash-inner{display:flex;flex-direction:column;align-items:center;width:100%;max-width:28rem;padding:0 1.5rem}.html-splash-inner svg{width:120px;height:120px}.html-splash-inner h1{font-size:2.25rem;font-weight:900;margin:0;color:var(--foreground,#000);font-family:system-ui,sans-serif}.html-splash-track{margin-top:1rem;width:160px;height:4px;border-radius:2px;background:var(--default,#e5e7eb);overflow:hidden}.html-splash-bar{width:56px;height:100%;border-radius:2px;background:var(--foreground,#000);animation:splash-move 1150ms ease-in-out infinite}@keyframes splash-move{from{transform:translateX(-56px)}to{transform:translateX(160px)}}@media(prefers-reduced-motion:reduce){.html-splash-bar{animation:none;opacity:0.25}}
+        </style>
     </head>
     <body>
-        <div id="root"></div>
+        <div id="root">
+            <div class="html-splash">
+                <div class="html-splash-inner">
+                    <svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 241.16 170.09">
+                        <g transform="translate(-106.42 -552.93)">
+                            <path fill="#000" fill-rule="evenodd" stroke="#000" stroke-width="5" d="m108.92 624.83 63.11 95.69c20.36-28.5 67.18-46.83 93.65-40.72 32.57-22.39 69.22-18.32 79.4-10.18l-73.29-95.68s-50.9-14.25-71.26 16.28c-36.64-16.28-81.43 10.18-91.61 34.61z"/>
+                            <path fill="#fff" fill-rule="evenodd" stroke="#000" stroke-width="5" d="m116.72 612.21 54.97 83.47c22.39-40.72 67.18-59.04 89.58-32.57 34.61-48.87 75.32 0 79.39 0l-73.29-99.76s-48.86-22.4-69.22 8.14c-20.35-16.29-69.21 4.07-81.43 40.72z"/>
+                            <path fill="none" stroke="#000" stroke-width="5" d="m199.51 571.9 63.12 85.51c8.14 12.21-8.15 34.61 26.46 48.86"/>
+                        </g>
+                    </svg>
+                    <h1>Manna</h1>
+                    <div class="html-splash-track"><div class="html-splash-bar"></div></div>
+                </div>
+            </div>
+        </div>
         <script type="module" src="/src/main.tsx"></script>
     </body>
 </html>
