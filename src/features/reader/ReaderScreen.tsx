@@ -1,5 +1,5 @@
-import { useEffect } from "react";
-import { Button, Surface, Typography } from "@heroui/react";
+import { useEffect, useRef } from "react";
+import { Button, ScrollShadow, Surface, Typography } from "@heroui/react";
 
 import { getBibleBookName } from "../../shared/bible";
 import { useBooks } from "./hooks/useBooks";
@@ -27,8 +27,15 @@ const ReaderScreen = () => {
     }
   }, [book, books, setBook]);
 
+  const scrollRef = useRef<HTMLDivElement>(null);
+
+  const prevBookChapter = useRef({ book, chapter });
   useEffect(() => {
-    window.scrollTo(0, 0);
+    const prev = prevBookChapter.current;
+    if (prev.book !== book || prev.chapter !== chapter) {
+      scrollRef.current?.scrollTo(0, 0);
+      prevBookChapter.current = { book, chapter };
+    }
   }, [book, chapter]);
 
   const selectedBookSummary = books.find((candidate) => candidate.id === book);
@@ -77,7 +84,7 @@ const ReaderScreen = () => {
   }
 
   return (
-    <main className="pb-16">
+    <ScrollShadow ref={scrollRef} hideScrollBar className="h-dvh pb-16">
       <Typography.Heading level={1} className="sr-only">
         {selectedBookSummary ? `${getBibleBookName(selectedBookSummary.id)} ${chapter}` : "Bible Reader"}
       </Typography.Heading>
@@ -122,7 +129,7 @@ const ReaderScreen = () => {
       </section>
 
       {snapshot && <VerseActionBar verses={snapshot.verses} />}
-    </main>
+    </ScrollShadow>
   );
 };
 

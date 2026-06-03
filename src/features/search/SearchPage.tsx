@@ -1,6 +1,6 @@
 import { useEffect, useRef, useState } from "react";
 import { BookmarkFill, Magnifier } from "@gravity-ui/icons";
-import { Button, SearchField, Surface, Tooltip, Typography } from "@heroui/react";
+import { Button, ScrollShadow, SearchField, Surface, Tooltip, Typography } from "@heroui/react";
 
 import { getBibleBookName, searchVerses, type BibleVerse } from "../../shared/bible";
 import { useBookmarks } from "../bookmarks/hooks/useBookmarks";
@@ -44,10 +44,8 @@ const SearchPage = ({ onNavigateToReader }: SearchPageProps) => {
     onNavigateToReader();
   };
 
-  useEffect(() => { window.scrollTo(0, 0); }, []);
-
   return (
-    <main className="min-h-dvh">
+    <ScrollShadow hideScrollBar className="h-dvh pb-16">
       <Surface className="sticky top-0 z-30 py-3 border border-b">
         <div className="max-w-md sm:max-w-lg md:max-w-xl lg:max-w-2xl xl:max-w-3xl w-full px-2 mx-auto">
           <Typography.Heading level={1} className="text-xl">Search</Typography.Heading>
@@ -126,7 +124,7 @@ const SearchPage = ({ onNavigateToReader }: SearchPageProps) => {
           })}
         </section>
       )}
-    </main>
+    </ScrollShadow>
   );
 };
 

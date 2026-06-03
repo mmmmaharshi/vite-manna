@@ -1,4 +1,4 @@
-import { useEffect, useMemo, useState } from "react";
+import { useMemo, useState } from "react";
 import {
   ArrowUpFromSquare,
   Bookmark,
@@ -76,10 +76,8 @@ const BookmarksPage = ({ onNavigateToReader }: BookmarksPageProps) => {
     onNavigateToReader();
   };
 
-  useEffect(() => { window.scrollTo(0, 0); }, []);
-
   return (
-    <main className="min-h-dvh">
+    <ScrollShadow hideScrollBar className="h-dvh pb-16">
       {/* Header */}
       <Surface className="sticky top-0 z-30 bg-surface py-3 border border-b">
         <div className="max-w-md sm:max-w-lg md:max-w-xl lg:max-w-2xl xl:max-w-3xl w-full px-2 mx-auto flex flex-col gap-2">
@@ -188,7 +186,7 @@ const BookmarksPage = ({ onNavigateToReader }: BookmarksPageProps) => {
           )}
         </div>
       )}
-    </main>
+    </ScrollShadow>
   );
 };
 

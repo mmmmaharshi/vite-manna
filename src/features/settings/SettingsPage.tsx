@@ -3,9 +3,9 @@ interface PeriodicSyncManager {
   unregister: (tag: string) => Promise<void>;
 }
 
-import { useCallback, useEffect, useState } from "react";
+import { useCallback, useState } from "react";
 import { ArrowRotateLeft, Bell, Moon, Sun } from "@gravity-ui/icons";
-import { Button, Surface, Tooltip, Typography } from "@heroui/react";
+import { Button, ScrollShadow, Surface, Tooltip, Typography } from "@heroui/react";
 
 import { useTheme } from "../../shared/hooks/useTheme";
 import { SIZE_PROPS } from "../../shared/lib/fontSize";
@@ -67,10 +67,8 @@ const SettingsPage = () => {
     setNotifEnabled(true);
   }, [notifEnabled]);
 
-  useEffect(() => { window.scrollTo(0, 0); }, []);
-
   return (
-    <main className="min-h-dvh">
+    <ScrollShadow hideScrollBar className="h-dvh pb-16">
       <Surface className="sticky top-0 z-30 bg-surface py-3 border border-b">
         <div className="max-w-md sm:max-w-lg md:max-w-xl lg:max-w-2xl xl:max-w-3xl w-full px-2 mx-auto">
           <Typography.Heading level={1} className="text-xl">Settings</Typography.Heading>
@@ -152,7 +150,7 @@ const SettingsPage = () => {
           )}
         </Surface>
       </section>
-    </main>
+    </ScrollShadow>
   );
 };
 
