@@ -45,86 +45,88 @@ const SearchPage = ({ onNavigateToReader }: SearchPageProps) => {
   };
 
   return (
-    <ScrollShadow hideScrollBar className="h-dvh pb-16">
+    <div className="h-dvh flex flex-col">
       <Surface className="sticky top-0 z-30 py-3 border border-b">
         <div className="max-w-md sm:max-w-lg md:max-w-xl lg:max-w-2xl xl:max-w-3xl w-full px-2 mx-auto">
           <Typography.Heading level={1} className="text-xl">Search</Typography.Heading>
         </div>
       </Surface>
 
-      <div className="max-w-md sm:max-w-lg md:max-w-xl lg:max-w-2xl xl:max-w-3xl w-full px-2 mx-auto pt-2">
-        <SearchField
-          value={query}
-          onChange={setQuery}
-          onClear={() => { setResults([]); setSearched(false); }}
-          fullWidth
-          aria-label="Search verses"
-        >
-          <SearchField.Group>
-            <SearchField.SearchIcon />
-            <SearchField.Input placeholder="Search verses..." />
-            <SearchField.ClearButton />
-          </SearchField.Group>
-        </SearchField>
-      </div>
+      <ScrollShadow hideScrollBar className="flex-1 pb-16">
+        <div className="max-w-md sm:max-w-lg md:max-w-xl lg:max-w-2xl xl:max-w-3xl w-full px-2 mx-auto pt-2">
+          <SearchField
+            value={query}
+            onChange={setQuery}
+            onClear={() => { setResults([]); setSearched(false); }}
+            fullWidth
+            aria-label="Search verses"
+          >
+            <SearchField.Group>
+              <SearchField.SearchIcon />
+              <SearchField.Input placeholder="Search verses..." />
+              <SearchField.ClearButton />
+            </SearchField.Group>
+          </SearchField>
+        </div>
 
-      {!searched ? (
-        <section className="max-w-md w-full px-2 py-24 mx-auto flex flex-col items-center gap-2 text-center">
-          <Magnifier aria-hidden="true" className="h-12 w-12 text-muted" />
-          <Typography className="text-base font-medium">Search Bible</Typography>
-          <Typography.Paragraph size="sm" color="muted">
-            Search verses by keyword
-          </Typography.Paragraph>
-        </section>
-      ) : results.length === 0 ? (
-        <section className="max-w-md w-full px-2 py-24 mx-auto flex flex-col items-center gap-2 text-center">
-          <Typography className="text-base font-medium">No results</Typography>
-          <Typography.Paragraph size="sm" color="muted">
-            Try a different search term
-          </Typography.Paragraph>
-        </section>
-      ) : (
-        <section className="max-w-md w-full px-2 py-4 mx-auto flex flex-col gap-2">
-          <Typography.Paragraph size="sm" color="muted" className="px-1">
-            {results.length} result{results.length !== 1 ? "s" : ""}
-          </Typography.Paragraph>
-          {results.map((verse) => {
-            const isBm = bookmarkedIds.has(verse.id);
-            return (
-              <Surface key={verse.id} className="flex items-start gap-2 p-3">
-                <button
-                  type="button"
-                  className="flex-1 min-w-0 text-left"
-                  onClick={() => handleNavigate(verse)}
-                >
-                  <Typography className="text-sm font-medium text-accent">
-                    {formatRef(verse)}
-                  </Typography>
-                  <Typography.Paragraph size="sm" color="muted" className="mt-0.5">
-                    {verse.text}
-                  </Typography.Paragraph>
-                </button>
-                <Tooltip delay={0}>
-                  <Button
-                    aria-label={isBm ? "Remove bookmark" : "Bookmark"}
-                    isIconOnly
-                    size="sm"
-                    variant="tertiary"
-                    className="shrink-0 mt-0.5"
-                    onPress={() => toggle(verse)}
+        {!searched ? (
+          <section className="max-w-md w-full px-2 py-24 mx-auto flex flex-col items-center gap-2 text-center">
+            <Magnifier aria-hidden="true" className="h-12 w-12 text-muted" />
+            <Typography className="text-base font-medium">Search Bible</Typography>
+            <Typography.Paragraph size="sm" color="muted">
+              Search verses by keyword
+            </Typography.Paragraph>
+          </section>
+        ) : results.length === 0 ? (
+          <section className="max-w-md w-full px-2 py-24 mx-auto flex flex-col items-center gap-2 text-center">
+            <Typography className="text-base font-medium">No results</Typography>
+            <Typography.Paragraph size="sm" color="muted">
+              Try a different search term
+            </Typography.Paragraph>
+          </section>
+        ) : (
+          <section className="max-w-md w-full px-2 py-4 mx-auto flex flex-col gap-2">
+            <Typography.Paragraph size="sm" color="muted" className="px-1">
+              {results.length} result{results.length !== 1 ? "s" : ""}
+            </Typography.Paragraph>
+            {results.map((verse) => {
+              const isBm = bookmarkedIds.has(verse.id);
+              return (
+                <Surface key={verse.id} className="flex items-start gap-2 p-3">
+                  <button
+                    type="button"
+                    className="flex-1 min-w-0 text-left"
+                    onClick={() => handleNavigate(verse)}
                   >
-                    {isBm
-                      ? <BookmarkFill aria-hidden="true" className="h-4 w-4 text-accent" />
-                      : <BookmarkFill aria-hidden="true" className="h-4 w-4 text-muted/60" />}
-                  </Button>
-                  <Tooltip.Content placement="top">{isBm ? "Remove Bookmark" : "Bookmark"}</Tooltip.Content>
-                </Tooltip>
-              </Surface>
-            );
-          })}
-        </section>
-      )}
-    </ScrollShadow>
+                    <Typography className="text-sm font-medium text-accent">
+                      {formatRef(verse)}
+                    </Typography>
+                    <Typography.Paragraph size="sm" color="muted" className="mt-0.5">
+                      {verse.text}
+                    </Typography.Paragraph>
+                  </button>
+                  <Tooltip delay={0}>
+                    <Button
+                      aria-label={isBm ? "Remove bookmark" : "Bookmark"}
+                      isIconOnly
+                      size="sm"
+                      variant="tertiary"
+                      className="shrink-0 mt-0.5"
+                      onPress={() => toggle(verse)}
+                    >
+                      {isBm
+                        ? <BookmarkFill aria-hidden="true" className="h-4 w-4 text-accent" />
+                        : <BookmarkFill aria-hidden="true" className="h-4 w-4 text-muted/60" />}
+                    </Button>
+                    <Tooltip.Content placement="top">{isBm ? "Remove Bookmark" : "Bookmark"}</Tooltip.Content>
+                  </Tooltip>
+                </Surface>
+              );
+            })}
+          </section>
+        )}
+      </ScrollShadow>
+    </div>
   );
 };
 

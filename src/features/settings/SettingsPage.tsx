@@ -68,89 +68,91 @@ const SettingsPage = () => {
   }, [notifEnabled]);
 
   return (
-    <ScrollShadow hideScrollBar className="h-dvh pb-16">
+    <div className="h-dvh flex flex-col">
       <Surface className="sticky top-0 z-30 bg-surface py-3 border border-b">
         <div className="max-w-md sm:max-w-lg md:max-w-xl lg:max-w-2xl xl:max-w-3xl w-full px-2 mx-auto">
           <Typography.Heading level={1} className="text-xl">Settings</Typography.Heading>
         </div>
       </Surface>
 
-      <section className="max-w-md w-full px-2 py-4 mx-auto flex flex-col gap-2">
-        <Surface className="p-3">
-          <Typography className="text-sm font-medium mb-2">Appearance</Typography>
-          <div className="flex gap-2">
-            {OPTIONS.map(({ mode: m, label, Icon }) => (
-              <Button
-                key={m}
-                variant={mode === m ? "primary" : "secondary"}
-                size="sm"
-                className="flex-1"
-                onPress={() => setMode(m)}
-              >
-                <Icon aria-hidden="true" className="h-4 w-4" />
-                {label}
-              </Button>
-            ))}
-          </div>
-        </Surface>
+      <ScrollShadow hideScrollBar className="flex-1 pb-16">
+        <section className="max-w-md w-full px-2 py-4 mx-auto flex flex-col gap-2">
+          <Surface className="p-3">
+            <Typography className="text-sm font-medium mb-2">Appearance</Typography>
+            <div className="flex gap-2">
+              {OPTIONS.map(({ mode: m, label, Icon }) => (
+                <Button
+                  key={m}
+                  variant={mode === m ? "primary" : "secondary"}
+                  size="sm"
+                  className="flex-1"
+                  onPress={() => setMode(m)}
+                >
+                  <Icon aria-hidden="true" className="h-4 w-4" />
+                  {label}
+                </Button>
+              ))}
+            </div>
+          </Surface>
 
-        <Surface className="p-3">
-          <div className="flex items-center justify-between mb-2">
-            <Typography className="text-sm font-medium">Font Size</Typography>
-            <Tooltip>
-              <Button variant="tertiary" size="sm" onPress={() => setFontSize("sm")}>
-                <ArrowRotateLeft aria-hidden="true" className="h-3 w-3" />
-                Reset
-              </Button>
-              <Tooltip.Content showArrow placement="top">
-                <Tooltip.Arrow />
-                Reset to default (S)
-              </Tooltip.Content>
-            </Tooltip>
-          </div>
-          <div className="flex gap-2 mb-3">
-            {FONT_SIZES.map(({ value, label }) => (
+          <Surface className="p-3">
+            <div className="flex items-center justify-between mb-2">
+              <Typography className="text-sm font-medium">Font Size</Typography>
+              <Tooltip>
+                <Button variant="tertiary" size="sm" onPress={() => setFontSize("sm")}>
+                  <ArrowRotateLeft aria-hidden="true" className="h-3 w-3" />
+                  Reset
+                </Button>
+                <Tooltip.Content showArrow placement="top">
+                  <Tooltip.Arrow />
+                  Reset to default (S)
+                </Tooltip.Content>
+              </Tooltip>
+            </div>
+            <div className="flex gap-2 mb-3">
+              {FONT_SIZES.map(({ value, label }) => (
+                <Button
+                  key={value}
+                  variant={fontSize === value ? "primary" : "secondary"}
+                  size="sm"
+                  className="flex-1"
+                  onPress={() => setFontSize(value)}
+                >
+                  {label}
+                </Button>
+              ))}
+            </div>
+            <div className="rounded-lg border bg-field-background p-3">
+              <Typography {...SIZE_PROPS[fontSize]} render={({ children, ...dp }) => <span {...dp}>{children}</span>}>
+                <sup className="me-1 text-[0.65em] text-muted">1</sup>
+                {PREVIEW_TEXT}
+              </Typography>
+            </div>
+          </Surface>
+          <Surface className="p-3">
+            <div className="flex items-center justify-between">
+              <Typography className="text-sm font-medium">Daily Notifications</Typography>
               <Button
-                key={value}
-                variant={fontSize === value ? "primary" : "secondary"}
+                variant={notifEnabled ? "primary" : "tertiary"}
                 size="sm"
-                className="flex-1"
-                onPress={() => setFontSize(value)}
+                onPress={toggleNotifications}
               >
-                {label}
+                <Bell aria-hidden="true" className="h-4 w-4" />
+                {notifEnabled ? "Enabled" : "Disabled"}
               </Button>
-            ))}
-          </div>
-          <div className="rounded-lg border bg-field-background p-3">
-            <Typography {...SIZE_PROPS[fontSize]} render={({ children, ...dp }) => <span {...dp}>{children}</span>}>
-              <sup className="me-1 text-[0.65em] text-muted">1</sup>
-              {PREVIEW_TEXT}
+            </div>
+            <Typography className="text-xs text-muted mt-1">
+              Receive a daily notification with the verse of the day.
             </Typography>
-          </div>
-        </Surface>
-        <Surface className="p-3">
-          <div className="flex items-center justify-between">
-            <Typography className="text-sm font-medium">Daily Notifications</Typography>
-            <Button
-              variant={notifEnabled ? "primary" : "tertiary"}
-              size="sm"
-              onPress={toggleNotifications}
-            >
-              <Bell aria-hidden="true" className="h-4 w-4" />
-              {notifEnabled ? "Enabled" : "Disabled"}
-            </Button>
-          </div>
-          <Typography className="text-xs text-muted mt-1">
-            Receive a daily notification with the verse of the day.
-          </Typography>
-          {typeof Notification !== "undefined" && Notification.permission === "denied" && (
-            <Typography className="text-xs text-danger mt-1">
-              Notification permission was denied. Update your browser settings to re-enable.
-            </Typography>
-          )}
-        </Surface>
-      </section>
-    </ScrollShadow>
+            {typeof Notification !== "undefined" && Notification.permission === "denied" && (
+              <Typography className="text-xs text-danger mt-1">
+                Notification permission was denied. Update your browser settings to re-enable.
+              </Typography>
+            )}
+          </Surface>
+        </section>
+      </ScrollShadow>
+    </div>
   );
 };
 

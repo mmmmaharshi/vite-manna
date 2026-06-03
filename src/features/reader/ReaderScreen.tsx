@@ -84,10 +84,7 @@ const ReaderScreen = () => {
   }
 
   return (
-    <ScrollShadow ref={scrollRef} hideScrollBar className="h-dvh pb-16">
-      <Typography.Heading level={1} className="sr-only">
-        {selectedBookSummary ? `${getBibleBookName(selectedBookSummary.id)} ${chapter}` : "Bible Reader"}
-      </Typography.Heading>
+    <div className="h-dvh flex flex-col">
       <Surface className="sticky top-0 z-30 py-2.5 pt-3.5 border border-b">
         <div className="max-w-md sm:max-w-lg md:max-w-xl lg:max-w-2xl flex flex-col gap-2 w-full px-2 mx-auto">
           <BookSelect
@@ -105,31 +102,36 @@ const ReaderScreen = () => {
         </div>
       </Surface>
 
-      <section
-        className={[
-          "max-w-md sm:max-w-lg md:max-w-xl lg:max-w-2xl w-full px-2 py-4 mx-auto",
-          isSelectionMode ? "pb-24" : "",
-        ].join(" ")}
-        aria-label={selectedBookSummary ? `${getBibleBookName(selectedBookSummary.id)} ${chapter}` : "Bible reader"}
-      >
-        {snapshot && (
-          <VerseList verses={snapshot.verses} />
-        )}
-        {!snapshot && hasLoadedBooks && (
-          <div className="flex flex-col gap-3" aria-busy="true">
-            {Array.from({ length: 8 }, (_, i) => (
-              <div
-                key={i}
-                className="h-5 rounded bg-surface-secondary animate-pulse"
-                style={{ width: `${60 + Math.random() * 35}%` }}
-              />
-            ))}
-          </div>
-        )}
-      </section>
+      <ScrollShadow ref={scrollRef} hideScrollBar className="flex-1 pb-16">
+        <Typography.Heading level={1} className="sr-only">
+          {selectedBookSummary ? `${getBibleBookName(selectedBookSummary.id)} ${chapter}` : "Bible Reader"}
+        </Typography.Heading>
+        <section
+          className={[
+            "max-w-md sm:max-w-lg md:max-w-xl lg:max-w-2xl w-full px-2 py-4 mx-auto",
+            isSelectionMode ? "pb-24" : "",
+          ].join(" ")}
+          aria-label={selectedBookSummary ? `${getBibleBookName(selectedBookSummary.id)} ${chapter}` : "Bible reader"}
+        >
+          {snapshot && (
+            <VerseList verses={snapshot.verses} />
+          )}
+          {!snapshot && hasLoadedBooks && (
+            <div className="flex flex-col gap-3" aria-busy="true">
+              {Array.from({ length: 8 }, (_, i) => (
+                <div
+                  key={i}
+                  className="h-5 rounded bg-surface-secondary animate-pulse"
+                  style={{ width: `${60 + Math.random() * 35}%` }}
+                />
+              ))}
+            </div>
+          )}
+        </section>
 
-      {snapshot && <VerseActionBar verses={snapshot.verses} />}
-    </ScrollShadow>
+        {snapshot && <VerseActionBar verses={snapshot.verses} />}
+      </ScrollShadow>
+    </div>
   );
 };
 
