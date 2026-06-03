@@ -53,22 +53,9 @@ export function useAppShell(): ShellStatus {
   useEffect(() => {
     let mounted = true;
 
-    void waitForFonts().then(() => {
+    void Promise.all([waitForFonts(), waitForOfflineReadiness()]).then(() => {
       if (mounted) {
         setAreFontsReady(true);
-      }
-    });
-
-    return () => {
-      mounted = false;
-    };
-  }, []);
-
-  useEffect(() => {
-    let mounted = true;
-
-    void waitForOfflineReadiness().then(() => {
-      if (mounted) {
         setIsOfflineReady(true);
       }
     });
