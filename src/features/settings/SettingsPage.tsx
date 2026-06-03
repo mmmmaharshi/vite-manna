@@ -75,7 +75,7 @@ const SettingsPage = () => {
         </div>
       </Surface>
 
-      <ScrollShadow hideScrollBar className="flex-1 pb-16">
+      <ScrollShadow hideScrollBar className="flex-1">
         <section className="max-w-md w-full px-2 py-4 mx-auto flex flex-col gap-2">
           <Surface className="p-3">
             <Typography className="text-sm font-medium mb-2">Appearance</Typography>
@@ -151,6 +151,7 @@ const SettingsPage = () => {
             )}
           </Surface>
         </section>
+        <div className="h-16" />
       </ScrollShadow>
     </div>
   );

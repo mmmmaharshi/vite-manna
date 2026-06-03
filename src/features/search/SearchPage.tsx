@@ -52,7 +52,7 @@ const SearchPage = ({ onNavigateToReader }: SearchPageProps) => {
         </div>
       </Surface>
 
-      <ScrollShadow hideScrollBar className="flex-1 pb-16">
+      <ScrollShadow hideScrollBar className="flex-1">
         <div className="max-w-md sm:max-w-lg md:max-w-xl lg:max-w-2xl xl:max-w-3xl w-full px-2 mx-auto pt-2">
           <SearchField
             value={query}
@@ -125,6 +125,7 @@ const SearchPage = ({ onNavigateToReader }: SearchPageProps) => {
             })}
           </section>
         )}
+        <div className="h-16" />
       </ScrollShadow>
     </div>
   );

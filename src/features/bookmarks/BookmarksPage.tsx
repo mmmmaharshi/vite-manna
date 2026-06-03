@@ -88,7 +88,7 @@ const BookmarksPage = ({ onNavigateToReader }: BookmarksPageProps) => {
         </div>
       </Surface>
 
-      <ScrollShadow hideScrollBar className="flex-1 pb-16">
+      <ScrollShadow hideScrollBar className="flex-1">
         {/* Book filter */}
         {bookmarks.length > 0 && uniqueBooks.length > 1 && (
           <div className="max-w-md sm:max-w-lg md:max-w-xl lg:max-w-2xl xl:max-w-3xl w-full px-2 mx-auto pt-2">
@@ -187,6 +187,7 @@ const BookmarksPage = ({ onNavigateToReader }: BookmarksPageProps) => {
             )}
           </div>
         )}
+        <div className="h-16" />
       </ScrollShadow>
     </div>
   );

@@ -102,7 +102,7 @@ const ReaderScreen = () => {
         </div>
       </Surface>
 
-      <ScrollShadow ref={scrollRef} hideScrollBar className="flex-1 pb-16">
+      <ScrollShadow ref={scrollRef} hideScrollBar className="flex-1">
         <Typography.Heading level={1} className="sr-only">
           {selectedBookSummary ? `${getBibleBookName(selectedBookSummary.id)} ${chapter}` : "Bible Reader"}
         </Typography.Heading>
@@ -130,6 +130,7 @@ const ReaderScreen = () => {
         </section>
 
         {snapshot && <VerseActionBar verses={snapshot.verses} />}
+        <div className="h-16" />
       </ScrollShadow>
     </div>
   );
