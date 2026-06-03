@@ -1,5 +1,5 @@
-import { useEffect } from "react";
-import { ArrowRotateLeft, Moon, Sun } from "@gravity-ui/icons";
+import { useCallback, useEffect, useState } from "react";
+import { ArrowRotateLeft, Bell, Moon, Sun } from "@gravity-ui/icons";
 import { Button, Surface, Tooltip, Typography } from "@heroui/react";
 
 import { useTheme } from "../../shared/hooks/useTheme";
@@ -40,6 +40,36 @@ const SettingsPage = () => {
   const { mode, setMode } = useTheme();
   const fontSize = useReaderStore((state) => state.fontSize);
   const setFontSize = useReaderStore((state) => state.setFontSize);
+  const [notifSupported, setNotifSupported] = useState(false);
+  const [notifEnabled, setNotifEnabled] = useState(false);
+
+  useEffect(() => {
+    if (!("serviceWorker" in navigator)) return;
+    navigator.serviceWorker.ready.then((reg) => {
+      const ps = (reg as unknown as { periodicSync: { getTags: () => Promise<string[]> } }).periodicSync;
+      if (!ps) return;
+      setNotifSupported(true);
+      ps.getTags().then((tags: string[]) => {
+        if (tags.includes("daily-verse")) setNotifEnabled(true);
+      });
+    });
+  }, []);
+
+  const toggleNotifications = useCallback(async () => {
+    if (notifEnabled) {
+      const reg = await navigator.serviceWorker.ready;
+      await (reg as unknown as { periodicSync: { unregister: (tag: string) => Promise<void> } }).periodicSync.unregister("daily-verse");
+      setNotifEnabled(false);
+      return;
+    }
+    const perm = await Notification.requestPermission();
+    if (perm !== "granted") return;
+    const reg = await navigator.serviceWorker.ready;
+    await (reg as unknown as { periodicSync: { register: (tag: string, opts: { minInterval: number }) => Promise<void> } }).periodicSync.register("daily-verse", {
+      minInterval: 24 * 60 * 60 * 1000,
+    });
+    setNotifEnabled(true);
+  }, [notifEnabled]);
 
   useEffect(() => { window.scrollTo(0, 0); }, []);
 
@@ -104,6 +134,24 @@ const SettingsPage = () => {
             </Typography>
           </div>
         </Surface>
+        {notifSupported && (
+          <Surface className="p-3">
+            <div className="flex items-center justify-between">
+              <Typography className="text-sm font-medium">Daily Notifications</Typography>
+              <Button
+                variant={notifEnabled ? "primary" : "secondary"}
+                size="sm"
+                onPress={toggleNotifications}
+              >
+                <Bell aria-hidden="true" className="h-4 w-4" />
+                {notifEnabled ? "Enabled" : "Disabled"}
+              </Button>
+            </div>
+            <Typography className="text-xs text-muted mt-1">
+              Receive a daily notification with the verse of the day.
+            </Typography>
+          </Surface>
+        )}
       </section>
     </main>
   );

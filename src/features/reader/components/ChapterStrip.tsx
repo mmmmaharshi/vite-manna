@@ -1,8 +1,10 @@
-import { useLayoutEffect, useMemo, useRef, type RefObject } from "react";
+import { useLayoutEffect, useMemo, useRef, useState, type RefObject } from "react";
+import { Sparkles } from "@gravity-ui/icons";
 import { Button, ScrollShadow } from "@heroui/react";
 
 import { useBookmarks } from "../../bookmarks/hooks/useBookmarks";
 import { useReaderStore } from "../store/readerStore";
+import DailyVerseModal from "./DailyVerseModal";
 
 interface ChapterStripProps {
   chapters: number[];
@@ -125,9 +127,21 @@ const ChapterStrip = ({
     visibleChaptersLength: chapters.length,
   });
 
+  const [isDailyVerseOpen, setIsDailyVerseOpen] = useState(false);
+  const handleDailyVerseNavigate = (book: number, chapter: number) => {
+    setIsDailyVerseOpen(false);
+    useReaderStore.getState().setBook(book);
+    useReaderStore.getState().setChapter(chapter);
+  };
+
   if (chapters.length === 0) return null;
 
   return (
+    <div className="flex items-center gap-1">
+      <Button isIconOnly size="sm" variant="tertiary" aria-label="Verse of the Day"
+        className="shrink-0" onPress={() => setIsDailyVerseOpen(true)}>
+        <Sparkles className="h-4 w-4" />
+      </Button>
     <ScrollShadow
       ref={chapterStripRef}
       hideScrollBar
@@ -154,6 +168,12 @@ const ChapterStrip = ({
         ))}
       </div>
     </ScrollShadow>
+      <DailyVerseModal
+        isOpen={isDailyVerseOpen}
+        onOpenChange={setIsDailyVerseOpen}
+        onNavigateToChapter={handleDailyVerseNavigate}
+      />
+    </div>
   );
 };
 

@@ -1,0 +1,131 @@
+export const DAILY_VERSE_REFS: readonly string[] = [
+  "Genesis 1:27–28Aa", "Genesis 28:22b", "Ephesians 1:7",
+  "2 Corinthians 5:14-15", "Romans 6:9", "Ezekiel 43:2",
+  "Genesis 5:24", "Proverbs 8:35", "Acts 4:12",
+  "Matthew 11:25", "Matthew 5:7", "John 18:11",
+  "John 6:11", "Ezekiel 34:11", "Proverbs 6:23",
+  "James 3:7&ndash;8", "Psalm 109:22", "Psalm 82:3",
+  "Ezekiel 34:16", "Hosea 6:3", "John 5:24",
+  "James 5:8", "Proverbs 3:30", "Psalm 138:7",
+  "Proverbs 29:23", "Ephesians 3:20&ndash;21", "Matthew 14:30&ndash;31",
+  "James 1:5", "Exodus 17:15", "Isaiah 9:6",
+  "Daniel 11:35", "Genesis 16:13", "Acts 9:4",
+  "Deuteronomy 31:6", "2 Timothy 1:7", "Judges 16:16",
+  "James 1:27", "Galatians 3:11", "Genesis 19:26",
+  "Psalm 81:6&ndash;7", "1 Corinthians 12:4", "Proverbs 4:13",
+  "Luke 15:18&ndash;19", "2 Corinthians 3:17", "John 9:3 ESV",
+  "2 Timothy 4:8 ESV", "Psalm 73:3 ESV", "1 Kings 12:24 ESV",
+  "Luke 3:9 ESV", "Luke 10:41&ndash;42 ESV", "Jeremiah 29:13 ESV",
+  "James 1:19&ndash;20 ESV", "Psalm 78:39 ESV", "Numbers 9:23 ESV",
+  "Hebrews 9:22 ESV", "Isaiah 54:4 ESV", "Exodus 12:51 ESV",
+  "Genesis 1:16 ESV", "Psalm 119:176 ESV", "John 6:14 ESV",
+  "Luke 2:19 ESV", "Luke 11:34 ESV", "2 Thessalonians 2:14 ESV",
+  "Matthew 5:13 ESV", "Joshua 21:43 ESV", "2 Samuel 6:11 ESV",
+  "Proverbs 9:6 ESV", "2 Peter 3:9 ESV", "Acts 10:38 ESV",
+  "Ecclesiastes 12:1 ESV", "James 4:14 ESV", "1 John 4:18 ESV",
+  "Luke 24:5&ndash;6 ESV", "Hebrews 4:16 ESV", "2 Samuel 22:31 ESV",
+  "2 Chronicles 20:12 ESV", "Hebrews 11:6 ESV", "Luke 24:25&ndash;26 ESV",
+  "Acts 9:31 ESV", "1 Samuel 3:10 ESV", "1 Corinthians 12:12&ndash;13 ESV",
+  "Deuteronomy 4:29 ESV", "Psalm 73:26 ESV", "Genesis 35:10 ESV",
+  "Galatians 3:8 ESV", "James 2:1 ESV", "Mark 15:2 ESV",
+  "Matthew 5:11 ESV", "Joshua 22:34 ESV", "Acts 17:11 ESV",
+  "Proverbs 31:25 ESV", "Luke 9:16 ESV", "John 16:33 ESV",
+  "Ezekiel 36:23 ESV", "Ezekiel 34:15 ESV", "Matthew 27:29 ESV",
+  "James 1:12 ESV", "Psalm 38:21 ESV",
+];
+
+export function getDayOfYear() {
+  const now = new Date();
+  const start = new Date(now.getFullYear(), 0, 0);
+  const diff = now.getTime() - start.getTime();
+  return Math.floor(diff / (1000 * 60 * 60 * 24));
+}
+
+const ENGLISH_BOOK_MAP: Record<string, number> = {
+  Genesis: 1,
+  Exodus: 2,
+  Leviticus: 3,
+  Numbers: 4,
+  Deuteronomy: 5,
+  Joshua: 6,
+  Judges: 7,
+  Ruth: 8,
+  "1 Samuel": 9,
+  "2 Samuel": 10,
+  "1 Kings": 11,
+  "2 Kings": 12,
+  "1 Chronicles": 13,
+  "2 Chronicles": 14,
+  Ezra: 15,
+  Nehemiah: 16,
+  Esther: 17,
+  Job: 18,
+  Psalm: 19,
+  Proverbs: 20,
+  Ecclesiastes: 21,
+  "Song of Solomon": 22,
+  Isaiah: 23,
+  Jeremiah: 24,
+  Lamentations: 25,
+  Ezekiel: 26,
+  Daniel: 27,
+  Hosea: 28,
+  Joel: 29,
+  Amos: 30,
+  Obadiah: 31,
+  Jonah: 32,
+  Micah: 33,
+  Nahum: 34,
+  Habakkuk: 35,
+  Zephaniah: 36,
+  Haggai: 37,
+  Zechariah: 38,
+  Malachi: 39,
+  Matthew: 40,
+  Mark: 41,
+  Luke: 42,
+  John: 43,
+  Acts: 44,
+  Romans: 45,
+  "1 Corinthians": 46,
+  "2 Corinthians": 47,
+  Galatians: 48,
+  Ephesians: 49,
+  Philippians: 50,
+  Colossians: 51,
+  "1 Thessalonians": 52,
+  "2 Thessalonians": 53,
+  "1 Timothy": 54,
+  "2 Timothy": 55,
+  Titus: 56,
+  Philemon: 57,
+  Hebrews: 58,
+  James: 59,
+  "1 Peter": 60,
+  "2 Peter": 61,
+  "1 John": 62,
+  "2 John": 63,
+  "3 John": 64,
+  Jude: 65,
+  Revelation: 66,
+};
+
+export function parseVerseref(
+  verseref: string,
+): { book: number | null; chapter: number | null; verse: number | null } {
+  const m = verseref.match(
+    /^(\d\s+)?([A-Za-z]+(?:\s+[A-Za-z]+)?)\s*(\d+):(\d+)/,
+  );
+  if (!m) return { book: null, chapter: null, verse: null };
+
+  const fullName = ((m[1] ?? "") + m[2]).trim();
+  const book = ENGLISH_BOOK_MAP[fullName] ?? null;
+  const chapter = parseInt(m[3], 10);
+  const verse = parseInt(m[4], 10);
+
+  return {
+    book,
+    chapter: isNaN(chapter) ? null : chapter,
+    verse: isNaN(verse) ? null : verse,
+  };
+}

@@ -34,6 +34,9 @@ export default defineConfig({
 		react(),
 		babel({ presets: [reactCompilerPreset()] }),
 		VitePWA({
+			strategies: 'injectManifest',
+			srcDir: 'src',
+			filename: 'sw.ts',
 			manifest: {
 				name: 'Manna - Telugu Bible',
 				short_name: 'Manna',
@@ -52,23 +55,14 @@ export default defineConfig({
 				],
 			},
 			registerType: 'autoUpdate',
-			workbox: {
+			injectManifest: {
 				globPatterns: ['**/*.{css,js,html,svg,woff2}'],
 				globIgnores: ['**/bible.json'],
 				maximumFileSizeToCacheInBytes: 5 * 1024 * 1024,
-				runtimeCaching: [
-					{
-						urlPattern: /bible\.json$/,
-						handler: 'CacheFirst',
-						options: {
-							cacheName: 'bible-data',
-							expiration: {
-								maxEntries: 1,
-								maxAgeSeconds: 60 * 60 * 24 * 365,
-							},
-						},
-					},
-				],
+			},
+			devOptions: {
+				enabled: true,
+				type: 'module',
 			},
 		}),
 	],

@@ -148,3 +148,7 @@ export function searchVerses(query: string) {
     .limit(50)
     .toArray();
 }
+
+export { parseVerseref } from "./dailyVerseData";
+
+

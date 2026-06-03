@@ -16,4 +16,5 @@ export {
   getBookmarkedChapters,
   isBookmarked,
   searchVerses,
+  parseVerseref,
 } from "./bibleRepository";
