@@ -1,5 +1,5 @@
 const REQUIRED_CACHE_URLS = ["/index.html", "/bible.json"];
-const CACHE_CHECK_INTERVAL_MS = 250;
+const CACHE_CHECK_INTERVAL_MS = 1000;
 
 function waitForNextCacheCheck() {
   return new Promise<void>((resolve) => {

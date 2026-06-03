@@ -1,8 +1,8 @@
 @import "tailwindcss";
 @import "@heroui/styles";
 
-:root {
-    scrollbar-gutter: stable;
+@supports (scrollbar-gutter: stable) {
+    :root { scrollbar-gutter: stable; }
 }
 
 @keyframes splash-progress-slide {
