@@ -27,11 +27,7 @@ function formatReference(book: number, chapter: number) {
 
 function buildShareText(verses: BibleVerse[], book: number, chapter: number) {
   const reference = formatReference(book, chapter);
-  const ordered = [...verses].sort(
-    (first, second) => first.verse - second.verse,
-  );
-
-  return ordered
+  return verses
     .map((verse) => `${reference}:${verse.verse} ${verse.text}`)
     .join("\n");
 }
@@ -63,18 +59,18 @@ const VerseActionBarInner = ({ verses, onShareAsImage }: VerseActionBarInnerProp
   const { bookmarkedIds, toggle } = useBookmarks();
   const selectedSet = new Set(selectedVerseIds);
   const selectedVerses = verses.filter((verse) => selectedSet.has(verse.id));
-  const text = buildShareText(selectedVerses, book, chapter);
+  const sortedVerses = selectedVerses.toSorted((a, b) => a.verse - b.verse);
+  const text = buildShareText(sortedVerses, book, chapter);
   const singleSelectedVerse =
-    selectedVerses.length === 1 ? selectedVerses[0] : null;
+    sortedVerses.length === 1 ? sortedVerses[0] : null;
   const allSelectedBookmarked = selectedVerses.every((v) => bookmarkedIds.has(v.id));
 
-  const orderedVerses = [...selectedVerses].sort((a, b) => a.verse - b.verse);
-  const imageTeluguText = orderedVerses.map((v) => v.text).join("  ");
+  const imageTeluguText = sortedVerses.map((v) => v.text).join("  ");
   const bookName = getBibleBookName(book);
   const imageReference =
-    orderedVerses.length === 1
-      ? `${bookName} ${chapter}:${orderedVerses[0].verse}`
-      : `${bookName} ${chapter}:${orderedVerses[0].verse}-${orderedVerses[orderedVerses.length - 1].verse}`;
+    sortedVerses.length === 1
+      ? `${bookName} ${chapter}:${sortedVerses[0].verse}`
+      : `${bookName} ${chapter}:${sortedVerses[0].verse}-${sortedVerses[sortedVerses.length - 1].verse}`;
 
   const handleCopy = async () => {
     if (selectedVerses.length === 0) {
@@ -112,9 +108,9 @@ const VerseActionBarInner = ({ verses, onShareAsImage }: VerseActionBarInnerProp
   };
 
   const handleShareAsImage = () => {
-    if (orderedVerses.length === 0) return;
+    if (sortedVerses.length === 0) return;
     onShareAsImage({
-      verses: orderedVerses,
+      verses: sortedVerses,
       reference: imageReference,
       teluguText: imageTeluguText,
     });

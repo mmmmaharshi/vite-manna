@@ -96,12 +96,9 @@ const styles = {
 };
 
 const VerseImageCard = ({ ref, verses, reference, teluguText }: VerseImageCardProps) => {
-  const verseNumbers = verses
-    .map((v) => v.verse)
-    .filter((n, i, a) => a.indexOf(n) === i)
-    .toSorted((a, b) => a - b)
-    .map((n) => (verses.length > 1 ? n : null))
-    .filter((n) => n !== null);
+  const verseNumbers = verses.length > 1
+    ? [...new Set(verses.map((v) => v.verse))].toSorted((a, b) => a - b)
+    : [];
 
   return (
     <div

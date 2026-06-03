@@ -1,6 +1,7 @@
 import { useEffect, useRef } from "react";
 import { Button, ScrollShadow, Skeleton, Surface, Typography } from "@heroui/react";
 
+import { cn } from "../../shared/lib/cn";
 import { getBibleBookName } from "../../shared/bible";
 import { useBooks } from "./hooks/useBooks";
 import { useReaderSnapshot } from "./hooks/useReaderSnapshot";
@@ -121,10 +122,10 @@ const ReaderScreen = () => {
         </Typography.Heading>
         <section
           ref={verseSectionRef}
-          className={[
+          className={cn(
             "max-w-md sm:max-w-lg md:max-w-xl lg:max-w-2xl w-full px-2 py-4 mx-auto",
-            isSelectionMode ? "pb-24" : "",
-          ].join(" ")}
+            isSelectionMode && "pb-24",
+          )}
           aria-label={selectedBookSummary ? `${getBibleBookName(selectedBookSummary.id)} ${chapter}` : "Bible reader"}
         >
           {snapshot && (

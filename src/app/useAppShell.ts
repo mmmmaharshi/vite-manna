@@ -1,6 +1,6 @@
 import { useEffect, useState } from "react";
 
-import { initializeBible, useBibleStatus } from "../features/setup";
+import { useBibleStatus } from "../features/setup/hooks/useBibleStatus";
 import { getBibleBookName, getReaderBootstrap, getReaderSnapshot } from "../shared/bible";
 import { waitForOfflineReadiness } from "../shared/lib/offlineReadiness";
 import { waitForFonts } from "../shared/lib/waitForFonts";
@@ -72,26 +72,23 @@ export function useAppShell(): ShellStatus {
 
     let mounted = true;
 
-    void initializeBible((nextProgress) => {
-      if (!mounted) {
-        return;
-      }
-
-      setDownloadProgress(Math.min(Math.round(nextProgress), PROGRESS_CAP));
-    })
-      .then(() => {
-        if (mounted) {
-          setDownloadProgress(0);
-          setIsBibleComplete(true);
-        }
+    import("../features/setup").then(({ initializeBible }) => {
+      if (!mounted) return;
+      initializeBible((nextProgress) => {
+        if (!mounted) return;
+        setDownloadProgress(Math.min(Math.round(nextProgress), PROGRESS_CAP));
       })
-      .catch((error) => {
-        console.error("[Bible] Failed to initialize database", error);
-
-        if (mounted) {
-          setDownloadError(DOWNLOAD_ERROR_MESSAGE);
-        }
-      });
+        .then(() => {
+          if (mounted) {
+            setDownloadProgress(0);
+            setIsBibleComplete(true);
+          }
+        })
+        .catch((error) => {
+          console.error("[Bible] Failed to initialize database", error);
+          if (mounted) setDownloadError(DOWNLOAD_ERROR_MESSAGE);
+        });
+    });
 
     return () => {
       mounted = false;
