@@ -1,5 +1,5 @@
 import { useEffect, useRef } from "react";
-import { Button, ScrollShadow, Surface, Typography } from "@heroui/react";
+import { Button, ScrollShadow, Skeleton, Surface, Typography } from "@heroui/react";
 
 import { getBibleBookName } from "../../shared/bible";
 import { useBooks } from "./hooks/useBooks";
@@ -133,11 +133,7 @@ const ReaderScreen = () => {
           {!snapshot && hasLoadedBooks && (
             <div className="flex flex-col gap-3" aria-busy="true">
               {Array.from({ length: 8 }, (_, i) => (
-                <div
-                  key={i}
-                  className="h-5 rounded bg-surface-secondary animate-pulse"
-                  style={{ width: `${60 + Math.random() * 35}%` }}
-                />
+                <Skeleton key={i} className="h-5 rounded-lg" style={{ width: `${60 + Math.random() * 35}%` }} />
               ))}
             </div>
           )}

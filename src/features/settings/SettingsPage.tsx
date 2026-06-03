@@ -1,6 +1,6 @@
-import { useCallback } from "react";
+import { useCallback, useMemo } from "react";
 import { ArrowRotateLeft, Bell, Moon, Sun } from "@gravity-ui/icons";
-import { Button, ScrollShadow, Surface, Tooltip, Typography } from "@heroui/react";
+import { Button, ScrollShadow, Surface, ToggleButton, ToggleButtonGroup, Tooltip, Typography } from "@heroui/react";
 import { useLocalStorage } from "@reactuses/core";
 
 import { useTheme } from "../../shared/hooks/useTheme";
@@ -76,20 +76,22 @@ const SettingsPage = () => {
         <section className="max-w-md sm:max-w-lg md:max-w-xl lg:max-w-2xl xl:max-w-3xl w-full px-2 py-4 mx-auto flex flex-col gap-2">
           <Surface className="p-3">
             <Typography className="text-sm font-medium mb-2">Appearance</Typography>
-            <div className="flex gap-2">
+            <ToggleButtonGroup
+              fullWidth
+              selectionMode="single"
+              selectedKeys={useMemo(() => new Set([mode]), [mode])}
+              onSelectionChange={(keys) => {
+                const value = [...keys][0] as string;
+                if (value) setMode(value as "light" | "dark" | "system");
+              }}
+            >
               {OPTIONS.map(({ mode: m, label, Icon }) => (
-                <Button
-                  key={m}
-                  variant={mode === m ? "primary" : "secondary"}
-                  size="sm"
-                  className="flex-1"
-                  onPress={() => setMode(m)}
-                >
+                <ToggleButton key={m} id={m}>
                   <Icon aria-hidden="true" className="h-4 w-4" />
                   {label}
-                </Button>
+                </ToggleButton>
               ))}
-            </div>
+            </ToggleButtonGroup>
           </Surface>
 
           <Surface className="p-3">
@@ -106,19 +108,22 @@ const SettingsPage = () => {
                 </Tooltip.Content>
               </Tooltip>
             </div>
-            <div className="flex gap-2 mb-3">
+            <ToggleButtonGroup
+              fullWidth
+              selectionMode="single"
+              className="mb-3"
+              selectedKeys={useMemo(() => new Set([fontSize]), [fontSize])}
+              onSelectionChange={(keys) => {
+                const value = [...keys][0] as FontSize;
+                if (value) setFontSize(value);
+              }}
+            >
               {FONT_SIZES.map(({ value, label }) => (
-                <Button
-                  key={value}
-                  variant={fontSize === value ? "primary" : "secondary"}
-                  size="sm"
-                  className="flex-1"
-                  onPress={() => setFontSize(value)}
-                >
+                <ToggleButton key={value} id={value}>
                   {label}
-                </Button>
+                </ToggleButton>
               ))}
-            </div>
+            </ToggleButtonGroup>
             <div className="rounded-lg border bg-field-background p-3">
               <Typography {...SIZE_PROPS[fontSize]} render={({ children, ...dp }) => <span {...dp}>{children}</span>}>
                 <sup className="me-1 text-[0.65em] text-muted">1</sup>

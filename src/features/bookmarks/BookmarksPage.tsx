@@ -5,7 +5,7 @@ import {
   Copy,
   TrashBin,
 } from "@gravity-ui/icons";
-import { Button, ScrollShadow, Surface, toast, Tooltip, Typography } from "@heroui/react";
+import { Button, ScrollShadow, Surface, ToggleButton, ToggleButtonGroup, toast, Tooltip, Typography } from "@heroui/react";
 
 import { getBibleBookName, type Bookmark as BookmarkType } from "../../shared/bible";
 import { canNativeShare } from "../../shared/lib/browser";
@@ -93,19 +93,24 @@ const BookmarksPage = ({ onNavigateToReader }: BookmarksPageProps) => {
         {bookmarks.length > 0 && uniqueBooks.length > 1 && (
           <div className="max-w-md sm:max-w-lg md:max-w-xl lg:max-w-2xl xl:max-w-3xl w-full px-2 mx-auto pt-2">
             <ScrollShadow hideScrollBar orientation="horizontal">
-              <div className="flex gap-2 pb-1">
-                <Button size="sm" variant={filterBook === null ? "primary" : "secondary"}
-                  onPress={() => setFilterBook(null)}>
+              <ToggleButtonGroup
+                selectionMode="single"
+                disallowEmptySelection
+                selectedKeys={useMemo(() => new Set(filterBook === null ? ["all"] : [String(filterBook)]), [filterBook])}
+                onSelectionChange={(keys) => {
+                  const value = [...keys][0] as string;
+                  setFilterBook(value === "all" ? null : Number(value));
+                }}
+              >
+                <ToggleButton id="all">
                   All ({bookmarks.length})
-                </Button>
+                </ToggleButton>
                 {uniqueBooks.map((bookId) => (
-                  <Button key={bookId} size="sm"
-                    variant={filterBook === bookId ? "primary" : "secondary"}
-                    onPress={() => setFilterBook(bookId)}>
+                  <ToggleButton key={bookId} id={String(bookId)}>
                     {getBibleBookName(bookId)} ({bookmarks.filter((b) => b.book === bookId).length})
-                  </Button>
+                  </ToggleButton>
                 ))}
-              </div>
+              </ToggleButtonGroup>
             </ScrollShadow>
           </div>
         )}
