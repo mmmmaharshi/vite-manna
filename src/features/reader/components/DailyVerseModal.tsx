@@ -1,8 +1,9 @@
-import { useEffect } from "react";
-import { ArrowUpFromSquare, Sparkles } from "@gravity-ui/icons";
+import { useEffect, useState } from "react";
+import { ArrowUpFromSquare, Picture, Sparkles } from "@gravity-ui/icons";
 import { Button, Modal, Spinner, toast, Typography } from "@heroui/react";
 
 import { useDailyVerse } from "../hooks/useDailyVerse";
+import VerseImageModal from "./VerseImageModal";
 
 interface DailyVerseModalProps {
   isOpen: boolean;
@@ -25,6 +26,17 @@ const DailyVerseModal = ({
   }, [isFirstOpenToday, isLoading, onOpenChange, markDailyVerseShown]);
 
   const canNavigate = book !== null && chapter !== null;
+  const [imageModalData, setImageModalData] = useState<{ verses: { text: string; verse: number }[]; reference: string; teluguText: string } | null>(null);
+
+  const handleShareImage = () => {
+    if (!teluguText || !reference) return;
+    setImageModalData({
+      verses: [{ text: teluguText, verse: 1 }],
+      reference,
+      teluguText,
+    });
+  };
+
   const handleShare = async () => {
     if (!teluguText) return;
     if (typeof navigator === "undefined" || typeof navigator.share !== "function") {
@@ -79,6 +91,9 @@ const DailyVerseModal = ({
               <Button isIconOnly variant="tertiary" aria-label="Share" onPress={handleShare}>
                 <ArrowUpFromSquare className="h-4 w-4" />
               </Button>
+              <Button isIconOnly variant="tertiary" aria-label="Share as image" isDisabled={isLoading || !teluguText} onPress={handleShareImage}>
+                <Picture className="h-4 w-4" />
+              </Button>
               <Button slot="close" variant="secondary">
                 Close
               </Button>
@@ -96,6 +111,15 @@ const DailyVerseModal = ({
           </Modal.Dialog>
         </Modal.Container>
       </Modal.Backdrop>
+      {imageModalData && (
+        <VerseImageModal
+          isOpen={!!imageModalData}
+          onOpenChange={(open) => { if (!open) setImageModalData(null); }}
+          verses={imageModalData.verses}
+          reference={imageModalData.reference}
+          teluguText={imageModalData.teluguText}
+        />
+      )}
     </Modal>
   );
 };
