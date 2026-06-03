@@ -99,7 +99,7 @@ function lookupVerseText(
   verse: number,
 ): Promise<string | null> {
   return new Promise((resolve, reject) => {
-    const request = indexedDB.open("BibleDB", 6);
+    const request = indexedDB.open("BibleDB");
 
     request.onerror = () => reject(request.error);
 
