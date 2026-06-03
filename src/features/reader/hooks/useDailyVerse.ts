@@ -140,5 +140,25 @@ export function useDailyVerse(): DailyVerseResult {
     };
   }, []);
 
+  useEffect(() => {
+    if (result.isLoading || !result.isFirstOpenToday || !result.teluguText) return;
+
+    try {
+      if (
+        localStorage.getItem("manna.notifications-enabled") === "true" &&
+        typeof Notification !== "undefined" &&
+        Notification.permission === "granted"
+      ) {
+        new Notification(result.reference, {
+          body: result.teluguText,
+          icon: "/favicon.svg",
+          tag: "daily-verse",
+        });
+      }
+    } catch {
+      // notification API unavailable
+    }
+  }, [result.isLoading, result.isFirstOpenToday, result.teluguText, result.reference]);
+
   return result;
 }

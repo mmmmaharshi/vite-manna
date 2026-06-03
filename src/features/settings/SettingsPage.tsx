@@ -40,34 +40,31 @@ const SettingsPage = () => {
   const { mode, setMode } = useTheme();
   const fontSize = useReaderStore((state) => state.fontSize);
   const setFontSize = useReaderStore((state) => state.setFontSize);
-  const [notifSupported, setNotifSupported] = useState(false);
-  const [notifEnabled, setNotifEnabled] = useState(false);
-
-  useEffect(() => {
-    if (!("serviceWorker" in navigator)) return;
-    navigator.serviceWorker.ready.then((reg) => {
-      const ps = (reg as unknown as { periodicSync: { getTags: () => Promise<string[]> } }).periodicSync;
-      if (!ps) return;
-      setNotifSupported(true);
-      ps.getTags().then((tags: string[]) => {
-        if (tags.includes("daily-verse")) setNotifEnabled(true);
-      });
-    });
-  }, []);
+  const NOTIF_PREF_KEY = "manna.notifications-enabled";
+  const [notifEnabled, setNotifEnabled] = useState(() => {
+    try { return localStorage.getItem(NOTIF_PREF_KEY) === "true"; }
+    catch { return false; }
+  });
 
   const toggleNotifications = useCallback(async () => {
     if (notifEnabled) {
-      const reg = await navigator.serviceWorker.ready;
-      await (reg as unknown as { periodicSync: { unregister: (tag: string) => Promise<void> } }).periodicSync.unregister("daily-verse");
+      try {
+        const reg = await navigator.serviceWorker.ready;
+        const ps = (reg as any).periodicSync;
+        if (ps?.unregister) await ps.unregister("daily-verse");
+      } catch { }
+      try { localStorage.setItem(NOTIF_PREF_KEY, "false"); } catch { }
       setNotifEnabled(false);
       return;
     }
     const perm = await Notification.requestPermission();
     if (perm !== "granted") return;
-    const reg = await navigator.serviceWorker.ready;
-    await (reg as unknown as { periodicSync: { register: (tag: string, opts: { minInterval: number }) => Promise<void> } }).periodicSync.register("daily-verse", {
-      minInterval: 24 * 60 * 60 * 1000,
-    });
+    try {
+      const reg = await navigator.serviceWorker.ready;
+      const ps = (reg as any).periodicSync;
+      if (ps?.register) await ps.register("daily-verse", { minInterval: 24 * 60 * 60 * 1000 });
+    } catch { }
+    try { localStorage.setItem(NOTIF_PREF_KEY, "true"); } catch { }
     setNotifEnabled(true);
   }, [notifEnabled]);
 
@@ -134,24 +131,27 @@ const SettingsPage = () => {
             </Typography>
           </div>
         </Surface>
-        {notifSupported && (
-          <Surface className="p-3">
-            <div className="flex items-center justify-between">
-              <Typography className="text-sm font-medium">Daily Notifications</Typography>
-              <Button
-                variant={notifEnabled ? "primary" : "secondary"}
-                size="sm"
-                onPress={toggleNotifications}
-              >
-                <Bell aria-hidden="true" className="h-4 w-4" />
-                {notifEnabled ? "Enabled" : "Disabled"}
-              </Button>
-            </div>
-            <Typography className="text-xs text-muted mt-1">
-              Receive a daily notification with the verse of the day.
+        <Surface className="p-3">
+          <div className="flex items-center justify-between">
+            <Typography className="text-sm font-medium">Daily Notifications</Typography>
+            <Button
+              variant={notifEnabled ? "primary" : "tertiary"}
+              size="sm"
+              onPress={toggleNotifications}
+            >
+              <Bell aria-hidden="true" className="h-4 w-4" />
+              {notifEnabled ? "Enabled" : "Disabled"}
+            </Button>
+          </div>
+          <Typography className="text-xs text-muted mt-1">
+            Receive a daily notification with the verse of the day.
+          </Typography>
+          {typeof Notification !== "undefined" && Notification.permission === "denied" && (
+            <Typography className="text-xs text-danger mt-1">
+              Notification permission was denied. Update your browser settings to re-enable.
             </Typography>
-          </Surface>
-        )}
+          )}
+        </Surface>
       </section>
     </main>
   );
