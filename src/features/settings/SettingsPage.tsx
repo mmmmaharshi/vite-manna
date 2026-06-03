@@ -1,6 +1,6 @@
 import { useEffect } from "react";
-import { Moon, Sun } from "@gravity-ui/icons";
-import { Button, Surface, Typography } from "@heroui/react";
+import { ArrowRotateLeft, Moon, Sun } from "@gravity-ui/icons";
+import { Button, Surface, Tooltip, Typography } from "@heroui/react";
 
 import { useTheme } from "../../shared/hooks/useTheme";
 import { useReaderStore, type FontSize } from "../reader/store/readerStore";
@@ -8,12 +8,14 @@ import { useReaderStore, type FontSize } from "../reader/store/readerStore";
 const OPTIONS: { mode: "light" | "dark" | "system"; label: string; Icon: typeof Sun }[] = [
   { mode: "light", label: "Light", Icon: Sun },
   { mode: "dark", label: "Dark", Icon: Moon },
-  { mode: "system", label: "System", Icon: () => (
-    <svg className="h-4 w-4" viewBox="0 0 16 16" fill="currentColor">
-      <circle cx="8" cy="8" r="3" />
-      <path d="M8 1v2M8 13v2M2.05 2.05l1.41 1.41M12.54 12.54l1.41 1.41M1 8h2M13 8h2M2.05 13.95l1.41-1.41M12.54 3.46l1.41-1.41" stroke="currentColor" strokeWidth="1.3" fill="none" strokeLinecap="round" />
-    </svg>
-  )},
+  {
+    mode: "system", label: "System", Icon: () => (
+      <svg className="h-4 w-4" viewBox="0 0 16 16" fill="currentColor">
+        <circle cx="8" cy="8" r="3" />
+        <path d="M8 1v2M8 13v2M2.05 2.05l1.41 1.41M12.54 12.54l1.41 1.41M1 8h2M13 8h2M2.05 13.95l1.41-1.41M12.54 3.46l1.41-1.41" stroke="currentColor" strokeWidth="1.3" fill="none" strokeLinecap="round" />
+      </svg>
+    )
+  },
 ];
 
 const FONT_SIZES: { value: FontSize; label: string }[] = [
@@ -69,7 +71,19 @@ const SettingsPage = () => {
         </Surface>
 
         <Surface className="p-3">
-          <Typography className="text-sm font-medium mb-2">Font Size</Typography>
+          <div className="flex items-center justify-between mb-2">
+            <Typography className="text-sm font-medium">Font Size</Typography>
+            <Tooltip>
+              <Button variant="tertiary" size="sm" onPress={() => setFontSize("sm")}>
+                <ArrowRotateLeft aria-hidden="true" className="h-3 w-3" />
+                Reset
+              </Button>
+              <Tooltip.Content showArrow placement="top">
+                <Tooltip.Arrow />
+                Reset to default (S)
+              </Tooltip.Content>
+            </Tooltip>
+          </div>
           <div className="flex gap-2 mb-3">
             {FONT_SIZES.map(({ value, label }) => (
               <Button
