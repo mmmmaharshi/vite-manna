@@ -32,6 +32,11 @@ const ReaderScreen = () => {
   }, [book, chapter]);
 
   const selectedBookSummary = books.find((candidate) => candidate.id === book);
+
+  useEffect(() => {
+    const name = selectedBookSummary ? getBibleBookName(selectedBookSummary.id) : "";
+    document.title = name ? `మన్నా - ${name} ${chapter}` : "మన్నా - తెలుగు బైబిల్";
+  }, [selectedBookSummary, chapter]);
   const snapshot = useReaderSnapshot(
     book,
     chapter,
@@ -73,6 +78,9 @@ const ReaderScreen = () => {
 
   return (
     <main className="pb-16">
+      <Typography.Heading level={1} className="sr-only">
+        {selectedBookSummary ? `${getBibleBookName(selectedBookSummary.id)} ${chapter}` : "Bible Reader"}
+      </Typography.Heading>
       <Surface className="sticky top-0 z-30 py-2.5 pt-3.5 border border-b">
         <div className="max-w-md flex flex-col gap-2 w-full px-2 mx-auto">
           <BookSelect

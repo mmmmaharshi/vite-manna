@@ -1,4 +1,5 @@
 import { lazy, Suspense, useCallback, useState } from "react";
+import { Spinner } from "@heroui/react";
 import { useSearchParams } from "react-router";
 
 import { ReaderScreen } from "../features/reader";
@@ -35,17 +36,17 @@ const TabLayout = () => {
         <ReaderScreen />
       </div>
       {activeTab === "search" && (
-        <Suspense fallback={null}>
+        <Suspense fallback={<div className="min-h-dvh flex items-center justify-center"><Spinner size="lg" aria-label="Loading" /></div>}>
           <SearchPage onNavigateToReader={() => setActiveTab("reader")} />
         </Suspense>
       )}
       {activeTab === "bookmarks" && (
-        <Suspense fallback={null}>
+        <Suspense fallback={<div className="min-h-dvh flex items-center justify-center"><Spinner size="lg" aria-label="Loading" /></div>}>
           <BookmarksPage onNavigateToReader={() => setActiveTab("reader")} />
         </Suspense>
       )}
       {activeTab === "settings" && (
-        <Suspense fallback={null}>
+        <Suspense fallback={<div className="min-h-dvh flex items-center justify-center"><Spinner size="lg" aria-label="Loading" /></div>}>
           <SettingsPage />
         </Suspense>
       )}
