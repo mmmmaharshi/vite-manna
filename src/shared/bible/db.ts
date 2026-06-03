@@ -17,9 +17,15 @@ export interface Bookmark {
   createdAt: number;
 }
 
+export interface MetaEntry {
+  key: string;
+  value: unknown;
+}
+
 class BibleDB extends Dexie {
   verses!: Table<BibleVerse, number>;
   bookmarks!: Table<Bookmark, number>;
+  meta!: Table<MetaEntry, string>;
 
   constructor() {
     super("BibleDB");
@@ -30,6 +36,7 @@ class BibleDB extends Dexie {
     this.version(4).stores({ verses: "id, book" });
     this.version(5).stores({ verses: "id, book, [book+chapter]" });
     this.version(6).stores({ bookmarks: "verseId, book, chapter, createdAt" });
+    this.version(7).stores({ meta: "key" });
   }
 }
 

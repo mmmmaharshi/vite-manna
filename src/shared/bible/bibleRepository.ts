@@ -126,4 +126,40 @@ export function searchVerses(query: string) {
 
 export { parseVerseref } from "./dailyVerseData";
 
+const OFFSET_KEY = "daily-verse-offset";
+
+export function getCachedUserOffset(): number | null {
+  try {
+    const raw = localStorage.getItem(OFFSET_KEY);
+    return raw ? parseInt(raw, 10) : null;
+  } catch {
+    return null;
+  }
+}
+
+export function setCachedUserOffset(offset: number) {
+  try { localStorage.setItem(OFFSET_KEY, String(offset)); } catch { }
+}
+
+export async function getUserOffset(): Promise<number> {
+  const cached = getCachedUserOffset();
+  if (cached !== null) return cached;
+
+  try {
+    const stored = await db.meta.get(OFFSET_KEY);
+    if (stored?.value !== undefined) {
+      const val = Number(stored.value);
+      if (!isNaN(val)) {
+        setCachedUserOffset(val);
+        return val;
+      }
+    }
+  } catch { }
+
+  const offset = Math.floor(Math.random() * 365);
+  setCachedUserOffset(offset);
+  try { await db.meta.put({ key: OFFSET_KEY, value: offset }); } catch { }
+  return offset;
+}
+
 

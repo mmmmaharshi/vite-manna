@@ -46,7 +46,9 @@ self.addEventListener("periodicsync", (event: Event) => {
 
 async function showDailyVerseNotification() {
   const dayOfYear = getDayOfYear(new Date());
-  const ref = DAILY_VERSE_REFS[(dayOfYear - 1) % DAILY_VERSE_REFS.length];
+  const offset = await getUserOffsetFromDB();
+  const index = ((dayOfYear - 1 + offset) % DAILY_VERSE_REFS.length + DAILY_VERSE_REFS.length) % DAILY_VERSE_REFS.length;
+  const ref = DAILY_VERSE_REFS[index];
   const parsed = parseVerseref(ref);
 
   let title = "Verse of the Day";
@@ -103,6 +105,25 @@ self.addEventListener("notificationclick", (event: Event) => {
       }),
   );
 });
+
+function getUserOffsetFromDB(): Promise<number> {
+  return new Promise((resolve) => {
+    try {
+      const request = indexedDB.open("BibleDB");
+      request.onsuccess = () => {
+        const db = request.result;
+        if (!db.objectStoreNames.contains("meta")) { resolve(0); return; }
+        const tx = db.transaction("meta", "readonly");
+        const store = tx.objectStore("meta");
+        const get = store.get("daily-verse-offset");
+        get.onsuccess = () => resolve(get.result?.value ?? 0);
+        get.onerror = () => resolve(0);
+      };
+      request.onerror = () => resolve(0);
+      request.onupgradeneeded = () => resolve(0);
+    } catch { resolve(0); }
+  });
+}
 
 function lookupVerseText(
   book: number,

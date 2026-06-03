@@ -1,7 +1,8 @@
 import { format } from "date-fns";
-import { useCallback, useEffect, useState } from "react";
+import { useCallback, useEffect, useRef, useState } from "react";
 
 import { getBibleBookName, db } from "../../../shared/bible";
+import { getUserOffset } from "../../../shared/bible/bibleRepository";
 import { DAILY_VERSE_REFS, getDayOfYear, parseVerseref } from "../../../shared/bible/dailyVerseData";
 
 const CACHE_KEY = "manna.daily-verse";
@@ -81,14 +82,28 @@ export function useDailyVerse(): DailyVerseResult {
     };
   });
 
+  const offsetRef = useRef(0);
+  const loaded = useRef(false);
+
+  useEffect(() => {
+    if (loaded.current) return;
+    loaded.current = true;
+
+    getUserOffset().then((offset) => {
+      offsetRef.current = offset;
+    });
+  }, []);
+
   useEffect(() => {
     if (!result.isLoading) return;
     let mounted = true;
 
     async function load() {
+      await getUserOffset();
       const dayOfYear = getDayOfYear(new Date());
-      const verseref =
-        DAILY_VERSE_REFS[(dayOfYear - 1) % DAILY_VERSE_REFS.length];
+      const offset = offsetRef.current;
+      const index = ((dayOfYear - 1 + offset) % DAILY_VERSE_REFS.length + DAILY_VERSE_REFS.length) % DAILY_VERSE_REFS.length;
+      const verseref = DAILY_VERSE_REFS[index];
       const parsed = parseVerseref(verseref);
 
       let teluguText = "";
