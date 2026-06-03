@@ -128,10 +128,11 @@ const ChapterStrip = ({
   });
 
   const [isDailyVerseOpen, setIsDailyVerseOpen] = useState(false);
-  const handleDailyVerseNavigate = (book: number, chapter: number) => {
+  const handleDailyVerseNavigate = (book: number, chapter: number, verse: number) => {
     setIsDailyVerseOpen(false);
     useReaderStore.getState().setBook(book);
     useReaderStore.getState().setChapter(chapter);
+    useReaderStore.getState().setPermalinkVerse(verse);
   };
 
   if (chapters.length === 0) return null;

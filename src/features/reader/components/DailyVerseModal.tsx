@@ -8,7 +8,7 @@ import VerseImageModal from "./VerseImageModal";
 interface DailyVerseModalProps {
   isOpen: boolean;
   onOpenChange: (open: boolean) => void;
-  onNavigateToChapter: (book: number, chapter: number) => void;
+  onNavigateToChapter: (book: number, chapter: number, verse: number) => void;
 }
 
 const DailyVerseModal = ({
@@ -16,7 +16,7 @@ const DailyVerseModal = ({
   onOpenChange,
   onNavigateToChapter,
 }: DailyVerseModalProps) => {
-  const { isLoading, teluguText, reference, book, chapter, isFirstOpenToday, markDailyVerseShown } =
+  const { isLoading, teluguText, reference, book, chapter, verse, isFirstOpenToday, markDailyVerseShown } =
     useDailyVerse();
   const autoOpened = useRef(false);
 
@@ -27,7 +27,7 @@ const DailyVerseModal = ({
     markDailyVerseShown();
   }, [isFirstOpenToday, isLoading, onOpenChange, markDailyVerseShown]);
 
-  const canNavigate = book !== null && chapter !== null;
+  const canNavigate = book !== null && chapter !== null && verse !== null;
   const [imageModalData, setImageModalData] = useState<{ verses: { text: string; verse: number }[]; reference: string; teluguText: string } | null>(null);
 
   const handleShareImage = () => {
@@ -102,7 +102,7 @@ const DailyVerseModal = ({
               {canNavigate && (
                 <Button
                   onPress={() => {
-                    onNavigateToChapter(book!, chapter!);
+                    onNavigateToChapter(book!, chapter!, verse!);
                     onOpenChange(false);
                   }}
                 >
