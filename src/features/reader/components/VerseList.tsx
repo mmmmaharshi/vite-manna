@@ -2,7 +2,7 @@ import { useLayoutEffect, useRef } from "react";
 import { Typography } from "@heroui/react";
 
 import { useBookmarks } from "../../bookmarks/hooks/useBookmarks";
-import { useReaderStore } from "../store/readerStore";
+import { useReaderStore, type FontSize } from "../store/readerStore";
 import type { BibleVerse } from "../../../shared/bible";
 import "./verseList.css";
 
@@ -20,6 +20,7 @@ const VerseList = ({ verses }: VerseListProps) => {
   const permalinkRef = useRef<HTMLLIElement | null>(null);
   const lastScrolledVerseRef = useRef<number | null>(null);
 
+  const fontSize = useReaderStore((state) => state.fontSize);
   const { bookmarkedIds } = useBookmarks();
   const selectedSet = new Set(selectedVerseIds);
 
@@ -47,8 +48,16 @@ const VerseList = ({ verses }: VerseListProps) => {
     lastScrolledVerseRef.current = permalinkVerse;
   }, [permalinkVerse, verses]);
 
+  const sizeClass: Record<FontSize, string> = {
+    sm: "text-sm",
+    base: "text-base",
+    lg: "text-lg",
+    xl: "text-xl",
+    "2xl": "text-2xl",
+  };
+
   return (
-    <ol className="flex flex-col gap-1">
+    <ol className={`flex flex-col gap-1 ${sizeClass[fontSize]}`}>
       {verses.map((verse) => {
         const isSelected = selectedSet.has(verse.id);
         const isPermalink = verse.verse === permalinkVerse;
@@ -72,8 +81,8 @@ const VerseList = ({ verses }: VerseListProps) => {
               ].join(" ")}
               onClick={() => toggleVerseSelection(verse.id)}
             >
-              <Typography className="text-sm">
-                <sup className="me-1 text-xs text-muted">{verse.verse}</sup>
+              <Typography>
+                <sup className="me-1 text-[0.65em] text-muted">{verse.verse}</sup>
                 {verse.text}
               </Typography>
             </button>

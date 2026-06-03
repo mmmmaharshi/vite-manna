@@ -3,6 +3,8 @@ import { create } from "zustand";
 const PENDING_BOOK_SAFETY_TIMEOUT = 15_000;
 const MAX_REASONABLE_ID = 200;
 
+export type FontSize = "sm" | "base" | "lg" | "xl" | "2xl";
+
 export interface ReaderState {
   book: number;
   chapter: number;
@@ -12,6 +14,7 @@ export interface ReaderState {
   selectedVerseIds: number[];
   isSelectionMode: boolean;
   permalinkVerse: number | null;
+  fontSize: FontSize;
 
   setBook: (book: number) => void;
   setChapter: (chapter: number) => void;
@@ -21,10 +24,12 @@ export interface ReaderState {
   toggleVerseSelection: (verseId: number) => void;
   clearVerseSelection: () => void;
   setPermalinkVerse: (verse: number | null) => void;
+  setFontSize: (fontSize: FontSize) => void;
   reset: () => void;
 }
 
 const STORAGE_KEY = "manna.reader-location";
+const FONT_SIZE_KEY = "manna.reader-font-size";
 const STORAGE_VERSION = 1;
 
 interface StoredLocation {
@@ -139,6 +144,15 @@ function loadInitialState() {
   return { book, chapter, chaptersByBook, permalinkVerse };
 }
 
+function loadFontSize(): FontSize {
+  const valid: FontSize[] = ["sm", "base", "lg", "xl", "2xl"];
+  try {
+    const stored = localStorage.getItem(FONT_SIZE_KEY) as FontSize | null;
+    if (stored && valid.includes(stored)) return stored;
+  } catch { /* noop */ }
+  return "lg";
+}
+
 function rememberChapter(
   chaptersByBook: Record<number, number>,
   book: number,
@@ -157,6 +171,7 @@ export const useReaderStore = create<ReaderState>((set, get) => ({
   selectedVerseIds: [],
   isSelectionMode: false,
   permalinkVerse: initial.permalinkVerse,
+  fontSize: loadFontSize(),
 
   setBook: (book) => {
     const { chaptersByBook } = get();
@@ -246,6 +261,11 @@ export const useReaderStore = create<ReaderState>((set, get) => ({
     set({ selectedVerseIds: [], isSelectionMode: false });
   },
 
+  setFontSize: (fontSize) => {
+    try { localStorage.setItem(FONT_SIZE_KEY, fontSize); } catch { /* noop */ }
+    set({ fontSize });
+  },
+
   setPermalinkVerse: (verse) => {
     if (get().permalinkVerse === verse) {
       return;
@@ -265,6 +285,7 @@ export const useReaderStore = create<ReaderState>((set, get) => ({
       selectedVerseIds: [],
       isSelectionMode: false,
       permalinkVerse: fresh.permalinkVerse,
+      fontSize: loadFontSize(),
     });
   },
 }));
