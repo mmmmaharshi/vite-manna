@@ -57,7 +57,7 @@ const VerseList = ({ verses }: VerseListProps) => {
   };
 
   return (
-    <ol className={`flex flex-col gap-1 ${sizeClass[fontSize]}`}>
+    <ol className="flex flex-col gap-1">
       {verses.map((verse) => {
         const isSelected = selectedSet.has(verse.id);
         const isPermalink = verse.verse === permalinkVerse;
@@ -81,7 +81,7 @@ const VerseList = ({ verses }: VerseListProps) => {
               ].join(" ")}
               onClick={() => toggleVerseSelection(verse.id)}
             >
-              <Typography>
+              <Typography className={sizeClass[fontSize]}>
                 <sup className="me-1 text-[0.65em] text-muted">{verse.verse}</sup>
                 {verse.text}
               </Typography>
