@@ -25,6 +25,18 @@
       "skillPath": "skills/heroui-react/SKILL.md",
       "computedHash": "f4a764d21a39ccc5b2076a869cf083bbfdb983e81f9deda8d75fef42c939a993"
     },
+    "lean-ux": {
+      "source": "wondelai/skills",
+      "sourceType": "github",
+      "skillPath": "lean-ux/SKILL.md",
+      "computedHash": "72a810ecfa8f50beb6ecc64197264d42e8ce4df20debb3b4db1f102c2d26ad83"
+    },
+    "product-ux-expert": {
+      "source": "majiayu000/claude-arsenal",
+      "sourceType": "github",
+      "skillPath": "skills/product-ux-expert/SKILL.md",
+      "computedHash": "be39d796c55dd28f49dab3481eb06e4a5249312a91828644fc9443e0207f42a9"
+    },
     "refactor": {
       "source": "github/awesome-copilot",
       "sourceType": "github",
