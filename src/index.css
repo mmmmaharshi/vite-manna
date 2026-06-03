@@ -56,7 +56,6 @@ html, body {
     --muted: oklch(55.17% 0.004 262.87);
     --overlay: oklch(100% 0.0006 262.87);
     --overlay-foreground: oklch(21.03% 0.002 262.87);
-    --scrollbar: oklch(87.1% 0.002 262.87);
     --segment: oklch(100% 0.002 262.87);
     --segment-foreground: oklch(21.03% 0.002 262.87);
     --separator: oklch(92% 0.002 262.87);
@@ -100,7 +99,6 @@ html, body {
     --muted: oklch(70.5% 0.004 262.87);
     --overlay: oklch(21.03% 0.004 262.87);
     --overlay-foreground: oklch(99.11% 0.002 262.87);
-    --scrollbar: oklch(70.5% 0.002 262.87);
     --segment: oklch(39.64% 0.002 262.87);
     --segment-foreground: oklch(99.11% 0.002 262.87);
     --separator: oklch(25% 0.002 262.87);
