@@ -7,6 +7,12 @@
       "skillPath": "skills/caveman/SKILL.md",
       "computedHash": "7935e83f9c6a8b7cbb5404d144b0d19e3ba93583f4388301c3dada37cd25adf8"
     },
+    "ce-commit": {
+      "source": "everyinc/compound-engineering-plugin",
+      "sourceType": "github",
+      "skillPath": "plugins/compound-engineering/skills/ce-commit/SKILL.md",
+      "computedHash": "cdebed273fb53f0a2b057f77de18d718fa8dbe68d7cacbcc17fa08acb0a930e0"
+    },
     "find-skills": {
       "source": "vercel-labs/skills",
       "sourceType": "github",
