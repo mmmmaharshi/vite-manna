@@ -8,6 +8,7 @@ import {
 import { Button, ScrollShadow, Surface, toast, Tooltip, Typography } from "@heroui/react";
 
 import { getBibleBookName, type Bookmark as BookmarkType } from "../../shared/bible";
+import { canNativeShare } from "../../shared/lib/browser";
 import { useReaderStore } from "../reader/store/readerStore";
 import { useBookmarks } from "./hooks/useBookmarks";
 
@@ -21,10 +22,6 @@ function formatRef(book: number, chapter: number, verse: number) {
 
 function formatShareText(bms: BookmarkType[]) {
   return bms.map((bm) => `${formatRef(bm.book, bm.chapter, bm.verse)} ${bm.text}`).join("\n\n");
-}
-
-function canNativeShare() {
-  return typeof navigator !== "undefined" && typeof navigator.share === "function";
 }
 
 const BookmarksPage = ({ onNavigateToReader }: BookmarksPageProps) => {

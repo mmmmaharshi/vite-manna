@@ -1,7 +1,8 @@
 import { create } from "zustand";
 
+import { parsePositiveInteger } from "../../../shared/lib/parsePositiveInteger";
+
 const PENDING_BOOK_SAFETY_TIMEOUT = 15_000;
-const MAX_REASONABLE_ID = 200;
 
 export type FontSize = "sm" | "base" | "lg" | "xl" | "2xl";
 
@@ -37,12 +38,6 @@ interface StoredLocation {
   chapter?: number;
   chaptersByBook?: Record<string, number>;
   version?: number;
-}
-
-function parsePositiveInteger(value: string | null) {
-  const parsed = Number(value);
-
-  return Number.isInteger(parsed) && parsed > 0 && parsed <= MAX_REASONABLE_ID ? parsed : null;
 }
 
 function parseChaptersByBook(value: unknown): Record<number, number> {
@@ -290,6 +285,4 @@ export const useReaderStore = create<ReaderState>((set, get) => ({
   },
 }));
 
-export function getReaderStoreState() {
-  return useReaderStore.getState();
-}
+

@@ -1,8 +1,14 @@
+interface PeriodicSyncManager {
+  register: (tag: string, options: { minInterval: number }) => Promise<void>;
+  unregister: (tag: string) => Promise<void>;
+}
+
 import { useCallback, useEffect, useState } from "react";
 import { ArrowRotateLeft, Bell, Moon, Sun } from "@gravity-ui/icons";
 import { Button, Surface, Tooltip, Typography } from "@heroui/react";
 
 import { useTheme } from "../../shared/hooks/useTheme";
+import { SIZE_PROPS } from "../../shared/lib/fontSize";
 import { useReaderStore, type FontSize } from "../reader/store/readerStore";
 
 const OPTIONS: { mode: "light" | "dark" | "system"; label: string; Icon: typeof Sun }[] = [
@@ -26,14 +32,6 @@ const FONT_SIZES: { value: FontSize; label: string }[] = [
   { value: "2xl", label: "2XL" },
 ];
 
-const SIZE_PROPS: Record<FontSize, { type: "body-sm" | "body" | "h5" | "h4" | "h3"; weight?: "normal" }> = {
-  sm: { type: "body-sm" },
-  base: { type: "body" },
-  lg: { type: "h5", weight: "normal" },
-  xl: { type: "h4", weight: "normal" },
-  "2xl": { type: "h3", weight: "normal" },
-};
-
 const PREVIEW_TEXT = "ఆదియందు దేవుడు ఆకాశమును భూమిని సృష్టించెను. భూమి నిరాకారముగా నిర్జనముగా ఉండెను. అగాధజలముల మీదను అంధకారము కమ్ముకొని యుండెను. దేవుని ఆత్మ జలముల మీద కదలాడుచుండెను. అప్పుడు దేవుడు వెలుగు కలుగునని చెప్పగా వెలుగు కలిగెను.";
 
 const SettingsPage = () => {
@@ -50,7 +48,7 @@ const SettingsPage = () => {
     if (notifEnabled) {
       try {
         const reg = await navigator.serviceWorker.ready;
-        const ps = (reg as any).periodicSync;
+        const ps = (reg as unknown as { periodicSync?: PeriodicSyncManager }).periodicSync;
         if (ps?.unregister) await ps.unregister("daily-verse");
       } catch { }
       try { localStorage.setItem(NOTIF_PREF_KEY, "false"); } catch { }
@@ -61,7 +59,7 @@ const SettingsPage = () => {
     if (perm !== "granted") return;
     try {
       const reg = await navigator.serviceWorker.ready;
-      const ps = (reg as any).periodicSync;
+      const ps = (reg as unknown as { periodicSync?: PeriodicSyncManager }).periodicSync;
       if (ps?.register) await ps.register("daily-verse", { minInterval: 24 * 60 * 60 * 1000 });
     } catch { }
     try { localStorage.setItem(NOTIF_PREF_KEY, "true"); } catch { }

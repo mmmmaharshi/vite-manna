@@ -1,6 +1,7 @@
 import { useEffect, useRef } from "react";
 import { useSearchParams } from "react-router";
 
+import { parsePositiveInteger } from "../../shared/lib/parsePositiveInteger";
 import { useReaderStore } from "./store/readerStore";
 
 const URL_PARAM_BOOK = "book";
@@ -8,11 +9,6 @@ const URL_PARAM_CHAPTER = "chapter";
 const URL_PARAM_VERSE = "verse";
 const STORAGE_KEY = "manna.reader-location";
 const STORAGE_VERSION = 1;
-
-function parsePositiveInteger(value: string | null) {
-  const parsed = Number(value);
-  return Number.isInteger(parsed) && parsed > 0 && parsed <= 200 ? parsed : null;
-}
 
 export function useUrlSync() {
   const [searchParams, setSearchParams] = useSearchParams();

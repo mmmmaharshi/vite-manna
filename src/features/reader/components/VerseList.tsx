@@ -2,7 +2,8 @@ import { useLayoutEffect, useRef } from "react";
 import { Typography } from "@heroui/react";
 
 import { useBookmarks } from "../../bookmarks/hooks/useBookmarks";
-import { useReaderStore, type FontSize } from "../store/readerStore";
+import { useReaderStore } from "../store/readerStore";
+import { SIZE_PROPS } from "../../../shared/lib/fontSize";
 import type { BibleVerse } from "../../../shared/bible";
 import "./verseList.css";
 
@@ -48,14 +49,6 @@ const VerseList = ({ verses }: VerseListProps) => {
     lastScrolledVerseRef.current = permalinkVerse;
   }, [permalinkVerse, verses]);
 
-  const sizeProps: Record<FontSize, { type: "body-sm" | "body" | "h5" | "h4" | "h3"; weight?: "normal" }> = {
-    sm: { type: "body-sm" },
-    base: { type: "body" },
-    lg: { type: "h5", weight: "normal" },
-    xl: { type: "h4", weight: "normal" },
-    "2xl": { type: "h3", weight: "normal" },
-  };
-
   return (
     <ol className="flex flex-col gap-1">
       {verses.map((verse) => {
@@ -81,7 +74,7 @@ const VerseList = ({ verses }: VerseListProps) => {
               ].join(" ")}
               onClick={() => toggleVerseSelection(verse.id)}
             >
-              <Typography {...sizeProps[fontSize]} render={({ children, ...dp }) => <span {...dp}>{children}</span>}>
+              <Typography {...SIZE_PROPS[fontSize]} render={({ children, ...dp }) => <span {...dp}>{children}</span>}>
                 <sup className="me-1 text-[0.65em] text-muted">{verse.verse}</sup>
                 {verse.text}
               </Typography>

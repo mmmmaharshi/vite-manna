@@ -3,6 +3,7 @@ import { ArrowUpFromSquare, Bookmark as BookmarkIcon, BookmarkFill, Copy, Link a
 import { Button, Surface, toast, Tooltip } from "@heroui/react";
 
 import { getBibleBookName, type BibleVerse } from "../../../shared/bible";
+import { canNativeShare } from "../../../shared/lib/browser";
 import { useBookmarks } from "../../bookmarks/hooks/useBookmarks";
 import { useReaderStore } from "../store/readerStore";
 import VerseImageModal from "./VerseImageModal";
@@ -39,12 +40,6 @@ function buildPermalinkUrl(book: number, chapter: number, verse: number) {
   url.searchParams.set("verse", String(verse));
   url.hash = "";
   return url.toString();
-}
-
-function canNativeShare() {
-  return (
-    typeof navigator !== "undefined" && typeof navigator.share === "function"
-  );
 }
 
 async function copyToClipboard(text: string) {

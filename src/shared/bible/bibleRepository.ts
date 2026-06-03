@@ -2,23 +2,7 @@ import { db, type BibleVerse } from "./db";
 
 export function countVerses() {
   return db.verses.count();
-}
-
-export async function getBooks() {
-  const verses = await db.verses.orderBy("book").toArray();
-  const chapterNumbersByBook = new Map<number, Set<number>>();
-
-  for (const verse of verses) {
-    const chapterNumbers = chapterNumbersByBook.get(verse.book) ?? new Set();
-    chapterNumbers.add(verse.chapter);
-    chapterNumbersByBook.set(verse.book, chapterNumbers);
-  }
-
-  return [...chapterNumbersByBook].map(([id, chapterNumbers]) => ({
-    chapterCount: chapterNumbers.size,
-    id,
-  }));
-}
+}
 
 export async function getChapterNumbers(book: number) {
   const verses = await db.verses.where("book").equals(book).toArray();
@@ -131,15 +115,6 @@ export function getBookmarks() {
 export async function getBookmarkedVerseIds(): Promise<Set<number>> {
   const ids = await db.bookmarks.orderBy("verseId").keys();
   return new Set(ids as number[]);
-}
-
-export function isBookmarked(verseId: number) {
-  return db.bookmarks.get(verseId).then((entry) => entry !== undefined);
-}
-
-export async function getBookmarkedChapters(book: number): Promise<Set<number>> {
-  const entries = await db.bookmarks.where("book").equals(book).toArray();
-  return new Set(entries.map((e) => e.chapter));
 }
 
 export function searchVerses(query: string) {
