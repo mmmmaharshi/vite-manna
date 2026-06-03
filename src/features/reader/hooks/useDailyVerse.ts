@@ -1,9 +1,11 @@
-import { useEffect, useRef, useState } from "react";
+import { format } from "date-fns";
+import { useCallback, useEffect, useState } from "react";
 
 import { getBibleBookName, db } from "../../../shared/bible";
 import { DAILY_VERSE_REFS, getDayOfYear, parseVerseref } from "../../../shared/bible/dailyVerseData";
 
 const CACHE_KEY = "manna.daily-verse";
+const NOTIF_KEY = "manna.notifications-enabled";
 
 interface DailyVerseData {
   reference: string;
@@ -26,8 +28,7 @@ export interface DailyVerseResult extends DailyVerseData {
 }
 
 function getTodayKey() {
-  const d = new Date();
-  return `${d.getFullYear()}-${d.getMonth() + 1}-${d.getDate()}`;
+  return format(new Date(), "yyyy-M-d");
 }
 
 function readCache(): CacheEntry | null {
@@ -43,53 +44,49 @@ function readCache(): CacheEntry | null {
 
 function writeCache(data: DailyVerseData, shown: boolean) {
   try {
-    localStorage.setItem(
-      CACHE_KEY,
-      JSON.stringify({ date: getTodayKey(), data, shown }),
-    );
+    localStorage.setItem(CACHE_KEY, JSON.stringify({ date: getTodayKey(), data, shown }));
   } catch {
-    // cache full
   }
 }
 
 export function useDailyVerse(): DailyVerseResult {
-  const [result, setResult] = useState<DailyVerseResult>({
-    reference: "",
-    teluguText: "",
-    book: null,
-    chapter: null,
-    verse: null,
-    isLoading: true,
-    isFirstOpenToday: false,
-    markDailyVerseShown: () => {},
+  const cached = readCache();
+  const [notifPref] = useState(() => localStorage.getItem(NOTIF_KEY));
+
+  const markDailyVerseShown = useCallback(() => {
+    const entry = readCache();
+    if (entry && !entry.shown) {
+      writeCache(entry.data, true);
+    }
+  }, []);
+
+  const [result, setResult] = useState<DailyVerseResult>(() => {
+    if (cached) {
+      return {
+        ...cached.data,
+        isLoading: false,
+        isFirstOpenToday: !cached.shown,
+        markDailyVerseShown,
+      };
+    }
+    return {
+      reference: "",
+      teluguText: "",
+      book: null,
+      chapter: null,
+      verse: null,
+      isLoading: true,
+      isFirstOpenToday: false,
+      markDailyVerseShown,
+    };
   });
 
-  const markShownRef = useRef<() => void>(
-    () => {
-      const entry = readCache();
-      if (entry && !entry.shown) {
-        writeCache(entry.data, true);
-      }
-    },
-  );
-
   useEffect(() => {
+    if (!result.isLoading) return;
     let mounted = true;
 
     async function load() {
-      const cached = readCache();
-      if (cached) {
-        if (mounted)
-          setResult({
-            ...cached.data,
-            isLoading: false,
-            isFirstOpenToday: !cached.shown,
-            markDailyVerseShown: () => markShownRef.current?.(),
-          });
-        return;
-      }
-
-      const dayOfYear = getDayOfYear();
+      const dayOfYear = getDayOfYear(new Date());
       const verseref =
         DAILY_VERSE_REFS[(dayOfYear - 1) % DAILY_VERSE_REFS.length];
       const parsed = parseVerseref(verseref);
@@ -110,7 +107,6 @@ export function useDailyVerse(): DailyVerseResult {
           const found = verses.find((v) => v.verse === parsed.verse);
           if (found) teluguText = found.text;
         } catch {
-          // lookup failed
         }
         reference = `${getBibleBookName(parsed.book)} ${parsed.chapter}:${parsed.verse}`;
       }
@@ -130,7 +126,7 @@ export function useDailyVerse(): DailyVerseResult {
           ...data,
           isLoading: false,
           isFirstOpenToday: true,
-          markDailyVerseShown: () => markShownRef.current?.(),
+          markDailyVerseShown,
         });
     }
 
@@ -138,14 +134,14 @@ export function useDailyVerse(): DailyVerseResult {
     return () => {
       mounted = false;
     };
-  }, []);
+  }, [result.isLoading, markDailyVerseShown]);
 
   useEffect(() => {
     if (result.isLoading || !result.isFirstOpenToday || !result.teluguText) return;
 
     try {
       if (
-        localStorage.getItem("manna.notifications-enabled") === "true" &&
+        notifPref === "true" &&
         typeof Notification !== "undefined" &&
         Notification.permission === "granted"
       ) {
@@ -156,9 +152,8 @@ export function useDailyVerse(): DailyVerseResult {
         });
       }
     } catch {
-      // notification API unavailable
     }
-  }, [result.isLoading, result.isFirstOpenToday, result.teluguText, result.reference]);
+  }, [result.isLoading, result.isFirstOpenToday, result.teluguText, result.reference, notifPref]);
 
   return result;
 }

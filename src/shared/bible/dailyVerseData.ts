@@ -34,12 +34,7 @@ export const DAILY_VERSE_REFS: readonly string[] = [
   "James 1:12 ESV", "Psalm 38:21 ESV",
 ];
 
-export function getDayOfYear() {
-  const now = new Date();
-  const start = new Date(now.getFullYear(), 0, 0);
-  const diff = now.getTime() - start.getTime();
-  return Math.floor(diff / (1000 * 60 * 60 * 24));
-}
+export { getDayOfYear } from "date-fns";
 
 const ENGLISH_BOOK_MAP: Record<string, number> = {
   Genesis: 1,

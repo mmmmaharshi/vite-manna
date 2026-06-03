@@ -45,7 +45,7 @@ self.addEventListener("periodicsync", (event: Event) => {
 });
 
 async function showDailyVerseNotification() {
-  const dayOfYear = getDayOfYear();
+  const dayOfYear = getDayOfYear(new Date());
   const ref = DAILY_VERSE_REFS[(dayOfYear - 1) % DAILY_VERSE_REFS.length];
   const parsed = parseVerseref(ref);
 

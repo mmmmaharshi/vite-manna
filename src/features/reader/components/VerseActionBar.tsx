@@ -2,6 +2,8 @@ import { useState } from "react";
 import { ArrowUpFromSquare, Bookmark as BookmarkIcon, BookmarkFill, Copy, Link as LinkIcon, Picture } from "@gravity-ui/icons";
 import { Button, Surface, toast, Tooltip } from "@heroui/react";
 
+import { cn } from "../../../shared/lib/cn";
+
 import { getBibleBookName, type BibleVerse } from "../../../shared/bible";
 import { canNativeShare } from "../../../shared/lib/browser";
 import { useBookmarks } from "../../bookmarks/hooks/useBookmarks";
@@ -170,7 +172,7 @@ const VerseActionBarInner = ({ verses, onShareAsImage }: VerseActionBarInnerProp
             Clear
           </Button>
         </div>
-        <div className={`grid ${cols} gap-2`}>
+        <div className={cn("grid", cols, "gap-2")}>
           {singleSelectedVerse !== null && (
             <Tooltip delay={0}>
               <Button variant="tertiary" isIconOnly className="h-12 w-full rounded-xl" onPress={handleCopyLink}>

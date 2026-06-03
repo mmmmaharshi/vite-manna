@@ -1,3 +1,4 @@
+import { format } from "date-fns";
 import { useCallback, useLayoutEffect, useRef, useState } from "react";
 import { ArrowUpFromSquare, FileArrowDown } from "@gravity-ui/icons";
 import { Button, Modal, toast } from "@heroui/react";
@@ -34,7 +35,7 @@ const VerseImageModal = ({
     return () => ro.disconnect();
   }, [isOpen]);
 
-  const today = new Date().toISOString().slice(0, 10);
+  const today = format(new Date(), "yyyy-MM-dd");
 
   const handleShare = useCallback(async () => {
     try {

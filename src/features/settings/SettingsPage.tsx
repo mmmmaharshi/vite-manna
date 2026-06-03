@@ -1,16 +1,17 @@
-interface PeriodicSyncManager {
-  register: (tag: string, options: { minInterval: number }) => Promise<void>;
-  unregister: (tag: string) => Promise<void>;
-}
-
-import { useCallback, useState } from "react";
+import { useCallback } from "react";
 import { ArrowRotateLeft, Bell, Moon, Sun } from "@gravity-ui/icons";
 import { Button, ScrollShadow, Surface, Tooltip, Typography } from "@heroui/react";
+import { useLocalStorage } from "@reactuses/core";
 
 import { useTheme } from "../../shared/hooks/useTheme";
 import { SIZE_PROPS } from "../../shared/lib/fontSize";
 import { type FontSize } from "../../shared/lib/fontSize";
 import { useReaderStore } from "../reader/store/readerStore";
+
+interface PeriodicSyncManager {
+  register: (tag: string, options: { minInterval: number }) => Promise<void>;
+  unregister: (tag: string) => Promise<void>;
+}
 
 const OPTIONS: { mode: "light" | "dark" | "system"; label: string; Icon: typeof Sun }[] = [
   { mode: "light", label: "Light", Icon: Sun },
@@ -35,25 +36,22 @@ const FONT_SIZES: { value: FontSize; label: string }[] = [
 
 const PREVIEW_TEXT = "ఆదియందు దేవుడు ఆకాశమును భూమిని సృష్టించెను. భూమి నిరాకారముగా నిర్జనముగా ఉండెను. అగాధజలముల మీదను అంధకారము కమ్ముకొని యుండెను. దేవుని ఆత్మ జలముల మీద కదలాడుచుండెను. అప్పుడు దేవుడు వెలుగు కలుగునని చెప్పగా వెలుగు కలిగెను.";
 
+const NOTIF_PREF_KEY = "manna.notifications-enabled";
+
 const SettingsPage = () => {
   const { mode, setMode } = useTheme();
   const fontSize = useReaderStore((state) => state.fontSize);
   const setFontSize = useReaderStore((state) => state.setFontSize);
-  const NOTIF_PREF_KEY = "manna.notifications-enabled";
-  const [notifEnabled, setNotifEnabled] = useState(() => {
-    try { return localStorage.getItem(NOTIF_PREF_KEY) === "true"; }
-    catch { return false; }
-  });
+  const [notifEnabled, setNotifEnabled] = useLocalStorage(NOTIF_PREF_KEY, "false");
 
   const toggleNotifications = useCallback(async () => {
-    if (notifEnabled) {
+    if (notifEnabled === "true") {
       try {
         const reg = await navigator.serviceWorker.ready;
         const ps = (reg as unknown as { periodicSync?: PeriodicSyncManager }).periodicSync;
         if (ps?.unregister) await ps.unregister("daily-verse");
       } catch { }
-      try { localStorage.setItem(NOTIF_PREF_KEY, "false"); } catch { }
-      setNotifEnabled(false);
+      setNotifEnabled("false");
       return;
     }
     const perm = await Notification.requestPermission();
@@ -63,9 +61,8 @@ const SettingsPage = () => {
       const ps = (reg as unknown as { periodicSync?: PeriodicSyncManager }).periodicSync;
       if (ps?.register) await ps.register("daily-verse", { minInterval: 24 * 60 * 60 * 1000 });
     } catch { }
-    try { localStorage.setItem(NOTIF_PREF_KEY, "true"); } catch { }
-    setNotifEnabled(true);
-  }, [notifEnabled]);
+    setNotifEnabled("true");
+  }, [notifEnabled, setNotifEnabled]);
 
   return (
     <div className="h-dvh flex flex-col">
@@ -133,12 +130,12 @@ const SettingsPage = () => {
             <div className="flex items-center justify-between">
               <Typography className="text-sm font-medium">Daily Notifications</Typography>
               <Button
-                variant={notifEnabled ? "primary" : "tertiary"}
+                variant={notifEnabled === "true" ? "primary" : "tertiary"}
                 size="sm"
                 onPress={toggleNotifications}
               >
                 <Bell aria-hidden="true" className="h-4 w-4" />
-                {notifEnabled ? "Enabled" : "Disabled"}
+                {notifEnabled === "true" ? "Enabled" : "Disabled"}
               </Button>
             </div>
             <Typography className="text-xs text-muted mt-1">

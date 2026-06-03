@@ -1,4 +1,7 @@
+import { clamp } from "es-toolkit";
 import { memo, useState } from "react";
+
+import { cn } from "../lib/cn";
 
 const TRACK_WIDTH = 160;
 const TRACK_HEIGHT = 4;
@@ -20,7 +23,7 @@ interface SplashProgressProps {
 const SplashProgress = ({ value }: SplashProgressProps) => {
   const [animationDelay] = useState(getInitialAnimationDelay);
   const normalizedValue =
-    typeof value === "number" ? Math.min(Math.max(value, 0), 100) : null;
+    typeof value === "number" ? clamp(value, 0, 100) : null;
   const progressWidth =
     normalizedValue === null
       ? INDETERMINATE_WIDTH
@@ -46,11 +49,10 @@ const SplashProgress = ({ value }: SplashProgressProps) => {
         opacity={0.14}
       />
       <rect
-        className={
-          normalizedValue === null
-            ? "splash-progress__bar"
-            : "splash-progress__bar splash-progress__bar--determinate"
-        }
+        className={cn(
+          "splash-progress__bar",
+          normalizedValue !== null && "splash-progress__bar--determinate",
+        )}
         style={
           normalizedValue === null
             ? { animationDelay }

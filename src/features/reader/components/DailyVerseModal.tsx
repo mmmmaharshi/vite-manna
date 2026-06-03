@@ -1,4 +1,4 @@
-import { useEffect, useState } from "react";
+import { useEffect, useRef, useState } from "react";
 import { ArrowUpFromSquare, Picture, Sparkles } from "@gravity-ui/icons";
 import { Button, Modal, Spinner, toast, Typography } from "@heroui/react";
 
@@ -18,9 +18,11 @@ const DailyVerseModal = ({
 }: DailyVerseModalProps) => {
   const { isLoading, teluguText, reference, book, chapter, isFirstOpenToday, markDailyVerseShown } =
     useDailyVerse();
+  const autoOpened = useRef(false);
 
   useEffect(() => {
-    if (!isFirstOpenToday || isLoading) return;
+    if (!isFirstOpenToday || isLoading || autoOpened.current) return;
+    autoOpened.current = true;
     onOpenChange(true);
     markDailyVerseShown();
   }, [isFirstOpenToday, isLoading, onOpenChange, markDailyVerseShown]);
