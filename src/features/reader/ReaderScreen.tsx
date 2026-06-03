@@ -10,6 +10,7 @@ import VerseActionBar from "./components/VerseActionBar";
 import VerseList from "./components/VerseList";
 import { useReaderStore } from "./store/readerStore";
 import { useUrlSync } from "./useUrlSync";
+import { useSwipeAndKeyboard } from "./hooks/useSwipeAndKeyboard";
 
 const ReaderScreen = () => {
   useUrlSync();
@@ -37,6 +38,18 @@ const ReaderScreen = () => {
       prevBookChapter.current = { book, chapter };
     }
   }, [book, chapter]);
+
+  const verseSectionRef = useRef<HTMLElement>(null);
+  useSwipeAndKeyboard({
+    elementRef: verseSectionRef,
+    books,
+    book,
+    chapter,
+    setChapter,
+    setBook,
+    isSelectionMode,
+    isBookSelectOpen: useReaderStore((state) => state.isBookSelectOpen),
+  });
 
   const selectedBookSummary = books.find((candidate) => candidate.id === book);
 
@@ -107,6 +120,7 @@ const ReaderScreen = () => {
           {selectedBookSummary ? `${getBibleBookName(selectedBookSummary.id)} ${chapter}` : "Bible Reader"}
         </Typography.Heading>
         <section
+          ref={verseSectionRef}
           className={[
             "max-w-md sm:max-w-lg md:max-w-xl lg:max-w-2xl w-full px-2 py-4 mx-auto",
             isSelectionMode ? "pb-24" : "",

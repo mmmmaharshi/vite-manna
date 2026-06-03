@@ -1,6 +1,12 @@
 {
   "version": 1,
   "skills": {
+    "agent-browser": {
+      "source": "linuxlewis/agent-skills",
+      "sourceType": "github",
+      "skillPath": "skills/agent-browser/SKILL.md",
+      "computedHash": "30e06862b2a8de2ccccb8de47a12489f13e11edea1831e2c3ad678236a1b4a98"
+    },
     "caveman": {
       "source": "juliusbrussee/caveman",
       "sourceType": "github",
