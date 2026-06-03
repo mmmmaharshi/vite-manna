@@ -1,4 +1,4 @@
-import { db, type BibleVerse, type Bookmark } from "./db";
+import { db, type BibleVerse } from "./db";
 
 export function countVerses() {
   return db.verses.count();
@@ -140,20 +140,6 @@ export function isBookmarked(verseId: number) {
 export async function getBookmarkedChapters(book: number): Promise<Set<number>> {
   const entries = await db.bookmarks.where("book").equals(book).toArray();
   return new Set(entries.map((e) => e.chapter));
-}
-
-export async function searchBookmarksByText(query: string): Promise<Bookmark[]> {
-  const all = await db.bookmarks.toArray();
-  const q = query.toLowerCase();
-  return all.filter((bm) => bm.text.toLowerCase().includes(q));
-}
-
-export function updateBookmarkNote(verseId: number, note: string) {
-  return db.bookmarks.update(verseId, { note });
-}
-
-export function updateBookmarkTags(verseId: number, tags: string[]) {
-  return db.bookmarks.update(verseId, { tags });
 }
 
 export function searchVerses(query: string) {

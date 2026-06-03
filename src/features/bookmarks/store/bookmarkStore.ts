@@ -9,8 +9,6 @@ export interface BookmarkStore {
   addLocal: (bookmark: Bookmark) => void;
   removeLocal: (verseId: number) => void;
   clearAllLocal: () => void;
-  updateNoteLocal: (verseId: number, note: string) => void;
-  updateTagsLocal: (verseId: number, tags: string[]) => void;
 }
 
 export const useBookmarkStore = create<BookmarkStore>((set) => ({
@@ -42,21 +40,5 @@ export const useBookmarkStore = create<BookmarkStore>((set) => ({
 
   clearAllLocal: () => {
     set({ bookmarks: [], bookmarkedIds: [] });
-  },
-
-  updateNoteLocal: (verseId, note) => {
-    set((state) => ({
-      bookmarks: state.bookmarks.map((b) =>
-        b.verseId === verseId ? { ...b, note } : b,
-      ),
-    }));
-  },
-
-  updateTagsLocal: (verseId, tags) => {
-    set((state) => ({
-      bookmarks: state.bookmarks.map((b) =>
-        b.verseId === verseId ? { ...b, tags } : b,
-      ),
-    }));
   },
 }));

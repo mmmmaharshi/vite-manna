@@ -6,11 +6,7 @@ import {
   getBookmarkedVerseIds,
   getBookmarks,
   removeBookmark as removeBm,
-  searchBookmarksByText,
-  updateBookmarkNote as updateNoteBm,
-  updateBookmarkTags as updateTagsBm,
   type BibleVerse,
-  type Bookmark,
 } from "../../../shared/bible";
 import { useBookmarkStore } from "../store/bookmarkStore";
 
@@ -22,8 +18,6 @@ export function useBookmarks() {
   const addLocal = useBookmarkStore((s) => s.addLocal);
   const removeLocal = useBookmarkStore((s) => s.removeLocal);
   const clearAllLocal = useBookmarkStore((s) => s.clearAllLocal);
-  const updateNoteLocal = useBookmarkStore((s) => s.updateNoteLocal);
-  const updateTagsLocal = useBookmarkStore((s) => s.updateTagsLocal);
 
   const bookmarkedIds = useMemo(() => new Set(bookmarkedIdsArr), [bookmarkedIdsArr]);
 
@@ -78,35 +72,7 @@ export function useBookmarks() {
     void clearBm().then(() => clearAllLocal());
   }, [clearAllLocal]);
 
-  const updateNote = useCallback(
-    (verseId: number, note: string) => {
-      void updateNoteBm(verseId, note).then(() => updateNoteLocal(verseId, note));
-    },
-    [updateNoteLocal],
-  );
-
-  const updateTags = useCallback(
-    (verseId: number, tags: string[]) => {
-      void updateTagsBm(verseId, tags).then(() => updateTagsLocal(verseId, tags));
-    },
-    [updateTagsLocal],
-  );
-
-  const search = useCallback(async (query: string): Promise<Bookmark[]> => {
-    if (!query.trim()) return bookmarks;
-    return searchBookmarksByText(query);
-  }, [bookmarks]);
-
-  const allTags = useMemo(() => {
-    const set = new Set<string>();
-    for (const bm of bookmarks) {
-      for (const tag of bm.tags ?? []) set.add(tag);
-    }
-    return [...set].sort();
-  }, [bookmarks]);
-
   return {
-    bookmarks, bookmarkedIds, loaded, add, remove, toggle, isBookmarked,
-    clearAll, updateNote, updateTags, search, allTags,
+    bookmarks, bookmarkedIds, loaded, add, remove, toggle, isBookmarked, clearAll,
   };
 }

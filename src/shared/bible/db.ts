@@ -15,8 +15,6 @@ export interface Bookmark {
   verse: number;
   text: string;
   createdAt: number;
-  note?: string;
-  tags?: string[];
 }
 
 class BibleDB extends Dexie {

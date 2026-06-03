@@ -15,8 +15,5 @@ export {
   getBookmarkedVerseIds,
   getBookmarkedChapters,
   isBookmarked,
-  searchBookmarksByText,
-  updateBookmarkNote,
-  updateBookmarkTags,
   searchVerses,
 } from "./bibleRepository";
