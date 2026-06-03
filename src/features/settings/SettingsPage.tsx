@@ -9,7 +9,8 @@ import { Button, Surface, Tooltip, Typography } from "@heroui/react";
 
 import { useTheme } from "../../shared/hooks/useTheme";
 import { SIZE_PROPS } from "../../shared/lib/fontSize";
-import { useReaderStore, type FontSize } from "../reader/store/readerStore";
+import { type FontSize } from "../../shared/lib/fontSize";
+import { useReaderStore } from "../reader/store/readerStore";
 
 const OPTIONS: { mode: "light" | "dark" | "system"; label: string; Icon: typeof Sun }[] = [
   { mode: "light", label: "Light", Icon: Sun },

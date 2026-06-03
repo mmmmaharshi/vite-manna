@@ -1,10 +1,14 @@
 import { create } from "zustand";
 
-import { parsePositiveInteger } from "../../../shared/lib/parsePositiveInteger";
+import { type FontSize } from "../../../shared/lib/fontSize";
+import {
+  loadInitialState,
+  loadFontSize,
+  setStoredFontSize,
+  rememberChapter,
+} from "../../../shared/lib/persistence";
 
 const PENDING_BOOK_SAFETY_TIMEOUT = 15_000;
-
-export type FontSize = "sm" | "base" | "lg" | "xl" | "2xl";
 
 export interface ReaderState {
   book: number;
@@ -27,132 +31,6 @@ export interface ReaderState {
   setPermalinkVerse: (verse: number | null) => void;
   setFontSize: (fontSize: FontSize) => void;
   reset: () => void;
-}
-
-const STORAGE_KEY = "manna.reader-location";
-const FONT_SIZE_KEY = "manna.reader-font-size";
-const STORAGE_VERSION = 1;
-
-interface StoredLocation {
-  book?: number;
-  chapter?: number;
-  chaptersByBook?: Record<string, number>;
-  version?: number;
-}
-
-function parseChaptersByBook(value: unknown): Record<number, number> {
-  if (!value || typeof value !== "object") {
-    return {};
-  }
-
-  const result: Record<number, number> = {};
-
-  for (const [book, chapter] of Object.entries(value)) {
-    const parsedBook = parsePositiveInteger(book);
-    const parsedChapter = parsePositiveInteger(String(chapter));
-
-    if (parsedBook !== null && parsedChapter !== null) {
-      result[parsedBook] = parsedChapter;
-    }
-  }
-
-  return result;
-}
-
-function readUrlLocation() {
-  if (typeof window === "undefined") {
-    return null;
-  }
-
-  const params = new URLSearchParams(window.location.search);
-  const book = parsePositiveInteger(params.get("book"));
-  const chapter = parsePositiveInteger(params.get("chapter"));
-
-  if (book === null || chapter === null) {
-    return null;
-  }
-
-  return { book, chapter };
-}
-
-function readUrlVerse() {
-  if (typeof window === "undefined") {
-    return null;
-  }
-
-  const params = new URLSearchParams(window.location.search);
-  return parsePositiveInteger(params.get("verse"));
-}
-
-function loadInitialState() {
-  const fromUrl = readUrlLocation();
-  const permalinkVerse = readUrlVerse();
-
-  if (fromUrl !== null) {
-    let chaptersByBook: Record<number, number> = {};
-
-    try {
-      const stored = JSON.parse(
-        localStorage.getItem(STORAGE_KEY) ?? "",
-      ) as StoredLocation;
-
-      if (stored.version === STORAGE_VERSION) {
-        chaptersByBook = parseChaptersByBook(stored.chaptersByBook);
-      }
-    } catch {
-      // Keep the URL-derived book/chapter when localStorage is unreadable.
-    }
-
-    return {
-      book: fromUrl.book,
-      chapter: fromUrl.chapter,
-      chaptersByBook: { ...chaptersByBook, [fromUrl.book]: fromUrl.chapter },
-      permalinkVerse,
-    };
-  }
-
-  let book = 1;
-  let chapter = 1;
-  let chaptersByBook: Record<number, number> = {};
-
-  try {
-    const stored = JSON.parse(localStorage.getItem(STORAGE_KEY) ?? "") as StoredLocation;
-
-    if (stored.version === STORAGE_VERSION) {
-      const storedBook = parsePositiveInteger(String(stored.book));
-      const storedChapter = parsePositiveInteger(String(stored.chapter));
-      const storedChaptersByBook = parseChaptersByBook(stored.chaptersByBook);
-
-      if (storedBook !== null && storedChapter !== null) {
-        book = storedBook;
-        chapter = storedChapter;
-        chaptersByBook = {
-          ...storedChaptersByBook,
-          [storedBook]: storedChapter,
-        };
-      }
-    }
-  } catch {
-    // Use the canonical starting location when storage is unavailable or invalid.
-  }
-
-  return { book, chapter, chaptersByBook, permalinkVerse };
-}
-
-function loadFontSize(): FontSize {
-  const valid: FontSize[] = ["sm", "base", "lg", "xl", "2xl"];
-  try {
-    const stored = localStorage.getItem(FONT_SIZE_KEY) as FontSize | null;
-    if (stored && valid.includes(stored)) return stored;
-  } catch { /* noop */ }
-  return "sm";
-}
-
-function rememberChapter(
-  chaptersByBook: Record<number, number>,
-  book: number,
-) {
-  return chaptersByBook[book] ?? 1;
 }
 
 const initial = loadInitialState();
@@ -257,7 +135,7 @@ export const useReaderStore = create<ReaderState>((set, get) => ({
   },
 
   setFontSize: (fontSize) => {
-    try { localStorage.setItem(FONT_SIZE_KEY, fontSize); } catch { /* noop */ }
+    setStoredFontSize(fontSize);
     set({ fontSize });
   },
 

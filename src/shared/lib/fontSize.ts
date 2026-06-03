@@ -1,4 +1,4 @@
-import type { FontSize } from "../../features/reader/store/readerStore";
+export type FontSize = "sm" | "base" | "lg" | "xl" | "2xl";
 
 export const SIZE_PROPS: Record<FontSize, { type: "body-sm" | "body" | "h5" | "h4" | "h3"; weight?: "normal" }> = {
   sm: { type: "body-sm" },
