@@ -81,14 +81,25 @@ async function showDailyVerseNotification() {
 self.addEventListener("notificationclick", (event: Event) => {
   const notifEvent = event as NotificationEvent;
   notifEvent.notification.close();
+
+  const data = notifEvent.notification.data ?? {};
+  const { book, chapter, verse } = data as Record<string, unknown>;
+  const url = new URL(
+    book != null && chapter != null
+      ? `/?book=${book}&chapter=${chapter}${verse != null ? `&verse=${verse}` : ""}`
+      : "/",
+    self.location.origin,
+  ).href;
+
   notifEvent.waitUntil(
     self.clients
       .matchAll({ type: "window", includeUncontrolled: true })
       .then((clientList) => {
         if (clientList.length > 0) {
-          return clientList[0].focus();
+          const client = clientList[0];
+          return client.navigate(url).catch(() => {}).then(() => client.focus());
         }
-        return self.clients.openWindow("/");
+        return self.clients.openWindow(url);
       }),
   );
 });
