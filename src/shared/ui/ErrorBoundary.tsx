@@ -1,4 +1,5 @@
 import { Component, type ErrorInfo, type ReactNode } from "react";
+import { Button, Typography } from "@heroui/react";
 
 interface ErrorBoundaryProps {
   children: ReactNode;
@@ -26,25 +27,17 @@ class ErrorBoundary extends Component<ErrorBoundaryProps, ErrorBoundaryState> {
     if (this.state.hasError) {
       return (
         <main className="min-h-dvh flex flex-col items-center justify-center gap-4 px-4 text-center">
-          <h1 className="font-black text-2xl">Something went wrong</h1>
-          <p className="text-muted text-sm max-w-xs">
+          <Typography.Heading level={1} className="text-2xl">Something went wrong</Typography.Heading>
+          <Typography.Paragraph color="muted" size="sm" className="max-w-xs">
             An unexpected error occurred.
-          </p>
+          </Typography.Paragraph>
           <div className="flex gap-2">
-            <button
-              className="px-4 py-2 rounded-lg bg-accent text-accent-foreground text-sm"
-              type="button"
-              onClick={() => this.setState({ hasError: false })}
-            >
+            <Button variant="primary" onPress={() => this.setState({ hasError: false })}>
               Try Again
-            </button>
-            <button
-              className="px-4 py-2 rounded-lg bg-default text-default-foreground text-sm"
-              type="button"
-              onClick={() => window.location.reload()}
-            >
+            </Button>
+            <Button variant="tertiary" onPress={() => window.location.reload()}>
               Reload
-            </button>
+            </Button>
           </div>
         </main>
       );
