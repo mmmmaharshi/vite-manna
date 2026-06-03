@@ -5,7 +5,7 @@ import { Button, Surface, toast, Tooltip } from "@heroui/react";
 import { cn } from "../../../shared/lib/cn";
 
 import { getBibleBookName, type BibleVerse } from "../../../shared/bible";
-import { canNativeShare } from "../../../shared/lib/browser";
+import { canNativeShare, copyToClipboard } from "../../../shared/lib/browser";
 import { useBookmarks } from "../../bookmarks/hooks/useBookmarks";
 import { useReaderStore } from "../store/readerStore";
 import VerseImageModal from "./VerseImageModal";
@@ -42,23 +42,6 @@ function buildPermalinkUrl(book: number, chapter: number, verse: number) {
   url.searchParams.set("verse", String(verse));
   url.hash = "";
   return url.toString();
-}
-
-async function copyToClipboard(text: string) {
-  if (navigator.clipboard?.writeText) {
-    await navigator.clipboard.writeText(text);
-    return;
-  }
-
-  const textarea = document.createElement("textarea");
-  textarea.value = text;
-  textarea.setAttribute("readonly", "");
-  textarea.style.position = "fixed";
-  textarea.style.opacity = "0";
-  document.body.appendChild(textarea);
-  textarea.select();
-  document.execCommand("copy");
-  document.body.removeChild(textarea);
 }
 
 interface VerseActionBarInnerProps extends VerseActionBarProps {

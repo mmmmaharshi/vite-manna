@@ -8,7 +8,7 @@ import {
 import { Button, ScrollShadow, Surface, ToggleButton, ToggleButtonGroup, toast, Tooltip, Typography } from "@heroui/react";
 
 import { getBibleBookName, type Bookmark as BookmarkType } from "../../shared/bible";
-import { canNativeShare } from "../../shared/lib/browser";
+import { canNativeShare, copyToClipboard } from "../../shared/lib/browser";
 import { useReaderStore } from "../reader/store/readerStore";
 import { useBookmarks } from "./hooks/useBookmarks";
 
@@ -147,9 +147,13 @@ const BookmarksPage = ({ onNavigateToReader }: BookmarksPageProps) => {
                     <Tooltip delay={0}>
                       <Button isIconOnly size="sm" variant="tertiary"
                         aria-label="Copy verse"
-                        onPress={() => {
-                          navigator.clipboard.writeText(`${formatRef(bm.book, bm.chapter, bm.verse)} ${bm.text}`)
-                            .then(() => toast("Verse copied to clipboard", { variant: "success" }));
+                        onPress={async () => {
+                          try {
+                            await copyToClipboard(`${formatRef(bm.book, bm.chapter, bm.verse)} ${bm.text}`);
+                            toast("Verse copied to clipboard", { variant: "success" });
+                          } catch {
+                            toast("Failed to copy verse", { variant: "danger" });
+                          }
                         }}>
                         <Copy aria-hidden="true" className="h-3.5 w-3.5 text-muted" />
                       </Button>
@@ -180,15 +184,21 @@ const BookmarksPage = ({ onNavigateToReader }: BookmarksPageProps) => {
         {/* Bottom action bar */}
         {bookmarks.length > 0 && filtered.length > 0 && (
           <div className="max-w-md sm:max-w-lg md:max-w-xl lg:max-w-2xl xl:max-w-3xl w-full px-2 mx-auto py-4 flex gap-2 justify-center">
-            <Button size="sm" variant="tertiary" onPress={handleClearAll}>
-              <TrashBin aria-hidden="true" className="h-4 w-4" />
-              Delete All
-            </Button>
-            {canNativeShare() && (
-              <Button size="sm" variant="tertiary" onPress={handleShareAll}>
-                <ArrowUpFromSquare aria-hidden="true" className="h-4 w-4" />
-                Share All
+            <Tooltip delay={0}>
+              <Button size="sm" variant="tertiary" onPress={handleClearAll}>
+                <TrashBin aria-hidden="true" className="h-4 w-4" />
+                Delete All
               </Button>
+              <Tooltip.Content placement="top">Delete all bookmarks</Tooltip.Content>
+            </Tooltip>
+            {canNativeShare() && (
+              <Tooltip delay={0}>
+                <Button size="sm" variant="tertiary" onPress={handleShareAll}>
+                  <ArrowUpFromSquare aria-hidden="true" className="h-4 w-4" />
+                  Share All
+                </Button>
+                <Tooltip.Content placement="top">Share all bookmarks</Tooltip.Content>
+              </Tooltip>
             )}
           </div>
         )}
