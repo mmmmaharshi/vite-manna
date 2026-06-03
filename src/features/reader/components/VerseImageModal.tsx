@@ -65,7 +65,7 @@ const VerseImageModal = ({
             </Modal.Header>
             <Modal.Body>
               <div className="flex flex-col items-center gap-6">
-                <div ref={previewRef} className="w-full max-w-[500px] rounded-xl overflow-hidden shadow-xl" style={{ aspectRatio: `${CARD_WIDTH}/${CARD_HEIGHT}` }}>
+                <div ref={previewRef} className="w-full sm:max-w-[500px] rounded-xl overflow-hidden shadow-xl" style={{ aspectRatio: `${CARD_WIDTH}/${CARD_HEIGHT}` }}>
                   <div style={{ transform: `scale(${scale})`, transformOrigin: "top left", width: CARD_WIDTH, height: CARD_HEIGHT }}>
                     <VerseImageCard
                       verses={verses}
@@ -75,7 +75,7 @@ const VerseImageModal = ({
                   </div>
                 </div>
 
-                <div className="fixed -left-[9999px] top-0" aria-hidden="true">
+                <div className="absolute -left-[9999px] top-0" aria-hidden="true">
                   <VerseImageCard
                     ref={captureRef}
                     verses={verses}

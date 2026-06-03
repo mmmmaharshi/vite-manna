@@ -130,7 +130,7 @@ const ReaderScreen = () => {
         </section>
 
         {snapshot && <VerseActionBar verses={snapshot.verses} />}
-        <div className="h-16" />
+        <div className="h-[calc(4rem+env(safe-area-inset-bottom))]" />
       </ScrollShadow>
     </div>
   );

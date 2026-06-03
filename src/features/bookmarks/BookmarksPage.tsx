@@ -112,22 +112,22 @@ const BookmarksPage = ({ onNavigateToReader }: BookmarksPageProps) => {
 
         {/* Empty state */}
         {bookmarks.length === 0 ? (
-          <section className="max-w-md w-full px-2 py-24 mx-auto flex flex-col items-center gap-4 text-center">
-            <Bookmark aria-hidden="true" className="h-12 w-12 text-muted" />
+          <section className="max-w-md sm:max-w-lg md:max-w-xl lg:max-w-2xl xl:max-w-3xl w-full px-2 py-24 mx-auto flex flex-col items-center gap-4 text-center">
+            <Bookmark aria-hidden="true" className="h-10 w-10 sm:h-12 sm:w-12 text-muted" />
             <Typography className="text-base font-medium">No bookmarks yet</Typography>
             <Typography.Paragraph size="sm" color="muted">
               Bookmark verses to quickly find them later
             </Typography.Paragraph>
           </section>
         ) : filtered.length === 0 ? (
-          <section className="max-w-md w-full px-2 py-16 mx-auto text-center">
+          <section className="max-w-md sm:max-w-lg md:max-w-xl lg:max-w-2xl xl:max-w-3xl w-full px-2 py-16 mx-auto text-center">
             <Typography.Paragraph size="sm" color="muted">
               No matching bookmarks
             </Typography.Paragraph>
           </section>
         ) : (
           /* Bookmark list */
-          <section className="max-w-md w-full px-2 py-4 mx-auto flex flex-col gap-2">
+          <section className="max-w-md sm:max-w-lg md:max-w-xl lg:max-w-2xl xl:max-w-3xl w-full px-2 py-4 mx-auto flex flex-col gap-2">
             {filtered.map((bm) => (
               <Surface key={bm.verseId} className="flex flex-col p-3 gap-2">
                 {/* Top row */}
@@ -162,7 +162,7 @@ const BookmarksPage = ({ onNavigateToReader }: BookmarksPageProps) => {
                 </div>
 
                 {/* Verse text */}
-                <Typography.Paragraph size="sm" color="muted" className="line-clamp-3">
+                <Typography.Paragraph size="sm" color="muted" className="line-clamp-4 sm:line-clamp-3">
                   {bm.text}
                 </Typography.Paragraph>
 
@@ -187,7 +187,7 @@ const BookmarksPage = ({ onNavigateToReader }: BookmarksPageProps) => {
             )}
           </div>
         )}
-        <div className="h-16" />
+        <div className="h-[calc(4rem+env(safe-area-inset-bottom))]" />
       </ScrollShadow>
     </div>
   );

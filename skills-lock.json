@@ -42,6 +42,12 @@
       "sourceType": "github",
       "skillPath": "skills/refactor/SKILL.md",
       "computedHash": "87789a786b96f99ba0680e89345a975106e10e7db1071c7cdc2e76d507c449d6"
+    },
+    "responsive-testing": {
+      "source": "spencerpauly/awesome-cursor-skills",
+      "sourceType": "github",
+      "skillPath": "resources/responsive-testing/SKILL.md",
+      "computedHash": "9e40d1dbcad8514389f95725ad59a8e4c013b9db80903a66220050ab4d3b7819"
     }
   }
 }

@@ -73,7 +73,7 @@ const SettingsPage = () => {
       </Surface>
 
       <ScrollShadow hideScrollBar className="flex-1">
-        <section className="max-w-md w-full px-2 py-4 mx-auto flex flex-col gap-2">
+        <section className="max-w-md sm:max-w-lg md:max-w-xl lg:max-w-2xl xl:max-w-3xl w-full px-2 py-4 mx-auto flex flex-col gap-2">
           <Surface className="p-3">
             <Typography className="text-sm font-medium mb-2">Appearance</Typography>
             <div className="flex gap-2">
@@ -148,7 +148,7 @@ const SettingsPage = () => {
             )}
           </Surface>
         </section>
-        <div className="h-16" />
+        <div className="h-[calc(4rem+env(safe-area-inset-bottom))]" />
       </ScrollShadow>
     </div>
   );

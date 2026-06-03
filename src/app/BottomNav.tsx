@@ -31,7 +31,7 @@ const BottomNav = ({ activeTab, onTabChange }: BottomNavProps) => (
           >
             <Icon className={cn("h-5 w-5", isActive ? "text-accent" : "text-muted")} />
             <span
-              className={cn("text-[10px] leading-none", isActive ? "text-accent" : "text-muted")}
+              className={cn("text-[11px] sm:text-xs leading-none", isActive ? "text-accent" : "text-muted")}
             >
               {label}
             </span>

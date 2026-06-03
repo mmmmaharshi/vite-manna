@@ -157,11 +157,11 @@ const VerseActionBarInner = ({ verses, onShareAsImage }: VerseActionBarInnerProp
     }
   };
 
-  const cols = singleSelectedVerse !== null ? "grid-cols-5" : "grid-cols-4";
+  const cols = singleSelectedVerse !== null ? "grid-cols-3 sm:grid-cols-5" : "grid-cols-3 sm:grid-cols-4";
 
   return (
     <div
-      className="fixed inset-x-0 bottom-0 z-40 px-3 pb-[max(0.75rem,env(safe-area-inset-bottom))] pt-3 pointer-events-none"
+      className="fixed inset-x-0 bottom-[3.5rem] z-40 px-3 pb-[max(0.75rem,env(safe-area-inset-bottom))] pt-3 pointer-events-none"
     >
       <Surface className="mx-auto w-full border px-4 py-3 shadow-lg pointer-events-auto">
         <div className="flex items-center justify-between mb-3">
