@@ -31,7 +31,7 @@ const TabLayout = () => {
   );
 
   return (
-    <div className="min-h-dvh max-w-md mx-auto">
+    <div className="min-h-dvh max-w-md mx-auto sm:max-w-lg md:max-w-xl lg:max-w-2xl xl:max-w-3xl">
       <div className={activeTab === "reader" ? "" : "hidden"}>
         <ReaderScreen />
       </div>

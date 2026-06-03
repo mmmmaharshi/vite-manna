@@ -85,7 +85,7 @@ const BookmarksPage = ({ onNavigateToReader }: BookmarksPageProps) => {
     <main className="min-h-dvh">
       {/* Header */}
       <Surface className="sticky top-0 z-30 bg-surface py-3 border border-b">
-        <div className="max-w-md w-full px-2 mx-auto flex flex-col gap-2">
+        <div className="max-w-md sm:max-w-lg md:max-w-xl lg:max-w-2xl xl:max-w-3xl w-full px-2 mx-auto flex flex-col gap-2">
           <div className="flex items-center justify-between">
             <Typography.Heading level={1} className="text-xl">Bookmarks</Typography.Heading>
 
@@ -95,7 +95,7 @@ const BookmarksPage = ({ onNavigateToReader }: BookmarksPageProps) => {
 
       {/* Book filter */}
       {bookmarks.length > 0 && uniqueBooks.length > 1 && (
-        <div className="max-w-md w-full px-2 mx-auto pt-2">
+        <div className="max-w-md sm:max-w-lg md:max-w-xl lg:max-w-2xl xl:max-w-3xl w-full px-2 mx-auto pt-2">
           <ScrollShadow hideScrollBar orientation="horizontal">
             <div className="flex gap-2 pb-1">
               <Button size="sm" variant={filterBook === null ? "primary" : "secondary"}
@@ -178,7 +178,7 @@ const BookmarksPage = ({ onNavigateToReader }: BookmarksPageProps) => {
 
       {/* Bottom action bar */}
       {bookmarks.length > 0 && filtered.length > 0 && (
-        <div className="max-w-md w-full px-2 mx-auto py-4 flex gap-2 justify-center">
+        <div className="max-w-md sm:max-w-lg md:max-w-xl lg:max-w-2xl xl:max-w-3xl w-full px-2 mx-auto py-4 flex gap-2 justify-center">
           <Button size="sm" variant="tertiary" onPress={handleClearAll}>
             <TrashBin aria-hidden="true" className="h-4 w-4" />
             Delete All

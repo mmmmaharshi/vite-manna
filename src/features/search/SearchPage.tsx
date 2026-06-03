@@ -49,12 +49,12 @@ const SearchPage = ({ onNavigateToReader }: SearchPageProps) => {
   return (
     <main className="min-h-dvh">
       <Surface className="sticky top-0 z-30 py-3 border border-b">
-        <div className="max-w-md w-full px-2 mx-auto">
+        <div className="max-w-md sm:max-w-lg md:max-w-xl lg:max-w-2xl xl:max-w-3xl w-full px-2 mx-auto">
           <Typography.Heading level={1} className="text-xl">Search</Typography.Heading>
         </div>
       </Surface>
 
-      <div className="max-w-md w-full px-2 mx-auto pt-2">
+      <div className="max-w-md sm:max-w-lg md:max-w-xl lg:max-w-2xl xl:max-w-3xl w-full px-2 mx-auto pt-2">
         <SearchField
           value={query}
           onChange={setQuery}

@@ -82,7 +82,7 @@ const ReaderScreen = () => {
         {selectedBookSummary ? `${getBibleBookName(selectedBookSummary.id)} ${chapter}` : "Bible Reader"}
       </Typography.Heading>
       <Surface className="sticky top-0 z-30 py-2.5 pt-3.5 border border-b">
-        <div className="max-w-md flex flex-col gap-2 w-full px-2 mx-auto">
+        <div className="max-w-md sm:max-w-lg md:max-w-xl lg:max-w-2xl flex flex-col gap-2 w-full px-2 mx-auto">
           <BookSelect
             books={books}
             value={visibleBook}
@@ -100,7 +100,7 @@ const ReaderScreen = () => {
 
       <section
         className={[
-          "max-w-md w-full px-2 py-4 mx-auto",
+          "max-w-md sm:max-w-lg md:max-w-xl lg:max-w-2xl w-full px-2 py-4 mx-auto",
           isSelectionMode ? "pb-24" : "",
         ].join(" ")}
         aria-label={selectedBookSummary ? `${getBibleBookName(selectedBookSummary.id)} ${chapter}` : "Bible reader"}
