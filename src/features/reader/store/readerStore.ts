@@ -150,7 +150,7 @@ function loadFontSize(): FontSize {
     const stored = localStorage.getItem(FONT_SIZE_KEY) as FontSize | null;
     if (stored && valid.includes(stored)) return stored;
   } catch { /* noop */ }
-  return "lg";
+  return "sm";
 }
 
 function rememberChapter(

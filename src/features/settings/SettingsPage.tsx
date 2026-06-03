@@ -24,6 +24,16 @@ const FONT_SIZES: { value: FontSize; label: string }[] = [
   { value: "2xl", label: "2XL" },
 ];
 
+const SIZE_PROPS: Record<FontSize, { type: "body-sm" | "body" | "h5" | "h4" | "h3"; weight?: "normal" }> = {
+  sm: { type: "body-sm" },
+  base: { type: "body" },
+  lg: { type: "h5", weight: "normal" },
+  xl: { type: "h4", weight: "normal" },
+  "2xl": { type: "h3", weight: "normal" },
+};
+
+const PREVIEW_TEXT = "ఆదియందు దేవుడు ఆకాశమును భూమిని సృష్టించెను. భూమి నిరాకారముగా నిర్జనముగా ఉండెను. అగాధజలముల మీదను అంధకారము కమ్ముకొని యుండెను. దేవుని ఆత్మ జలముల మీద కదలాడుచుండెను. అప్పుడు దేవుడు వెలుగు కలుగునని చెప్పగా వెలుగు కలిగెను.";
+
 const SettingsPage = () => {
   const { mode, setMode } = useTheme();
   const fontSize = useReaderStore((state) => state.fontSize);
@@ -60,7 +70,7 @@ const SettingsPage = () => {
 
         <Surface className="p-3">
           <Typography className="text-sm font-medium mb-2">Font Size</Typography>
-          <div className="flex gap-2">
+          <div className="flex gap-2 mb-3">
             {FONT_SIZES.map(({ value, label }) => (
               <Button
                 key={value}
@@ -72,6 +82,12 @@ const SettingsPage = () => {
                 {label}
               </Button>
             ))}
+          </div>
+          <div className="rounded-lg border bg-field-background p-3">
+            <Typography {...SIZE_PROPS[fontSize]} render={({ children, ...dp }) => <span {...dp}>{children}</span>}>
+              <sup className="me-1 text-[0.65em] text-muted">1</sup>
+              {PREVIEW_TEXT}
+            </Typography>
           </div>
         </Surface>
       </section>

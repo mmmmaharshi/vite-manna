@@ -48,12 +48,12 @@ const VerseList = ({ verses }: VerseListProps) => {
     lastScrolledVerseRef.current = permalinkVerse;
   }, [permalinkVerse, verses]);
 
-  const sizeClass: Record<FontSize, string> = {
-    sm: "text-sm",
-    base: "text-base",
-    lg: "text-lg",
-    xl: "text-xl",
-    "2xl": "text-2xl",
+  const sizeProps: Record<FontSize, { type: "body-sm" | "body" | "h5" | "h4" | "h3"; weight?: "normal" }> = {
+    sm: { type: "body-sm" },
+    base: { type: "body" },
+    lg: { type: "h5", weight: "normal" },
+    xl: { type: "h4", weight: "normal" },
+    "2xl": { type: "h3", weight: "normal" },
   };
 
   return (
@@ -81,7 +81,7 @@ const VerseList = ({ verses }: VerseListProps) => {
               ].join(" ")}
               onClick={() => toggleVerseSelection(verse.id)}
             >
-              <Typography className={sizeClass[fontSize]}>
+              <Typography {...sizeProps[fontSize]} render={({ children, ...dp }) => <span {...dp}>{children}</span>}>
                 <sup className="me-1 text-[0.65em] text-muted">{verse.verse}</sup>
                 {verse.text}
               </Typography>
