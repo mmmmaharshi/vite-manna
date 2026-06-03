@@ -23,7 +23,7 @@ const SplashView = ({
       {error ? "Setup paused" : message}
     </p>
 
-    {error && (
+    {error ? (
       <div className="flex flex-col items-center gap-2 mt-2">
         <p className="text-danger text-center text-sm">{error}</p>
 
@@ -37,7 +37,7 @@ const SplashView = ({
           </button>
         )}
       </div>
-    )}
+    ) : null}
   </SplashFrame>
 );
 

@@ -1,5 +1,4 @@
 import { useCallback, useRef, useState } from "react";
-import { toBlob } from "html-to-image";
 
 export const CARD_WIDTH = 1200;
 export const CARD_HEIGHT = 630;
@@ -22,6 +21,7 @@ export function useVerseImage() {
     if (!node) throw new Error("Card not rendered");
     setIsGenerating(true);
     try {
+      const { toBlob } = await import("html-to-image");
       const blob = await toBlob(node, { cacheBust: true });
       if (!blob) throw new Error("Failed to generate image");
       return blob;

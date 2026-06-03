@@ -1,9 +1,10 @@
-import { useEffect, useRef, useState } from "react";
+import { lazy, Suspense, useEffect, useRef, useState } from "react";
 import { ArrowUpFromSquare, Picture, Sparkles } from "@gravity-ui/icons";
 import { Button, Modal, Spinner, toast, Typography } from "@heroui/react";
 
 import { useDailyVerse } from "../hooks/useDailyVerse";
-import VerseImageModal from "./VerseImageModal";
+
+const VerseImageModal = lazy(() => import("./VerseImageModal"));
 
 interface DailyVerseModalProps {
   isOpen: boolean;
@@ -114,13 +115,15 @@ const DailyVerseModal = ({
         </Modal.Container>
       </Modal.Backdrop>
       {imageModalData && (
-        <VerseImageModal
-          isOpen={!!imageModalData}
-          onOpenChange={(open) => { if (!open) setImageModalData(null); }}
-          verses={imageModalData.verses}
-          reference={imageModalData.reference}
-          teluguText={imageModalData.teluguText}
-        />
+        <Suspense fallback={null}>
+          <VerseImageModal
+            isOpen={!!imageModalData}
+            onOpenChange={(open) => { if (!open) setImageModalData(null); }}
+            verses={imageModalData.verses}
+            reference={imageModalData.reference}
+            teluguText={imageModalData.teluguText}
+          />
+        </Suspense>
       )}
     </Modal>
   );

@@ -295,12 +295,12 @@ const ENGLISH_BOOK_MAP: Record<string, number> = {
   Revelation: 66,
 };
 
+const VERSE_REF_REGEX = /^(\d\s+)?([A-Za-z]+(?:\s+[A-Za-z]+)?)\s*(\d+):(\d+)/;
+
 export function parseVerseref(
   verseref: string,
 ): { book: number | null; chapter: number | null; verse: number | null } {
-  const m = verseref.match(
-    /^(\d\s+)?([A-Za-z]+(?:\s+[A-Za-z]+)?)\s*(\d+):(\d+)/,
-  );
+  const m = verseref.match(VERSE_REF_REGEX);
   if (!m) return { book: null, chapter: null, verse: null };
 
   const fullName = ((m[1] ?? "") + m[2]).trim();

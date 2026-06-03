@@ -1,4 +1,4 @@
-import { useState } from "react";
+import { lazy, Suspense, useState } from "react";
 import { ArrowUpFromSquare, Bookmark as BookmarkIcon, BookmarkFill, Copy, Link as LinkIcon, Picture } from "@gravity-ui/icons";
 import { Button, Surface, toast, Tooltip } from "@heroui/react";
 
@@ -8,7 +8,8 @@ import { getBibleBookName, type BibleVerse } from "../../../shared/bible";
 import { canNativeShare, copyToClipboard } from "../../../shared/lib/browser";
 import { useBookmarks } from "../../bookmarks/hooks/useBookmarks";
 import { useReaderStore } from "../store/readerStore";
-import VerseImageModal from "./VerseImageModal";
+
+const VerseImageModal = lazy(() => import("./VerseImageModal"));
 
 interface VerseActionBarProps {
   verses: BibleVerse[];
@@ -209,18 +210,20 @@ const VerseActionBar = ({ verses }: VerseActionBarProps) => {
     <>
       {isSelectionMode && <VerseActionBarInner verses={verses} onShareAsImage={setImageModalData} />}
       {imageModalData && (
-        <VerseImageModal
-          isOpen={!!imageModalData}
-          onOpenChange={(open) => {
-            if (!open) {
-              setImageModalData(null);
-              clearVerseSelection();
-            }
-          }}
-          verses={imageModalData.verses}
-          reference={imageModalData.reference}
-          teluguText={imageModalData.teluguText}
-        />
+        <Suspense fallback={null}>
+          <VerseImageModal
+            isOpen={!!imageModalData}
+            onOpenChange={(open) => {
+              if (!open) {
+                setImageModalData(null);
+                clearVerseSelection();
+              }
+            }}
+            verses={imageModalData.verses}
+            reference={imageModalData.reference}
+            teluguText={imageModalData.teluguText}
+          />
+        </Suspense>
       )}
     </>
   );

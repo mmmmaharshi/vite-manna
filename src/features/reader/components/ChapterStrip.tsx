@@ -1,10 +1,11 @@
-import { useLayoutEffect, useMemo, useRef, useState, type RefObject } from "react";
+import { lazy, Suspense, useLayoutEffect, useMemo, useRef, useState, type RefObject } from "react";
 import { Sparkles } from "@gravity-ui/icons";
 import { Button, ScrollShadow } from "@heroui/react";
 
 import { useBookmarks } from "../../bookmarks/hooks/useBookmarks";
 import { useReaderStore } from "../store/readerStore";
-import DailyVerseModal from "./DailyVerseModal";
+
+const DailyVerseModal = lazy(() => import("./DailyVerseModal"));
 
 interface ChapterStripProps {
   chapters: number[];
@@ -169,11 +170,13 @@ const ChapterStrip = ({
         ))}
       </div>
     </ScrollShadow>
-      <DailyVerseModal
-        isOpen={isDailyVerseOpen}
-        onOpenChange={setIsDailyVerseOpen}
-        onNavigateToChapter={handleDailyVerseNavigate}
-      />
+      <Suspense fallback={null}>
+        <DailyVerseModal
+          isOpen={isDailyVerseOpen}
+          onOpenChange={setIsDailyVerseOpen}
+          onNavigateToChapter={handleDailyVerseNavigate}
+        />
+      </Suspense>
     </div>
   );
 };

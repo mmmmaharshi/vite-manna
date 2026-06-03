@@ -118,6 +118,7 @@ export async function getBookmarkedVerseIds(): Promise<Set<number>> {
 }
 
 export function searchVerses(query: string) {
+  if (!query.trim()) return Promise.resolve([]);
   return db.verses
     .filter((v) => v.text.toLowerCase().includes(query.toLowerCase()))
     .limit(50)
