@@ -37,12 +37,15 @@ const VerseImageModal = ({
   useLayoutEffect(() => {
     const el = previewRef.current;
     if (!el) return;
-    const update = () => setScale(Math.min(el.clientWidth / cardW, 1));
+    const update = () => {
+      const maxH = el.clientHeight;
+      setScale(Math.min(el.clientWidth / cardW, maxH / cardH, 1));
+    };
     update();
     const ro = new ResizeObserver(update);
     ro.observe(el);
     return () => ro.disconnect();
-  }, [isOpen, cardW]);
+  }, [isOpen, cardW, cardH]);
 
   const today = format(new Date(), "yyyy-MM-dd");
 
@@ -87,7 +90,7 @@ const VerseImageModal = ({
                   ))}
                 </div>
 
-                <div ref={previewRef} className="w-full sm:max-w-[500px] rounded-xl overflow-hidden shadow-xl" style={{ aspectRatio: `${cardW}/${cardH}` }}>
+                <div ref={previewRef} className="w-full sm:max-w-[500px] max-h-[65vh] rounded-xl overflow-hidden shadow-xl" style={{ aspectRatio: `${cardW}/${cardH}` }}>
                   <div style={{ transform: `scale(${scale})`, transformOrigin: "top left", width: cardW, height: cardH }}>
                     <VerseImageCard
                       verses={verses}
