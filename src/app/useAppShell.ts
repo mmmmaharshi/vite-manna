@@ -39,7 +39,7 @@ function progressMessage(progress: number) {
 
 export function useAppShell(): ShellStatus {
   const [areFontsReady, setAreFontsReady] = useState(false);
-  const [isOfflineReady, setIsOfflineReady] = useState(false);
+  const [isOfflineReady] = useState(true);
   const [isMinSplashElapsed, setIsMinSplashElapsed] = useState(false);
   const [downloadProgress, setDownloadProgress] = useState(0);
   const [downloadError, setDownloadError] = useState<string | null>(null);
@@ -53,12 +53,11 @@ export function useAppShell(): ShellStatus {
   useEffect(() => {
     let mounted = true;
 
-    void Promise.all([waitForFonts(), waitForOfflineReadiness()]).then(() => {
-      if (mounted) {
-        setAreFontsReady(true);
-        setIsOfflineReady(true);
-      }
+    void waitForFonts().then(() => {
+      if (mounted) setAreFontsReady(true);
     });
+
+    void waitForOfflineReadiness();
 
     return () => {
       mounted = false;
