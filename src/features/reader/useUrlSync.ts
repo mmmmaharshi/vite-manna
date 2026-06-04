@@ -1,14 +1,11 @@
 import { useEffect, useRef } from "react";
 import { useSearchParams } from "react-router";
 
-import { parsePositiveInteger } from "../../shared/lib/parsePositiveInteger";
 import { useReaderStore } from "./store/readerStore";
 
 const URL_PARAM_BOOK = "book";
 const URL_PARAM_CHAPTER = "chapter";
 const URL_PARAM_VERSE = "verse";
-const STORAGE_KEY = "manna.reader-location";
-const STORAGE_VERSION = 1;
 
 export function useUrlSync() {
   const [searchParams, setSearchParams] = useSearchParams();
@@ -21,17 +18,17 @@ export function useUrlSync() {
   useEffect(() => {
     const onPopState = () => {
       const params = new URLSearchParams(window.location.search);
-      const bookParam = parsePositiveInteger(params.get(URL_PARAM_BOOK));
-      const chapterParam = parsePositiveInteger(params.get(URL_PARAM_CHAPTER));
-      const verseParam = parsePositiveInteger(params.get(URL_PARAM_VERSE));
+      const bookParam = params.get(URL_PARAM_BOOK);
+      const chapterParam = params.get(URL_PARAM_CHAPTER);
+      const verseParam = params.get(URL_PARAM_VERSE);
 
       if (bookParam !== null && chapterParam !== null) {
         const state = useReaderStore.getState();
         isExternalUpdate.current = true;
-        state.setBook(bookParam);
-        state.setChapter(chapterParam);
+        state.setBook(Number(bookParam));
+        state.setChapter(Number(chapterParam));
         if (verseParam !== null) {
-          state.setPermalinkVerse(verseParam);
+          state.setPermalinkVerse(Number(verseParam));
         }
       }
     };
@@ -70,16 +67,15 @@ export function useUrlSync() {
   useEffect(() => {
     try {
       localStorage.setItem(
-        STORAGE_KEY,
+        "manna.reader-location",
         JSON.stringify({
-          version: STORAGE_VERSION,
+          version: 1,
           book,
           chapter,
           chaptersByBook,
         }),
       );
     } catch {
-      // URL state remains authoritative when storage is unavailable.
     }
   }, [book, chapter, chaptersByBook]);
 }

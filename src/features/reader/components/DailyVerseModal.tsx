@@ -1,14 +1,15 @@
-import { useEffect, useState } from "react";
+import { lazy, Suspense, useEffect, useRef, useState } from "react";
 import { ArrowUpFromSquare, Picture, Sparkles } from "@gravity-ui/icons";
 import { Button, Modal, Spinner, toast, Typography } from "@heroui/react";
 
 import { useDailyVerse } from "../hooks/useDailyVerse";
-import VerseImageModal from "./VerseImageModal";
+
+const VerseImageModal = lazy(() => import("./VerseImageModal"));
 
 interface DailyVerseModalProps {
   isOpen: boolean;
   onOpenChange: (open: boolean) => void;
-  onNavigateToChapter: (book: number, chapter: number) => void;
+  onNavigateToChapter: (book: number, chapter: number, verse: number) => void;
 }
 
 const DailyVerseModal = ({
@@ -16,16 +17,18 @@ const DailyVerseModal = ({
   onOpenChange,
   onNavigateToChapter,
 }: DailyVerseModalProps) => {
-  const { isLoading, teluguText, reference, book, chapter, isFirstOpenToday, markDailyVerseShown } =
+  const { isLoading, teluguText, reference, book, chapter, verse, isFirstOpenToday, markDailyVerseShown } =
     useDailyVerse();
+  const autoOpened = useRef(false);
 
   useEffect(() => {
-    if (!isFirstOpenToday || isLoading) return;
+    if (!isFirstOpenToday || isLoading || autoOpened.current) return;
+    autoOpened.current = true;
     onOpenChange(true);
     markDailyVerseShown();
   }, [isFirstOpenToday, isLoading, onOpenChange, markDailyVerseShown]);
 
-  const canNavigate = book !== null && chapter !== null;
+  const canNavigate = book !== null && chapter !== null && verse !== null;
   const [imageModalData, setImageModalData] = useState<{ verses: { text: string; verse: number }[]; reference: string; teluguText: string } | null>(null);
 
   const handleShareImage = () => {
@@ -100,7 +103,7 @@ const DailyVerseModal = ({
               {canNavigate && (
                 <Button
                   onPress={() => {
-                    onNavigateToChapter(book!, chapter!);
+                    onNavigateToChapter(book!, chapter!, verse!);
                     onOpenChange(false);
                   }}
                 >
@@ -112,13 +115,15 @@ const DailyVerseModal = ({
         </Modal.Container>
       </Modal.Backdrop>
       {imageModalData && (
-        <VerseImageModal
-          isOpen={!!imageModalData}
-          onOpenChange={(open) => { if (!open) setImageModalData(null); }}
-          verses={imageModalData.verses}
-          reference={imageModalData.reference}
-          teluguText={imageModalData.teluguText}
-        />
+        <Suspense fallback={null}>
+          <VerseImageModal
+            isOpen={!!imageModalData}
+            onOpenChange={(open) => { if (!open) setImageModalData(null); }}
+            verses={imageModalData.verses}
+            reference={imageModalData.reference}
+            teluguText={imageModalData.teluguText}
+          />
+        </Suspense>
       )}
     </Modal>
   );

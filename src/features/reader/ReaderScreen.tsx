@@ -1,6 +1,7 @@
 import { useEffect, useRef } from "react";
-import { Button, ScrollShadow, Surface, Typography } from "@heroui/react";
+import { Button, ScrollShadow, Skeleton, Surface, Typography } from "@heroui/react";
 
+import { cn } from "../../shared/lib/cn";
 import { getBibleBookName } from "../../shared/bible";
 import { useBooks } from "./hooks/useBooks";
 import { useReaderSnapshot } from "./hooks/useReaderSnapshot";
@@ -10,6 +11,7 @@ import VerseActionBar from "./components/VerseActionBar";
 import VerseList from "./components/VerseList";
 import { useReaderStore } from "./store/readerStore";
 import { useUrlSync } from "./useUrlSync";
+import { useSwipeAndKeyboard } from "./hooks/useSwipeAndKeyboard";
 
 const ReaderScreen = () => {
   useUrlSync();
@@ -37,6 +39,18 @@ const ReaderScreen = () => {
       prevBookChapter.current = { book, chapter };
     }
   }, [book, chapter]);
+
+  const verseSectionRef = useRef<HTMLElement>(null);
+  useSwipeAndKeyboard({
+    elementRef: verseSectionRef,
+    books,
+    book,
+    chapter,
+    setChapter,
+    setBook,
+    isSelectionMode,
+    isBookSelectOpen: useReaderStore((state) => state.isBookSelectOpen),
+  });
 
   const selectedBookSummary = books.find((candidate) => candidate.id === book);
 
@@ -107,10 +121,11 @@ const ReaderScreen = () => {
           {selectedBookSummary ? `${getBibleBookName(selectedBookSummary.id)} ${chapter}` : "Bible Reader"}
         </Typography.Heading>
         <section
-          className={[
+          ref={verseSectionRef}
+          className={cn(
             "max-w-md sm:max-w-lg md:max-w-xl lg:max-w-2xl w-full px-2 py-4 mx-auto",
-            isSelectionMode ? "pb-24" : "",
-          ].join(" ")}
+            isSelectionMode && "pb-24",
+          )}
           aria-label={selectedBookSummary ? `${getBibleBookName(selectedBookSummary.id)} ${chapter}` : "Bible reader"}
         >
           {snapshot && (
@@ -119,18 +134,14 @@ const ReaderScreen = () => {
           {!snapshot && hasLoadedBooks && (
             <div className="flex flex-col gap-3" aria-busy="true">
               {Array.from({ length: 8 }, (_, i) => (
-                <div
-                  key={i}
-                  className="h-5 rounded bg-surface-secondary animate-pulse"
-                  style={{ width: `${60 + Math.random() * 35}%` }}
-                />
+                <Skeleton key={i} className="h-5 rounded-lg" style={{ width: `${60 + Math.random() * 35}%` }} />
               ))}
             </div>
           )}
         </section>
 
         {snapshot && <VerseActionBar verses={snapshot.verses} />}
-        <div className="h-16" />
+        <div className="h-[calc(4rem+env(safe-area-inset-bottom))]" />
       </ScrollShadow>
     </div>
   );

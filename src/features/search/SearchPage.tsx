@@ -70,22 +70,22 @@ const SearchPage = ({ onNavigateToReader }: SearchPageProps) => {
         </div>
 
         {!searched ? (
-          <section className="max-w-md w-full px-2 py-24 mx-auto flex flex-col items-center gap-2 text-center">
-            <Magnifier aria-hidden="true" className="h-12 w-12 text-muted" />
+          <section className="max-w-md sm:max-w-lg md:max-w-xl lg:max-w-2xl xl:max-w-3xl w-full px-2 py-24 mx-auto flex flex-col items-center gap-2 text-center">
+            <Magnifier aria-hidden="true" className="h-10 w-10 sm:h-12 sm:w-12 text-muted" />
             <Typography className="text-base font-medium">Search Bible</Typography>
             <Typography.Paragraph size="sm" color="muted">
               Search verses by keyword
             </Typography.Paragraph>
           </section>
         ) : results.length === 0 ? (
-          <section className="max-w-md w-full px-2 py-24 mx-auto flex flex-col items-center gap-2 text-center">
+          <section className="max-w-md sm:max-w-lg md:max-w-xl lg:max-w-2xl xl:max-w-3xl w-full px-2 py-24 mx-auto flex flex-col items-center gap-2 text-center">
             <Typography className="text-base font-medium">No results</Typography>
             <Typography.Paragraph size="sm" color="muted">
               Try a different search term
             </Typography.Paragraph>
           </section>
         ) : (
-          <section className="max-w-md w-full px-2 py-4 mx-auto flex flex-col gap-2">
+          <section className="max-w-md sm:max-w-lg md:max-w-xl lg:max-w-2xl xl:max-w-3xl w-full px-2 py-4 mx-auto flex flex-col gap-2">
             <Typography.Paragraph size="sm" color="muted" className="px-1">
               {results.length} result{results.length !== 1 ? "s" : ""}
             </Typography.Paragraph>
@@ -125,7 +125,7 @@ const SearchPage = ({ onNavigateToReader }: SearchPageProps) => {
             })}
           </section>
         )}
-        <div className="h-16" />
+        <div className="h-[calc(4rem+env(safe-area-inset-bottom))]" />
       </ScrollShadow>
     </div>
   );

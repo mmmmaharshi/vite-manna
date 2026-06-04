@@ -1,6 +1,8 @@
 import { Book, Bookmark, Gear, Magnifier } from "@gravity-ui/icons";
 import { Button, Surface } from "@heroui/react";
 
+import { cn } from "../shared/lib/cn";
+
 export type TabId = "reader" | "search" | "bookmarks" | "settings";
 
 interface BottomNavProps {
@@ -27,9 +29,9 @@ const BottomNav = ({ activeTab, onTabChange }: BottomNavProps) => (
             className="flex h-auto min-w-0 flex-col gap-0.5 px-4 py-3 min-h-12"
             onPress={() => onTabChange(id)}
           >
-            <Icon className={`h-5 w-5 ${isActive ? "text-accent" : "text-muted"}`} />
+            <Icon className={cn("h-5 w-5", isActive ? "text-accent" : "text-muted")} />
             <span
-              className={`text-[10px] leading-none ${isActive ? "text-accent" : "text-muted"}`}
+              className={cn("text-[11px] sm:text-xs leading-none", isActive ? "text-accent" : "text-muted")}
             >
               {label}
             </span>

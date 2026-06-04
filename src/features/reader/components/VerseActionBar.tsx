@@ -1,12 +1,15 @@
-import { useState } from "react";
+import { lazy, Suspense, useState } from "react";
 import { ArrowUpFromSquare, Bookmark as BookmarkIcon, BookmarkFill, Copy, Link as LinkIcon, Picture } from "@gravity-ui/icons";
 import { Button, Surface, toast, Tooltip } from "@heroui/react";
 
+import { cn } from "../../../shared/lib/cn";
+
 import { getBibleBookName, type BibleVerse } from "../../../shared/bible";
-import { canNativeShare } from "../../../shared/lib/browser";
+import { canNativeShare, copyToClipboard } from "../../../shared/lib/browser";
 import { useBookmarks } from "../../bookmarks/hooks/useBookmarks";
 import { useReaderStore } from "../store/readerStore";
-import VerseImageModal from "./VerseImageModal";
+
+const VerseImageModal = lazy(() => import("./VerseImageModal"));
 
 interface VerseActionBarProps {
   verses: BibleVerse[];
@@ -24,11 +27,7 @@ function formatReference(book: number, chapter: number) {
 
 function buildShareText(verses: BibleVerse[], book: number, chapter: number) {
   const reference = formatReference(book, chapter);
-  const ordered = [...verses].sort(
-    (first, second) => first.verse - second.verse,
-  );
-
-  return ordered
+  return verses
     .map((verse) => `${reference}:${verse.verse} ${verse.text}`)
     .join("\n");
 }
@@ -40,23 +39,6 @@ function buildPermalinkUrl(book: number, chapter: number, verse: number) {
   url.searchParams.set("verse", String(verse));
   url.hash = "";
   return url.toString();
-}
-
-async function copyToClipboard(text: string) {
-  if (navigator.clipboard?.writeText) {
-    await navigator.clipboard.writeText(text);
-    return;
-  }
-
-  const textarea = document.createElement("textarea");
-  textarea.value = text;
-  textarea.setAttribute("readonly", "");
-  textarea.style.position = "fixed";
-  textarea.style.opacity = "0";
-  document.body.appendChild(textarea);
-  textarea.select();
-  document.execCommand("copy");
-  document.body.removeChild(textarea);
 }
 
 interface VerseActionBarInnerProps extends VerseActionBarProps {
@@ -77,18 +59,18 @@ const VerseActionBarInner = ({ verses, onShareAsImage }: VerseActionBarInnerProp
   const { bookmarkedIds, toggle } = useBookmarks();
   const selectedSet = new Set(selectedVerseIds);
   const selectedVerses = verses.filter((verse) => selectedSet.has(verse.id));
-  const text = buildShareText(selectedVerses, book, chapter);
+  const sortedVerses = selectedVerses.toSorted((a, b) => a.verse - b.verse);
+  const text = buildShareText(sortedVerses, book, chapter);
   const singleSelectedVerse =
-    selectedVerses.length === 1 ? selectedVerses[0] : null;
+    sortedVerses.length === 1 ? sortedVerses[0] : null;
   const allSelectedBookmarked = selectedVerses.every((v) => bookmarkedIds.has(v.id));
 
-  const orderedVerses = [...selectedVerses].sort((a, b) => a.verse - b.verse);
-  const imageTeluguText = orderedVerses.map((v) => v.text).join("  ");
+  const imageTeluguText = sortedVerses.map((v) => v.text).join("  ");
   const bookName = getBibleBookName(book);
   const imageReference =
-    orderedVerses.length === 1
-      ? `${bookName} ${chapter}:${orderedVerses[0].verse}`
-      : `${bookName} ${chapter}:${orderedVerses[0].verse}-${orderedVerses[orderedVerses.length - 1].verse}`;
+    sortedVerses.length === 1
+      ? `${bookName} ${chapter}:${sortedVerses[0].verse}`
+      : `${bookName} ${chapter}:${sortedVerses[0].verse}-${sortedVerses[sortedVerses.length - 1].verse}`;
 
   const handleCopy = async () => {
     if (selectedVerses.length === 0) {
@@ -126,9 +108,9 @@ const VerseActionBarInner = ({ verses, onShareAsImage }: VerseActionBarInnerProp
   };
 
   const handleShareAsImage = () => {
-    if (orderedVerses.length === 0) return;
+    if (sortedVerses.length === 0) return;
     onShareAsImage({
-      verses: orderedVerses,
+      verses: sortedVerses,
       reference: imageReference,
       teluguText: imageTeluguText,
     });
@@ -155,11 +137,11 @@ const VerseActionBarInner = ({ verses, onShareAsImage }: VerseActionBarInnerProp
     }
   };
 
-  const cols = singleSelectedVerse !== null ? "grid-cols-5" : "grid-cols-4";
+  const cols = singleSelectedVerse !== null ? "grid-cols-3 sm:grid-cols-5" : "grid-cols-3 sm:grid-cols-4";
 
   return (
     <div
-      className="fixed inset-x-0 bottom-0 z-40 px-3 pb-[max(0.75rem,env(safe-area-inset-bottom))] pt-3 pointer-events-none"
+      className="fixed inset-x-0 bottom-[3.5rem] z-40 px-3 pb-[max(0.75rem,env(safe-area-inset-bottom))] pt-3 pointer-events-none"
     >
       <Surface className="mx-auto w-full border px-4 py-3 shadow-lg pointer-events-auto">
         <div className="flex items-center justify-between mb-3">
@@ -170,7 +152,7 @@ const VerseActionBarInner = ({ verses, onShareAsImage }: VerseActionBarInnerProp
             Clear
           </Button>
         </div>
-        <div className={`grid ${cols} gap-2`}>
+        <div className={cn("grid", cols, "gap-2")}>
           {singleSelectedVerse !== null && (
             <Tooltip delay={0}>
               <Button variant="tertiary" isIconOnly className="h-12 w-full rounded-xl" onPress={handleCopyLink}>
@@ -224,18 +206,20 @@ const VerseActionBar = ({ verses }: VerseActionBarProps) => {
     <>
       {isSelectionMode && <VerseActionBarInner verses={verses} onShareAsImage={setImageModalData} />}
       {imageModalData && (
-        <VerseImageModal
-          isOpen={!!imageModalData}
-          onOpenChange={(open) => {
-            if (!open) {
-              setImageModalData(null);
-              clearVerseSelection();
-            }
-          }}
-          verses={imageModalData.verses}
-          reference={imageModalData.reference}
-          teluguText={imageModalData.teluguText}
-        />
+        <Suspense fallback={null}>
+          <VerseImageModal
+            isOpen={!!imageModalData}
+            onOpenChange={(open) => {
+              if (!open) {
+                setImageModalData(null);
+                clearVerseSelection();
+              }
+            }}
+            verses={imageModalData.verses}
+            reference={imageModalData.reference}
+            teluguText={imageModalData.teluguText}
+          />
+        </Suspense>
       )}
     </>
   );

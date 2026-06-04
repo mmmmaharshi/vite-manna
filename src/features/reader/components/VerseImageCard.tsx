@@ -1,6 +1,7 @@
-import { forwardRef } from "react";
+import type { Ref } from "react";
 
 interface VerseImageCardProps {
+  ref?: Ref<HTMLDivElement>;
   verses: { text: string; verse: number }[];
   reference: string;
   teluguText: string;
@@ -94,42 +95,35 @@ const styles = {
   },
 };
 
-const VerseImageCard = forwardRef<HTMLDivElement, VerseImageCardProps>(
-  ({ verses, reference, teluguText }, ref) => {
-    const verseNumbers = verses
-      .map((v) => v.verse)
-      .filter((n, i, a) => a.indexOf(n) === i)
-      .sort((a, b) => a - b)
-      .map((n) => (verses.length > 1 ? n : null))
-      .filter((n) => n !== null);
+const VerseImageCard = ({ ref, verses, reference, teluguText }: VerseImageCardProps) => {
+  const verseNumbers = verses.length > 1
+    ? [...new Set(verses.map((v) => v.verse))].toSorted((a, b) => a - b)
+    : [];
 
-    return (
-      <div
-        ref={ref}
-        style={styles.container}
-        aria-hidden="true"
-      >
-        <div style={styles.accentLine} />
-        <div style={styles.glow1} />
-        <div style={styles.glow2} />
+  return (
+    <div
+      ref={ref}
+      style={styles.container}
+      aria-hidden="true"
+    >
+      <div style={styles.accentLine} />
+      <div style={styles.glow1} />
+      <div style={styles.glow2} />
 
-        <div style={styles.content}>
-          {verseNumbers.length > 0 && (
-            <span style={styles.verseNumbers}>
-              {verseNumbers.join(", ")}
-            </span>
-          )}
-          <div style={styles.verseText}>{teluguText}</div>
-          <div style={styles.divider} />
-          <span style={styles.reference}>{reference}</span>
-        </div>
-
-        <span style={styles.branding}>మన్నా</span>
+      <div style={styles.content}>
+        {verseNumbers.length > 0 && (
+          <span style={styles.verseNumbers}>
+            {verseNumbers.join(", ")}
+          </span>
+        )}
+        <div style={styles.verseText}>{teluguText}</div>
+        <div style={styles.divider} />
+        <span style={styles.reference}>{reference}</span>
       </div>
-    );
-  },
-);
 
-VerseImageCard.displayName = "VerseImageCard";
+      <span style={styles.branding}>మన్నా</span>
+    </div>
+  );
+};
 
 export default VerseImageCard;

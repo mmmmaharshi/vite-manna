@@ -1,28 +1,12 @@
-import { useCallback, useEffect, useState } from "react";
+import { useCallback, useEffect, useMemo } from "react";
+import { useLocalStorage, useMediaQuery } from "@reactuses/core";
 
 const THEME_KEY = "theme";
 type ThemeMode = "light" | "dark" | "system";
 type Theme = "light" | "dark";
 
-function getSystemTheme(): Theme {
-  if (typeof window === "undefined") return "light";
-  return window.matchMedia("(prefers-color-scheme: dark)").matches ? "dark" : "light";
-}
-
-function getStoredMode(): ThemeMode | null {
-  try {
-    const stored = localStorage.getItem(THEME_KEY);
-    if (stored === "light" || stored === "dark" || stored === "system") return stored;
-  } catch { /* noop */ }
-  return null;
-}
-
-function getEffectiveMode(): ThemeMode {
-  return getStoredMode() ?? "system";
-}
-
-function resolveTheme(mode: ThemeMode): Theme {
-  return mode === "system" ? getSystemTheme() : mode;
+function resolveTheme(mode: ThemeMode, prefersDark: boolean): Theme {
+  return mode === "system" ? (prefersDark ? "dark" : "light") : mode;
 }
 
 function applyTheme(theme: Theme) {
@@ -30,29 +14,18 @@ function applyTheme(theme: Theme) {
 }
 
 export function useTheme() {
-  const [mode, setModeState] = useState<ThemeMode>(getEffectiveMode);
-  const resolvedTheme = resolveTheme(mode);
+  const [stored, setModeState] = useLocalStorage<ThemeMode>(THEME_KEY, "system");
+  const prefersDark = useMediaQuery("(prefers-color-scheme: dark)");
+  const mode = stored ?? "system";
+  const resolvedTheme = useMemo(() => resolveTheme(mode, prefersDark), [mode, prefersDark]);
 
   useEffect(() => {
     applyTheme(resolvedTheme);
   }, [resolvedTheme]);
 
-  useEffect(() => {
-    const mq = window.matchMedia("(prefers-color-scheme: dark)");
-    const onChange = () => {
-      const stored = getStoredMode();
-      if (stored === "system" || stored === null) {
-        setModeState("system");
-      }
-    };
-    mq.addEventListener("change", onChange);
-    return () => mq.removeEventListener("change", onChange);
-  }, []);
-
   const setMode = useCallback((m: ThemeMode) => {
-    try { localStorage.setItem(THEME_KEY, m); } catch { /* noop */ }
     setModeState(m);
-  }, []);
+  }, [setModeState]);
 
   return {
     mode,

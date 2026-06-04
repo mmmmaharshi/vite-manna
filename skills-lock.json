@@ -1,6 +1,12 @@
 {
   "version": 1,
   "skills": {
+    "agent-browser": {
+      "source": "linuxlewis/agent-skills",
+      "sourceType": "github",
+      "skillPath": "skills/agent-browser/SKILL.md",
+      "computedHash": "30e06862b2a8de2ccccb8de47a12489f13e11edea1831e2c3ad678236a1b4a98"
+    },
     "caveman": {
       "source": "juliusbrussee/caveman",
       "sourceType": "github",
@@ -25,17 +31,48 @@
       "skillPath": "skills/heroui-react/SKILL.md",
       "computedHash": "f4a764d21a39ccc5b2076a869cf083bbfdb983e81f9deda8d75fef42c939a993"
     },
+<<<<<<< HEAD
+    "lean-ux": {
+      "source": "wondelai/skills",
+      "sourceType": "github",
+      "skillPath": "lean-ux/SKILL.md",
+      "computedHash": "72a810ecfa8f50beb6ecc64197264d42e8ce4df20debb3b4db1f102c2d26ad83"
+    },
     "product-brainstorming": {
       "source": "anthropics/knowledge-work-plugins",
       "sourceType": "github",
       "skillPath": "product-management/skills/product-brainstorming/SKILL.md",
       "computedHash": "595e6cc5bb85da6b67b35c24d4d3906c6bac42a1fe4ecbe71fa154176d724c1b"
     },
+    "product-ux-expert": {
+      "source": "majiayu000/claude-arsenal",
+      "sourceType": "github",
+      "skillPath": "skills/product-ux-expert/SKILL.md",
+      "computedHash": "be39d796c55dd28f49dab3481eb06e4a5249312a91828644fc9443e0207f42a9"
+    },
     "refactor": {
       "source": "github/awesome-copilot",
       "sourceType": "github",
       "skillPath": "skills/refactor/SKILL.md",
       "computedHash": "87789a786b96f99ba0680e89345a975106e10e7db1071c7cdc2e76d507c449d6"
+    },
+    "responsive-testing": {
+      "source": "spencerpauly/awesome-cursor-skills",
+      "sourceType": "github",
+      "skillPath": "resources/responsive-testing/SKILL.md",
+      "computedHash": "9e40d1dbcad8514389f95725ad59a8e4c013b9db80903a66220050ab4d3b7819"
+    },
+    "vercel-composition-patterns": {
+      "source": "vercel-labs/agent-skills",
+      "sourceType": "github",
+      "skillPath": "skills/composition-patterns/SKILL.md",
+      "computedHash": "575757e3e25761c8c562d6e395d29f0b76c98b1273c0bd72d88e6ab1bc9c7d42"
+    },
+    "vercel-react-best-practices": {
+      "source": "vercel-labs/agent-skills",
+      "sourceType": "github",
+      "skillPath": "skills/react-best-practices/SKILL.md",
+      "computedHash": "ca7b0c0c6e5f2750043f7f0cd72d16ac4e2abc48f9b5500d047a4b77a2506212"
     }
   }
 }

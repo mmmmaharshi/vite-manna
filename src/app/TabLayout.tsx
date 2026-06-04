@@ -2,6 +2,7 @@ import { lazy, Suspense, useCallback, useState } from "react";
 import { Spinner } from "@heroui/react";
 import { useSearchParams } from "react-router";
 
+import { cn } from "../shared/lib/cn";
 import { ReaderScreen } from "../features/reader";
 import { useReaderStore } from "../features/reader/store/readerStore";
 import BottomNav from "./BottomNav";
@@ -32,7 +33,7 @@ const TabLayout = () => {
 
   return (
     <div className="min-h-dvh max-w-md mx-auto sm:max-w-lg md:max-w-xl lg:max-w-2xl xl:max-w-3xl">
-      <div className={activeTab === "reader" ? "" : "hidden"}>
+      <div className={cn(activeTab !== "reader" && "hidden")}>
         <ReaderScreen />
       </div>
       {activeTab === "search" && (

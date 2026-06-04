@@ -1,16 +1,17 @@
-interface PeriodicSyncManager {
-  register: (tag: string, options: { minInterval: number }) => Promise<void>;
-  unregister: (tag: string) => Promise<void>;
-}
-
-import { useCallback, useState } from "react";
+import { useCallback, useMemo } from "react";
 import { ArrowRotateLeft, Bell, Moon, Sun } from "@gravity-ui/icons";
-import { Button, ScrollShadow, Surface, Tooltip, Typography } from "@heroui/react";
+import { Button, ScrollShadow, Surface, ToggleButton, ToggleButtonGroup, Tooltip, Typography } from "@heroui/react";
+import { useLocalStorage } from "@reactuses/core";
 
 import { useTheme } from "../../shared/hooks/useTheme";
 import { SIZE_PROPS } from "../../shared/lib/fontSize";
 import { type FontSize } from "../../shared/lib/fontSize";
 import { useReaderStore } from "../reader/store/readerStore";
+
+interface PeriodicSyncManager {
+  register: (tag: string, options: { minInterval: number }) => Promise<void>;
+  unregister: (tag: string) => Promise<void>;
+}
 
 const OPTIONS: { mode: "light" | "dark" | "system"; label: string; Icon: typeof Sun }[] = [
   { mode: "light", label: "Light", Icon: Sun },
@@ -35,25 +36,22 @@ const FONT_SIZES: { value: FontSize; label: string }[] = [
 
 const PREVIEW_TEXT = "ఆదియందు దేవుడు ఆకాశమును భూమిని సృష్టించెను. భూమి నిరాకారముగా నిర్జనముగా ఉండెను. అగాధజలముల మీదను అంధకారము కమ్ముకొని యుండెను. దేవుని ఆత్మ జలముల మీద కదలాడుచుండెను. అప్పుడు దేవుడు వెలుగు కలుగునని చెప్పగా వెలుగు కలిగెను.";
 
+const NOTIF_PREF_KEY = "manna.notifications-enabled";
+
 const SettingsPage = () => {
   const { mode, setMode } = useTheme();
   const fontSize = useReaderStore((state) => state.fontSize);
   const setFontSize = useReaderStore((state) => state.setFontSize);
-  const NOTIF_PREF_KEY = "manna.notifications-enabled";
-  const [notifEnabled, setNotifEnabled] = useState(() => {
-    try { return localStorage.getItem(NOTIF_PREF_KEY) === "true"; }
-    catch { return false; }
-  });
+  const [notifEnabled, setNotifEnabled] = useLocalStorage(NOTIF_PREF_KEY, "false");
 
   const toggleNotifications = useCallback(async () => {
-    if (notifEnabled) {
+    if (notifEnabled === "true") {
       try {
         const reg = await navigator.serviceWorker.ready;
         const ps = (reg as unknown as { periodicSync?: PeriodicSyncManager }).periodicSync;
         if (ps?.unregister) await ps.unregister("daily-verse");
       } catch { }
-      try { localStorage.setItem(NOTIF_PREF_KEY, "false"); } catch { }
-      setNotifEnabled(false);
+      setNotifEnabled("false");
       return;
     }
     const perm = await Notification.requestPermission();
@@ -63,9 +61,8 @@ const SettingsPage = () => {
       const ps = (reg as unknown as { periodicSync?: PeriodicSyncManager }).periodicSync;
       if (ps?.register) await ps.register("daily-verse", { minInterval: 24 * 60 * 60 * 1000 });
     } catch { }
-    try { localStorage.setItem(NOTIF_PREF_KEY, "true"); } catch { }
-    setNotifEnabled(true);
-  }, [notifEnabled]);
+    setNotifEnabled("true");
+  }, [notifEnabled, setNotifEnabled]);
 
   return (
     <div className="h-dvh flex flex-col">
@@ -76,23 +73,25 @@ const SettingsPage = () => {
       </Surface>
 
       <ScrollShadow hideScrollBar className="flex-1">
-        <section className="max-w-md w-full px-2 py-4 mx-auto flex flex-col gap-2">
+        <section className="max-w-md sm:max-w-lg md:max-w-xl lg:max-w-2xl xl:max-w-3xl w-full px-2 py-4 mx-auto flex flex-col gap-2">
           <Surface className="p-3">
             <Typography className="text-sm font-medium mb-2">Appearance</Typography>
-            <div className="flex gap-2">
+            <ToggleButtonGroup
+              fullWidth
+              selectionMode="single"
+              selectedKeys={useMemo(() => new Set([mode]), [mode])}
+              onSelectionChange={(keys) => {
+                const value = [...keys][0] as string;
+                if (value) setMode(value as "light" | "dark" | "system");
+              }}
+            >
               {OPTIONS.map(({ mode: m, label, Icon }) => (
-                <Button
-                  key={m}
-                  variant={mode === m ? "primary" : "secondary"}
-                  size="sm"
-                  className="flex-1"
-                  onPress={() => setMode(m)}
-                >
+                <ToggleButton key={m} id={m}>
                   <Icon aria-hidden="true" className="h-4 w-4" />
                   {label}
-                </Button>
+                </ToggleButton>
               ))}
-            </div>
+            </ToggleButtonGroup>
           </Surface>
 
           <Surface className="p-3">
@@ -109,19 +108,22 @@ const SettingsPage = () => {
                 </Tooltip.Content>
               </Tooltip>
             </div>
-            <div className="flex gap-2 mb-3">
+            <ToggleButtonGroup
+              fullWidth
+              selectionMode="single"
+              className="mb-3"
+              selectedKeys={useMemo(() => new Set([fontSize]), [fontSize])}
+              onSelectionChange={(keys) => {
+                const value = [...keys][0] as FontSize;
+                if (value) setFontSize(value);
+              }}
+            >
               {FONT_SIZES.map(({ value, label }) => (
-                <Button
-                  key={value}
-                  variant={fontSize === value ? "primary" : "secondary"}
-                  size="sm"
-                  className="flex-1"
-                  onPress={() => setFontSize(value)}
-                >
+                <ToggleButton key={value} id={value}>
                   {label}
-                </Button>
+                </ToggleButton>
               ))}
-            </div>
+            </ToggleButtonGroup>
             <div className="rounded-lg border bg-field-background p-3">
               <Typography {...SIZE_PROPS[fontSize]} render={({ children, ...dp }) => <span {...dp}>{children}</span>}>
                 <sup className="me-1 text-[0.65em] text-muted">1</sup>
@@ -133,12 +135,12 @@ const SettingsPage = () => {
             <div className="flex items-center justify-between">
               <Typography className="text-sm font-medium">Daily Notifications</Typography>
               <Button
-                variant={notifEnabled ? "primary" : "tertiary"}
+                variant={notifEnabled === "true" ? "primary" : "tertiary"}
                 size="sm"
                 onPress={toggleNotifications}
               >
                 <Bell aria-hidden="true" className="h-4 w-4" />
-                {notifEnabled ? "Enabled" : "Disabled"}
+                {notifEnabled === "true" ? "Enabled" : "Disabled"}
               </Button>
             </div>
             <Typography className="text-xs text-muted mt-1">
@@ -151,7 +153,7 @@ const SettingsPage = () => {
             )}
           </Surface>
         </section>
-        <div className="h-16" />
+        <div className="h-[calc(4rem+env(safe-area-inset-bottom))]" />
       </ScrollShadow>
     </div>
   );

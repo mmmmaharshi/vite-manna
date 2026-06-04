@@ -1,6 +1,7 @@
 import { useLayoutEffect, useRef } from "react";
 import { Typography } from "@heroui/react";
 
+import { cn } from "../../../shared/lib/cn";
 import { useBookmarks } from "../../bookmarks/hooks/useBookmarks";
 import { useReaderStore } from "../store/readerStore";
 import { SIZE_PROPS } from "../../../shared/lib/fontSize";
@@ -64,14 +65,12 @@ const VerseList = ({ verses }: VerseListProps) => {
             <button
               type="button"
               aria-pressed={isSelected}
-              className={[
+              className={cn(
                 "block w-full rounded-md px-2 py-1.5 text-left transition-colors",
-                isSelected
-                  ? "bg-accent/15 hover:bg-accent/20"
-                  : "hover:bg-surface-secondary",
-                isPermalink ? "animate-permalink-flash" : "",
-                isBookmarked ? "bg-amber-100/90 dark:bg-amber-900/60" : "",
-              ].join(" ")}
+                isSelected ? "bg-accent/15 hover:bg-accent/20" : "hover:bg-surface-secondary",
+                isPermalink && "animate-permalink-flash",
+                isBookmarked && "bg-amber-100/90 dark:bg-amber-900/60",
+              )}
               onClick={() => toggleVerseSelection(verse.id)}
             >
               <Typography {...SIZE_PROPS[fontSize]} render={({ children, ...dp }) => <span {...dp}>{children}</span>}>

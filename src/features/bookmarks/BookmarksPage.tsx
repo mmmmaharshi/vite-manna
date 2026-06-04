@@ -5,10 +5,10 @@ import {
   Copy,
   TrashBin,
 } from "@gravity-ui/icons";
-import { Button, ScrollShadow, Surface, toast, Tooltip, Typography } from "@heroui/react";
+import { AlertDialog, Button, ScrollShadow, Surface, ToggleButton, ToggleButtonGroup, toast, Tooltip, Typography } from "@heroui/react";
 
 import { getBibleBookName, type Bookmark as BookmarkType } from "../../shared/bible";
-import { canNativeShare } from "../../shared/lib/browser";
+import { canNativeShare, copyToClipboard } from "../../shared/lib/browser";
 import { useReaderStore } from "../reader/store/readerStore";
 import { useBookmarks } from "./hooks/useBookmarks";
 
@@ -31,6 +31,7 @@ const BookmarksPage = ({ onNavigateToReader }: BookmarksPageProps) => {
 
   /* ── Filters ── */
   const [filterBook, setFilterBook] = useState<number | null>(null);
+  const [pendingRemove, setPendingRemove] = useState<BookmarkType | null>(null);
 
   const uniqueBooks = useMemo(() => {
     const ids = new Set(bookmarks.map((bm) => bm.book));
@@ -45,7 +46,7 @@ const BookmarksPage = ({ onNavigateToReader }: BookmarksPageProps) => {
   /* ── Undo on remove ── */
   const removeWithUndo = (bm: BookmarkType) => {
     toggle({ id: bm.verseId, book: bm.book, chapter: bm.chapter, verse: bm.verse, text: bm.text });
-    toast("Bookmark restored", { variant: "success" });
+    toast("Bookmark removed", { variant: "success" });
   };
 
   const handleShareAll = async () => {
@@ -93,41 +94,46 @@ const BookmarksPage = ({ onNavigateToReader }: BookmarksPageProps) => {
         {bookmarks.length > 0 && uniqueBooks.length > 1 && (
           <div className="max-w-md sm:max-w-lg md:max-w-xl lg:max-w-2xl xl:max-w-3xl w-full px-2 mx-auto pt-2">
             <ScrollShadow hideScrollBar orientation="horizontal">
-              <div className="flex gap-2 pb-1">
-                <Button size="sm" variant={filterBook === null ? "primary" : "secondary"}
-                  onPress={() => setFilterBook(null)}>
+              <ToggleButtonGroup
+                selectionMode="single"
+                disallowEmptySelection
+                selectedKeys={useMemo(() => new Set(filterBook === null ? ["all"] : [String(filterBook)]), [filterBook])}
+                onSelectionChange={(keys) => {
+                  const value = [...keys][0] as string;
+                  setFilterBook(value === "all" ? null : Number(value));
+                }}
+              >
+                <ToggleButton id="all">
                   All ({bookmarks.length})
-                </Button>
+                </ToggleButton>
                 {uniqueBooks.map((bookId) => (
-                  <Button key={bookId} size="sm"
-                    variant={filterBook === bookId ? "primary" : "secondary"}
-                    onPress={() => setFilterBook(bookId)}>
+                  <ToggleButton key={bookId} id={String(bookId)}>
                     {getBibleBookName(bookId)} ({bookmarks.filter((b) => b.book === bookId).length})
-                  </Button>
+                  </ToggleButton>
                 ))}
-              </div>
+              </ToggleButtonGroup>
             </ScrollShadow>
           </div>
         )}
 
         {/* Empty state */}
         {bookmarks.length === 0 ? (
-          <section className="max-w-md w-full px-2 py-24 mx-auto flex flex-col items-center gap-4 text-center">
-            <Bookmark aria-hidden="true" className="h-12 w-12 text-muted" />
+          <section className="max-w-md sm:max-w-lg md:max-w-xl lg:max-w-2xl xl:max-w-3xl w-full px-2 py-24 mx-auto flex flex-col items-center gap-4 text-center">
+            <Bookmark aria-hidden="true" className="h-10 w-10 sm:h-12 sm:w-12 text-muted" />
             <Typography className="text-base font-medium">No bookmarks yet</Typography>
             <Typography.Paragraph size="sm" color="muted">
               Bookmark verses to quickly find them later
             </Typography.Paragraph>
           </section>
         ) : filtered.length === 0 ? (
-          <section className="max-w-md w-full px-2 py-16 mx-auto text-center">
+          <section className="max-w-md sm:max-w-lg md:max-w-xl lg:max-w-2xl xl:max-w-3xl w-full px-2 py-16 mx-auto text-center">
             <Typography.Paragraph size="sm" color="muted">
               No matching bookmarks
             </Typography.Paragraph>
           </section>
         ) : (
           /* Bookmark list */
-          <section className="max-w-md w-full px-2 py-4 mx-auto flex flex-col gap-2">
+          <section className="max-w-md sm:max-w-lg md:max-w-xl lg:max-w-2xl xl:max-w-3xl w-full px-2 py-4 mx-auto flex flex-col gap-2">
             {filtered.map((bm) => (
               <Surface key={bm.verseId} className="flex flex-col p-3 gap-2">
                 {/* Top row */}
@@ -142,9 +148,13 @@ const BookmarksPage = ({ onNavigateToReader }: BookmarksPageProps) => {
                     <Tooltip delay={0}>
                       <Button isIconOnly size="sm" variant="tertiary"
                         aria-label="Copy verse"
-                        onPress={() => {
-                          navigator.clipboard.writeText(`${formatRef(bm.book, bm.chapter, bm.verse)} ${bm.text}`)
-                            .then(() => toast("Verse copied to clipboard", { variant: "success" }));
+                        onPress={async () => {
+                          try {
+                            await copyToClipboard(`${formatRef(bm.book, bm.chapter, bm.verse)} ${bm.text}`);
+                            toast("Verse copied to clipboard", { variant: "success" });
+                          } catch {
+                            toast("Failed to copy verse", { variant: "danger" });
+                          }
                         }}>
                         <Copy aria-hidden="true" className="h-3.5 w-3.5 text-muted" />
                       </Button>
@@ -153,7 +163,7 @@ const BookmarksPage = ({ onNavigateToReader }: BookmarksPageProps) => {
                     <Tooltip delay={0}>
                       <Button isIconOnly size="sm" variant="tertiary"
                         aria-label="Remove bookmark"
-                        onPress={() => removeWithUndo(bm)}>
+                        onPress={() => setPendingRemove(bm)}>
                         <TrashBin aria-hidden="true" className="h-3.5 w-3.5 text-muted" />
                       </Button>
                       <Tooltip.Content placement="top">Remove Bookmark</Tooltip.Content>
@@ -162,7 +172,7 @@ const BookmarksPage = ({ onNavigateToReader }: BookmarksPageProps) => {
                 </div>
 
                 {/* Verse text */}
-                <Typography.Paragraph size="sm" color="muted" className="line-clamp-3">
+                <Typography.Paragraph size="sm" color="muted" className="line-clamp-4 sm:line-clamp-3">
                   {bm.text}
                 </Typography.Paragraph>
 
@@ -175,20 +185,79 @@ const BookmarksPage = ({ onNavigateToReader }: BookmarksPageProps) => {
         {/* Bottom action bar */}
         {bookmarks.length > 0 && filtered.length > 0 && (
           <div className="max-w-md sm:max-w-lg md:max-w-xl lg:max-w-2xl xl:max-w-3xl w-full px-2 mx-auto py-4 flex gap-2 justify-center">
-            <Button size="sm" variant="tertiary" onPress={handleClearAll}>
-              <TrashBin aria-hidden="true" className="h-4 w-4" />
-              Delete All
-            </Button>
-            {canNativeShare() && (
-              <Button size="sm" variant="tertiary" onPress={handleShareAll}>
-                <ArrowUpFromSquare aria-hidden="true" className="h-4 w-4" />
-                Share All
+            <AlertDialog>
+              <Button size="sm" variant="tertiary">
+                <TrashBin aria-hidden="true" className="h-4 w-4" />
+                Delete All
               </Button>
+              <AlertDialog.Backdrop>
+                <AlertDialog.Container>
+                  <AlertDialog.Dialog className="sm:max-w-[400px]">
+                    {({ close }) => (
+                      <>
+                        <AlertDialog.CloseTrigger />
+                        <AlertDialog.Header>
+                          <AlertDialog.Icon status="danger" />
+                          <AlertDialog.Heading>Delete all bookmarks?</AlertDialog.Heading>
+                        </AlertDialog.Header>
+                        <AlertDialog.Body>
+                          <p>This will permanently delete all your bookmarks. This action cannot be undone.</p>
+                        </AlertDialog.Body>
+                        <AlertDialog.Footer>
+                          <Button slot="close" variant="tertiary">Cancel</Button>
+                          <Button variant="danger" onPress={() => { handleClearAll(); close(); }}>
+                            <TrashBin aria-hidden="true" className="h-4 w-4" />
+                            Delete All
+                          </Button>
+                        </AlertDialog.Footer>
+                      </>
+                    )}
+                  </AlertDialog.Dialog>
+                </AlertDialog.Container>
+              </AlertDialog.Backdrop>
+            </AlertDialog>
+            {canNativeShare() && (
+              <Tooltip delay={0}>
+                <Button size="sm" variant="tertiary" onPress={handleShareAll}>
+                  <ArrowUpFromSquare aria-hidden="true" className="h-4 w-4" />
+                  Share All
+                </Button>
+                <Tooltip.Content placement="top">Share all bookmarks</Tooltip.Content>
+              </Tooltip>
             )}
           </div>
         )}
-        <div className="h-16" />
+        <div className="h-[calc(4rem+env(safe-area-inset-bottom))]" />
       </ScrollShadow>
+
+      <AlertDialog.Backdrop isOpen={pendingRemove !== null} onOpenChange={(open) => { if (!open) setPendingRemove(null); }}>
+        <AlertDialog.Container>
+          <AlertDialog.Dialog className="sm:max-w-[400px]">
+            {({ close }) => (
+              <>
+                <AlertDialog.CloseTrigger />
+                <AlertDialog.Header>
+                  <AlertDialog.Icon status="danger" />
+                  <AlertDialog.Heading>Remove bookmark?</AlertDialog.Heading>
+                </AlertDialog.Header>
+                <AlertDialog.Body>
+                  <p>Remove bookmark for <strong>{pendingRemove ? formatRef(pendingRemove.book, pendingRemove.chapter, pendingRemove.verse) : ''}</strong>?</p>
+                </AlertDialog.Body>
+                <AlertDialog.Footer>
+                  <Button slot="close" variant="tertiary">Cancel</Button>
+                  <Button variant="danger" onPress={() => {
+                    if (pendingRemove) removeWithUndo(pendingRemove);
+                    close();
+                  }}>
+                    <TrashBin aria-hidden="true" className="h-4 w-4" />
+                    Remove
+                  </Button>
+                </AlertDialog.Footer>
+              </>
+            )}
+          </AlertDialog.Dialog>
+        </AlertDialog.Container>
+      </AlertDialog.Backdrop>
     </div>
   );
 };

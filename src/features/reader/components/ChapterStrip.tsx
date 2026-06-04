@@ -1,10 +1,11 @@
-import { useLayoutEffect, useMemo, useRef, useState, type RefObject } from "react";
+import { lazy, Suspense, useLayoutEffect, useMemo, useRef, useState, type RefObject } from "react";
 import { Sparkles } from "@gravity-ui/icons";
 import { Button, ScrollShadow } from "@heroui/react";
 
 import { useBookmarks } from "../../bookmarks/hooks/useBookmarks";
 import { useReaderStore } from "../store/readerStore";
-import DailyVerseModal from "./DailyVerseModal";
+
+const DailyVerseModal = lazy(() => import("./DailyVerseModal"));
 
 interface ChapterStripProps {
   chapters: number[];
@@ -128,10 +129,11 @@ const ChapterStrip = ({
   });
 
   const [isDailyVerseOpen, setIsDailyVerseOpen] = useState(false);
-  const handleDailyVerseNavigate = (book: number, chapter: number) => {
+  const handleDailyVerseNavigate = (book: number, chapter: number, verse: number) => {
     setIsDailyVerseOpen(false);
     useReaderStore.getState().setBook(book);
     useReaderStore.getState().setChapter(chapter);
+    useReaderStore.getState().setPermalinkVerse(verse);
   };
 
   if (chapters.length === 0) return null;
@@ -168,11 +170,13 @@ const ChapterStrip = ({
         ))}
       </div>
     </ScrollShadow>
-      <DailyVerseModal
-        isOpen={isDailyVerseOpen}
-        onOpenChange={setIsDailyVerseOpen}
-        onNavigateToChapter={handleDailyVerseNavigate}
-      />
+      <Suspense fallback={null}>
+        <DailyVerseModal
+          isOpen={isDailyVerseOpen}
+          onOpenChange={setIsDailyVerseOpen}
+          onNavigateToChapter={handleDailyVerseNavigate}
+        />
+      </Suspense>
     </div>
   );
 };
