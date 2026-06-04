@@ -1,8 +1,7 @@
-import { lazy, Suspense, useLayoutEffect, useMemo, useRef, useState, type RefObject } from "react";
+import { lazy, Suspense, useLayoutEffect, useRef, useState, type RefObject } from "react";
 import { Sparkles } from "@gravity-ui/icons";
 import { Button, ScrollShadow } from "@heroui/react";
 
-import { useBookmarks } from "../../bookmarks/hooks/useBookmarks";
 import { useReaderStore } from "../store/readerStore";
 
 const DailyVerseModal = lazy(() => import("./DailyVerseModal"));
@@ -109,16 +108,6 @@ const ChapterStrip = ({
   const chapterStripRef = useRef<HTMLDivElement>(null);
   const activeChapterRef = useRef<HTMLButtonElement>(null);
 
-  const { bookmarks } = useBookmarks();
-
-  const bookmarkedChapters = useMemo(() => {
-    const set = new Set<number>();
-    for (const bm of bookmarks) {
-      if (bm.book === currentBook) set.add(bm.chapter);
-    }
-    return set;
-  }, [bookmarks, currentBook]);
-
   const { rememberChapterStripScroll } = useChapterStripScroll({
     activeChapterRef,
     chapterStripRef,
@@ -163,9 +152,6 @@ const ChapterStrip = ({
             onPress={() => onSelectChapter(chapterNumber)}
           >
             {chapterNumber}
-            {bookmarkedChapters.has(chapterNumber) && (
-              <span className="absolute -bottom-0.5 left-1/2 -translate-x-1/2 h-1 w-1 rounded-full bg-accent" role="img" aria-label="Bookmarked" />
-            )}
           </Button>
         ))}
       </div>

@@ -2,10 +2,10 @@ import { useLayoutEffect, useRef } from "react";
 import { Typography } from "@heroui/react";
 
 import { cn } from "../../../shared/lib/cn";
-import { useBookmarks } from "../../bookmarks/hooks/useBookmarks";
+import { useHighlights } from "../../highlights/hooks/useHighlights";
 import { useReaderStore } from "../store/readerStore";
 import { SIZE_PROPS } from "../../../shared/lib/fontSize";
-import type { BibleVerse } from "../../../shared/bible";
+import type { BibleVerse, HighlightColor } from "../../../shared/bible";
 import "./verseList.css";
 
 interface VerseListProps {
@@ -23,8 +23,9 @@ const VerseList = ({ verses }: VerseListProps) => {
   const lastScrolledVerseRef = useRef<number | null>(null);
 
   const fontSize = useReaderStore((state) => state.fontSize);
-  const { bookmarkedIds } = useBookmarks();
   const selectedSet = new Set(selectedVerseIds);
+
+  const { highlightedMap } = useHighlights();
 
   useLayoutEffect(() => {
     if (permalinkVerse === null) {
@@ -55,27 +56,29 @@ const VerseList = ({ verses }: VerseListProps) => {
       {verses.map((verse) => {
         const isSelected = selectedSet.has(verse.id);
         const isPermalink = verse.verse === permalinkVerse;
-        const isBookmarked = bookmarkedIds.has(verse.id);
+        const highlightColor = highlightedMap.get(verse.id) as HighlightColor | undefined;
 
         return (
           <li
             key={verse.id}
             ref={isPermalink ? permalinkRef : null}
+            className="relative"
           >
+            {highlightColor && <div className={cn("highlight-strip", `highlight-${highlightColor}`)} />}
             <button
               type="button"
               aria-pressed={isSelected}
               className={cn(
-                "block w-full rounded-md px-2 py-1.5 text-left transition-colors",
+                "relative z-[1] block w-full rounded-md px-2 py-1.5 text-left transition-colors",
                 isSelected ? "bg-accent/15 hover:bg-accent/20" : "hover:bg-surface-secondary",
                 isPermalink && "animate-permalink-flash",
-                isBookmarked && "bg-amber-100/90 dark:bg-amber-900/60",
               )}
               onClick={() => toggleVerseSelection(verse.id)}
             >
               <Typography {...SIZE_PROPS[fontSize]} render={({ children, ...dp }) => <span {...dp}>{children}</span>}>
                 <sup className="me-1 text-[0.65em] text-muted">{verse.verse}</sup>
                 {verse.text}
+                {highlightColor && <span className={cn("hl-dot", `hl-dot-${highlightColor}`)} />}
               </Typography>
             </button>
           </li>

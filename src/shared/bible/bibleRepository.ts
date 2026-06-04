@@ -87,42 +87,66 @@ export function putVerses(verses: BibleVerse[]) {
   return db.verses.bulkPut(verses);
 }
 
-/* ───── Bookmark CRUD ───── */
-
-export function addBookmark(verse: BibleVerse) {
-  return db.bookmarks.put({
-    verseId: verse.id,
-    book: verse.book,
-    chapter: verse.chapter,
-    verse: verse.verse,
-    text: verse.text,
-    createdAt: Date.now(),
-  });
-}
-
-export function removeBookmark(verseId: number) {
-  return db.bookmarks.delete(verseId);
-}
-
-export function clearBookmarks() {
-  return db.bookmarks.clear();
-}
-
-export function getBookmarks() {
-  return db.bookmarks.orderBy("createdAt").reverse().toArray();
-}
-
-export async function getBookmarkedVerseIds(): Promise<Set<number>> {
-  const ids = await db.bookmarks.orderBy("verseId").keys();
-  return new Set(ids as number[]);
-}
-
 export function searchVerses(query: string) {
   if (!query.trim()) return Promise.resolve([]);
   return db.verses
     .filter((v) => v.text.toLowerCase().includes(query.toLowerCase()))
     .limit(50)
     .toArray();
+}
+
+/* ───── Highlight CRUD ───── */
+
+import type { HighlightColor } from "./db";
+
+export function upsertHighlight(
+  verseId: number,
+  book: number,
+  chapter: number,
+  verse: number,
+  text: string,
+  color: HighlightColor,
+  note = "",
+) {
+  return db.highlights.put({
+    verseId,
+    book,
+    chapter,
+    verse,
+    text,
+    color,
+    note,
+    createdAt: Date.now(),
+    updatedAt: Date.now(),
+  });
+}
+
+export function removeHighlight(verseId: number) {
+  return db.highlights.where("verseId").equals(verseId).delete();
+}
+
+export function getHighlights() {
+  return db.highlights.orderBy("updatedAt").reverse().toArray();
+}
+
+export async function getHighlightedVerseIds(): Promise<Map<number, HighlightColor>> {
+  const all = await db.highlights.toArray();
+  return new Map(all.map((h) => [h.verseId, h.color]));
+}
+
+export async function getHighlightsForChapter(
+  book: number,
+  chapter: number,
+): Promise<Map<number, HighlightColor>> {
+  const all = await db.highlights
+    .where("[book+chapter]")
+    .equals([book, chapter])
+    .toArray();
+  return new Map(all.map((h) => [h.verseId, h.color]));
+}
+
+export function updateHighlightNote(verseId: number, note: string) {
+  return db.highlights.where("verseId").equals(verseId).modify({ note, updatedAt: Date.now() });
 }
 
 export { parseVerseref } from "./dailyVerseData";

@@ -38,6 +38,13 @@ html {
 .default,
 [data-theme="light"],
 [data-theme="default"] {
+    /* Highlight Colors (Light Mode) */
+    --highlight-yellow: oklch(92% 0.12 95 / 0.45);
+    --highlight-green: oklch(80% 0.18 145 / 0.35);
+    --highlight-blue: oklch(75% 0.14 225 / 0.35);
+    --highlight-pink: oklch(78% 0.16 345 / 0.3);
+    --highlight-orange: oklch(80% 0.16 65 / 0.4);
+
     /* Theme Colors (Light Mode) */
     --accent: oklch(52.82% 0.2628 262.87);
     --accent-foreground: oklch(99.11% 0 0);
@@ -81,6 +88,13 @@ html {
 .dark,
 [data-theme="dark"] {
     color-scheme: dark;
+    /* Highlight Colors (Dark Mode) */
+    --highlight-yellow: oklch(85% 0.12 95 / 0.2);
+    --highlight-green: oklch(75% 0.18 145 / 0.18);
+    --highlight-blue: oklch(70% 0.14 225 / 0.18);
+    --highlight-pink: oklch(72% 0.16 345 / 0.15);
+    --highlight-orange: oklch(75% 0.16 65 / 0.18);
+
     /* Theme Colors (Dark Mode) */
     --accent: oklch(52.82% 0.2628 262.87);
     --accent-foreground: oklch(99.11% 0 0);

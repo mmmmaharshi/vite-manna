@@ -1,9 +1,8 @@
 import { useEffect, useRef, useState } from "react";
-import { BookmarkFill, Magnifier } from "@gravity-ui/icons";
-import { Button, ScrollShadow, SearchField, Surface, Tooltip, Typography } from "@heroui/react";
+import { Magnifier } from "@gravity-ui/icons";
+import { ScrollShadow, SearchField, Surface, Typography } from "@heroui/react";
 
 import { getBibleBookName, searchVerses, type BibleVerse } from "../../shared/bible";
-import { useBookmarks } from "../bookmarks/hooks/useBookmarks";
 import { useReaderStore } from "../reader/store/readerStore";
 
 interface SearchPageProps {
@@ -19,7 +18,6 @@ const SearchPage = ({ onNavigateToReader }: SearchPageProps) => {
   const [results, setResults] = useState<BibleVerse[]>([]);
   const [searched, setSearched] = useState(false);
   const timerRef = useRef<ReturnType<typeof setTimeout> | null>(null);
-  const { bookmarkedIds, toggle } = useBookmarks();
 
   useEffect(() => {
     if (timerRef.current) clearTimeout(timerRef.current);
@@ -89,40 +87,22 @@ const SearchPage = ({ onNavigateToReader }: SearchPageProps) => {
             <Typography.Paragraph size="sm" color="muted" className="px-1">
               {results.length} result{results.length !== 1 ? "s" : ""}
             </Typography.Paragraph>
-            {results.map((verse) => {
-              const isBm = bookmarkedIds.has(verse.id);
-              return (
-                <Surface key={verse.id} className="flex items-start gap-2 p-3">
-                  <button
-                    type="button"
-                    className="flex-1 min-w-0 text-left"
-                    onClick={() => handleNavigate(verse)}
-                  >
-                    <Typography className="text-sm font-medium text-accent">
-                      {formatRef(verse)}
-                    </Typography>
-                    <Typography.Paragraph size="sm" color="muted" className="mt-0.5">
-                      {verse.text}
-                    </Typography.Paragraph>
-                  </button>
-                  <Tooltip delay={0}>
-                    <Button
-                      aria-label={isBm ? "Remove bookmark" : "Bookmark"}
-                      isIconOnly
-                      size="sm"
-                      variant="tertiary"
-                      className="shrink-0 mt-0.5"
-                      onPress={() => toggle(verse)}
-                    >
-                      {isBm
-                        ? <BookmarkFill aria-hidden="true" className="h-4 w-4 text-accent" />
-                        : <BookmarkFill aria-hidden="true" className="h-4 w-4 text-muted/60" />}
-                    </Button>
-                    <Tooltip.Content placement="top">{isBm ? "Remove Bookmark" : "Bookmark"}</Tooltip.Content>
-                  </Tooltip>
-                </Surface>
-              );
-            })}
+            {results.map((verse) => (
+              <Surface key={verse.id} className="flex items-start gap-2 p-3">
+                <button
+                  type="button"
+                  className="flex-1 min-w-0 text-left"
+                  onClick={() => handleNavigate(verse)}
+                >
+                  <Typography className="text-sm font-medium text-accent">
+                    {formatRef(verse)}
+                  </Typography>
+                  <Typography.Paragraph size="sm" color="muted" className="mt-0.5">
+                    {verse.text}
+                  </Typography.Paragraph>
+                </button>
+              </Surface>
+            ))}
           </section>
         )}
         <div className="h-[calc(4rem+env(safe-area-inset-bottom))]" />

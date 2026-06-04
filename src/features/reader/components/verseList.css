@@ -13,3 +13,36 @@
         animation: manna-permalink-flash 1.2s ease-out;
     }
 }
+
+:root {
+    --hl-dot-size: 6px;
+}
+
+.highlight-strip {
+    position: absolute;
+    inset: 0;
+    pointer-events: none;
+    border-radius: inherit;
+}
+
+.highlight-yellow  { background-color: var(--highlight-yellow); }
+.highlight-green   { background-color: var(--highlight-green); }
+.highlight-blue    { background-color: var(--highlight-blue); }
+.highlight-pink    { background-color: var(--highlight-pink); }
+.highlight-orange  { background-color: var(--highlight-orange); }
+
+.hl-dot {
+    display: inline-block;
+    width: var(--hl-dot-size);
+    height: var(--hl-dot-size);
+    border-radius: 9999px;
+    margin-left: 2px;
+    vertical-align: super;
+    flex-shrink: 0;
+}
+
+.hl-dot-yellow  { background-color: oklch(85% 0.12 95); }
+.hl-dot-green   { background-color: oklch(75% 0.18 145); }
+.hl-dot-blue    { background-color: oklch(70% 0.14 225); }
+.hl-dot-pink    { background-color: oklch(72% 0.16 345); }
+.hl-dot-orange  { background-color: oklch(75% 0.16 65); }

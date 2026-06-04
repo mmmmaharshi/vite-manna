@@ -8,7 +8,7 @@ import { useReaderStore } from "../features/reader/store/readerStore";
 import BottomNav from "./BottomNav";
 import type { TabId } from "./BottomNav";
 
-const BookmarksPage = lazy(() => import("../features/bookmarks/BookmarksPage"));
+const HighlightsPage = lazy(() => import("../features/highlights/HighlightsPage"));
 const SearchPage = lazy(() => import("../features/search/SearchPage"));
 const SettingsPage = lazy(() => import("../features/settings/SettingsPage"));
 
@@ -41,9 +41,9 @@ const TabLayout = () => {
           <SearchPage onNavigateToReader={() => setActiveTab("reader")} />
         </Suspense>
       )}
-      {activeTab === "bookmarks" && (
+      {activeTab === "highlights" && (
         <Suspense fallback={<div className="min-h-dvh flex items-center justify-center"><Spinner size="lg" aria-label="Loading" /></div>}>
-          <BookmarksPage onNavigateToReader={() => setActiveTab("reader")} />
+          <HighlightsPage onNavigateToReader={() => setActiveTab("reader")} />
         </Suspense>
       )}
       {activeTab === "settings" && (

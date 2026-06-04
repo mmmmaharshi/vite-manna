@@ -8,24 +8,46 @@ export interface BibleVerse {
   text: string;
 }
 
-export interface Bookmark {
-  verseId: number;
-  book: number;
-  chapter: number;
-  verse: number;
-  text: string;
-  createdAt: number;
-}
-
 export interface MetaEntry {
   key: string;
   value: unknown;
 }
 
+export type HighlightColor = "yellow" | "green" | "blue" | "pink" | "orange";
+
+export interface Highlight {
+  id?: number;
+  verseId: number;
+  book: number;
+  chapter: number;
+  verse: number;
+  text: string;
+  color: HighlightColor;
+  note: string;
+  createdAt: number;
+  updatedAt: number;
+}
+
+export const HIGHLIGHT_COLORS: HighlightColor[] = [
+  "yellow",
+  "green",
+  "blue",
+  "pink",
+  "orange",
+];
+
+export const HIGHLIGHT_COLOR_VALUES: Record<HighlightColor, string> = {
+  yellow: "var(--highlight-yellow)",
+  green: "var(--highlight-green)",
+  blue: "var(--highlight-blue)",
+  pink: "var(--highlight-pink)",
+  orange: "var(--highlight-orange)",
+};
+
 class BibleDB extends Dexie {
   verses!: Table<BibleVerse, number>;
-  bookmarks!: Table<Bookmark, number>;
   meta!: Table<MetaEntry, string>;
+  highlights!: Table<Highlight, number>;
 
   constructor() {
     super("BibleDB");
@@ -35,8 +57,8 @@ class BibleDB extends Dexie {
     this.version(3).stores({ verses: "id" });
     this.version(4).stores({ verses: "id, book" });
     this.version(5).stores({ verses: "id, book, [book+chapter]" });
-    this.version(6).stores({ bookmarks: "verseId, book, chapter, createdAt" });
-    this.version(7).stores({ meta: "key" });
+    this.version(6).stores({ meta: "key" });
+    this.version(8).stores({ highlights: "++id, verseId, book, [book+chapter], updatedAt" });
   }
 }
 
