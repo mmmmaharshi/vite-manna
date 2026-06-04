@@ -54,7 +54,7 @@ const DOT_STYLES: Record<HighlightColor, string> = {
 };
 
 const HighlightsPage = ({ onNavigateToReader }: HighlightsPageProps) => {
-  const { highlights, remove, updateNote } = useHighlights();
+  const { highlights, remove, updateNote, loaded } = useHighlights();
   const [filterColor, setFilterColor] = useState<HighlightColor | "all">("all");
   const [editingNote, setEditingNote] = useState<HighlightEntry | null>(null);
   const [noteText, setNoteText] = useState("");
@@ -124,7 +124,13 @@ const HighlightsPage = ({ onNavigateToReader }: HighlightsPageProps) => {
       </Surface>
 
       <ScrollShadow hideScrollBar className="flex-1">
-        {highlights.length > 0 && uniqueColors.length > 1 && (
+        {!loaded ? (
+          <section className="max-w-md sm:max-w-lg md:max-w-xl lg:max-w-2xl xl:max-w-3xl w-full px-2 py-24 mx-auto flex flex-col items-center gap-3" aria-live="polite" aria-busy="true">
+            <div className="skeleton-shimmer h-32 w-full max-w-sm rounded-lg" />
+            <div className="skeleton-shimmer h-20 w-full max-w-sm rounded-lg" />
+            <div className="skeleton-shimmer h-20 w-full max-w-sm rounded-lg" />
+          </section>
+        ) : highlights.length > 0 && uniqueColors.length > 1 && (
           <div className="max-w-md sm:max-w-lg md:max-w-xl lg:max-w-2xl xl:max-w-3xl w-full px-2 mx-auto pt-2">
             <ScrollShadow hideScrollBar orientation="horizontal">
               <ToggleButtonGroup
@@ -145,7 +151,7 @@ const HighlightsPage = ({ onNavigateToReader }: HighlightsPageProps) => {
           </div>
         )}
 
-        {highlights.length === 0 ? (
+        {loaded && highlights.length === 0 ? (
           <section className="max-w-md sm:max-w-lg md:max-w-xl lg:max-w-2xl xl:max-w-3xl w-full px-2 py-24 mx-auto flex flex-col items-center gap-4 text-center">
             <PencilToSquare aria-hidden="true" className="h-10 w-10 sm:h-12 sm:w-12 text-muted" />
             <Typography className="text-base font-medium">No highlights yet</Typography>
@@ -153,12 +159,12 @@ const HighlightsPage = ({ onNavigateToReader }: HighlightsPageProps) => {
               Select a verse and tap the highlight icon to color it
             </Typography.Paragraph>
           </section>
-        ) : filtered.length === 0 ? (
+        ) : loaded && filtered.length === 0 ? (
           <section className="max-w-md sm:max-w-lg md:max-w-xl lg:max-w-2xl xl:max-w-3xl w-full px-2 py-16 mx-auto text-center">
             <Typography.Paragraph size="sm" color="muted">No matching highlights</Typography.Paragraph>
           </section>
-        ) : (
-          <section className="max-w-md sm:max-w-lg md:max-w-xl lg:max-w-2xl xl:max-w-3xl w-full px-2 py-4 mx-auto flex flex-col gap-2">
+        ) : loaded && (
+          <section className="max-w-md sm:max-w-lg md:max-w-xl lg:max-w-2xl xl:max-w-3xl w-full px-2 py-4 mx-auto flex flex-col gap-2" aria-live="polite" aria-atomic="true">
             {filtered.map((hl) => (
               <Surface key={hl.id} className={cn("flex flex-col p-3 gap-2 border-l-4", COLOR_STYLES[hl.color])}>
                 <div className="flex items-center gap-2">

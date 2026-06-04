@@ -11,12 +11,23 @@ interface ContinueReadingCardProps {
 
 export const ContinueReadingCard = ({ onNavigate }: ContinueReadingCardProps) => {
   const [lastRead, setLastRead] = useState<{ book: number; chapter: number } | null>(null);
+  const [loaded, setLoaded] = useState(false);
 
   useEffect(() => {
     getLastReadChapter().then((entry) => {
       if (entry) setLastRead({ book: entry.book, chapter: entry.chapter });
+      setLoaded(true);
     });
   }, []);
+
+  if (!loaded) {
+    return (
+      <Surface className="p-3">
+        <div className="skeleton-shimmer h-5 w-40 rounded mb-2" />
+        <div className="skeleton-shimmer h-8 w-24 rounded" />
+      </Surface>
+    );
+  }
 
   if (!lastRead) return null;
   const bookName = getBibleBookName(lastRead.book);
