@@ -2,7 +2,7 @@ import { useEffect, useRef } from "react";
 import { Button, ScrollShadow, Skeleton, Surface, Typography } from "@heroui/react";
 
 import { cn } from "../../shared/lib/cn";
-import { getBibleBookName } from "../../shared/bible";
+import { getBibleBookName, recordChapterRead } from "../../shared/bible";
 import { useBooks } from "./hooks/useBooks";
 import { useReaderSnapshot } from "./hooks/useReaderSnapshot";
 import BookSelect from "./components/BookSelect";
@@ -65,6 +65,10 @@ const ReaderScreen = () => {
     chapter,
     selectedBookSummary?.chapterCount,
   );
+
+  useEffect(() => {
+    if (snapshot) recordChapterRead(book, chapter);
+  }, [book, chapter, snapshot]);
 
   const visibleBook = pendingBook ?? snapshot?.book ?? book;
   const visibleBookSummary = books.find(
