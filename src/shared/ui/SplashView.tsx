@@ -1,4 +1,5 @@
 import { memo } from "react";
+import { Button } from "@heroui/react";
 
 import SplashFrame from "./SplashFrame";
 import SplashProgress from "./SplashProgress";
@@ -28,13 +29,9 @@ const SplashView = ({
         <p className="text-danger text-center text-sm">{error}</p>
 
         {onRetry && (
-          <button
-            className="px-3 py-1.5 rounded-md bg-default text-default-foreground text-sm"
-            type="button"
-            onClick={onRetry}
-          >
+          <Button variant="primary" size="sm" onPress={onRetry}>
             Retry
-          </button>
+          </Button>
         )}
       </div>
     ) : null}

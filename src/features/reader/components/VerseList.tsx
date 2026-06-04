@@ -69,7 +69,7 @@ const VerseList = memo(({ verses }: VerseListProps) => {
               type="button"
               aria-pressed={isSelected}
               className={cn(
-                "relative z-[1] block w-full rounded-md px-2 py-1.5 text-left transition-colors",
+                "relative z-[1] block w-full rounded-md px-2 py-2.5 text-left transition-colors min-h-11",
                 isSelected ? "bg-accent/15 hover:bg-accent/20" : "hover:bg-surface-secondary",
                 isPermalink && "animate-permalink-flash",
               )}
