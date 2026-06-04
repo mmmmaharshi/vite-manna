@@ -1,4 +1,4 @@
-const REQUIRED_CACHE_URLS = ["/index.html", "/bible.json"];
+const REQUIRED_CACHE_URLS = ["/index.html"];
 const CACHE_CHECK_INTERVAL_MS = 1000;
 
 function waitForNextCacheCheck() {
