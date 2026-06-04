@@ -1,75 +1,73 @@
-# React + TypeScript + Vite
+# మన్నా · Manna
 
-This template provides a minimal setup to get React working in Vite with HMR and some ESLint rules.
+> **Offline-first Telugu Bible reader** — Read, highlight, search, and share scripture. Works fully offline. Built with React 19, HeroUI v3, and Tailwind CSS v4.
 
-Currently, two official plugins are available:
+[![Live Demo](https://img.shields.io/badge/demo-vite--manna.vercel.app-000?style=flat&logo=vercel)](https://vite-manna.vercel.app)
+[![GitHub](https://img.shields.io/badge/github-mmmmaharshi/vite--manna-181717?style=flat&logo=github)](https://github.com/mmmmaharshi/vite-manna)
 
-- [@vitejs/plugin-react](https://github.com/vitejs/vite-plugin-react/blob/main/packages/plugin-react) uses [Oxc](https://oxc.rs)
-- [@vitejs/plugin-react-swc](https://github.com/vitejs/vite-plugin-react/blob/main/packages/plugin-react-swc) uses [SWC](https://swc.rs/)
+---
 
-## React Compiler
+## Features
 
-The React Compiler is enabled on this template. See [this documentation](https://react.dev/learn/react-compiler) for more information.
+- **Full Telugu Bible** — All 66 books, every verse, offline after first load
+- **Verse actions** — Copy, share, highlight (5 colors), or export as a shareable image
+- **Full-text search** — Instant debounced search across all verses
+- **Daily verse** — Curated verse of the day that auto-opens on first visit
+- **Reading progress** — Auto-tracked chapters, streaks, and per-book stats
+- **Offline PWA** — Service worker + IndexedDB means zero-loading after setup
+- **Dark mode** — Light, dark, or system theme with persisted preference
+- **Adjustable font size** — 5 levels from S to 2XL
+- **URL permalinks** — Every verse is linkable via `?book=X&chapter=Y&verse=Z`
 
-Note: This will impact Vite dev & build performances.
+## Quick start
 
-## Expanding the ESLint configuration
-
-If you are developing a production application, we recommend updating the configuration to enable type-aware lint rules:
-
-```js
-export default defineConfig([
-  globalIgnores(['dist']),
-  {
-    files: ['**/*.{ts,tsx}'],
-    extends: [
-      // Other configs...
-
-      // Remove tseslint.configs.recommended and replace with this
-      tseslint.configs.recommendedTypeChecked,
-      // Alternatively, use this for stricter rules
-      tseslint.configs.strictTypeChecked,
-      // Optionally, add this for stylistic rules
-      tseslint.configs.stylisticTypeChecked,
-
-      // Other configs...
-    ],
-    languageOptions: {
-      parserOptions: {
-        project: ['./tsconfig.node.json', './tsconfig.app.json'],
-        tsconfigRootDir: import.meta.dirname,
-      },
-      // other options...
-    },
-  },
-])
+```bash
+git clone https://github.com/mmmmaharshi/vite-manna.git
+cd vite-manna
+bun install
+bun run dev
 ```
 
-You can also install [eslint-plugin-react-x](https://github.com/Rel1cx/eslint-react/tree/main/packages/plugins/eslint-plugin-react-x) and [eslint-plugin-react-dom](https://github.com/Rel1cx/eslint-react/tree/main/packages/plugins/eslint-plugin-react-dom) for React-specific lint rules:
+Open [http://localhost:5173](http://localhost:5173) — the app downloads the Bible text on first visit (~6 MB, cached in IndexedDB).
 
-```js
-// eslint.config.js
-import reactX from 'eslint-plugin-react-x'
-import reactDom from 'eslint-plugin-react-dom'
+## Scripts
 
-export default defineConfig([
-  globalIgnores(['dist']),
-  {
-    files: ['**/*.{ts,tsx}'],
-    extends: [
-      // Other configs...
-      // Enable lint rules for React
-      reactX.configs['recommended-typescript'],
-      // Enable lint rules for React DOM
-      reactDom.configs.recommended,
-    ],
-    languageOptions: {
-      parserOptions: {
-        project: ['./tsconfig.node.json', './tsconfig.app.json'],
-        tsconfigRootDir: import.meta.dirname,
-      },
-      // other options...
-    },
-  },
-])
-```
+| Command | Description |
+|---|---|
+| `bun run dev` | Start dev server |
+| `bun run build` | Type-check + production build |
+| `bun run test` | Run Vitest tests |
+| `bun run lint` | ESLint |
+| `bun run preview` | Preview production build |
+
+## Tech stack
+
+| Category | Libraries |
+|---|---|
+| **Framework** | React 19, TypeScript 6, Vite 8 |
+| **UI** | HeroUI v3 (React Aria), Tailwind CSS v4, tailwind-merge, clsx |
+| **State** | Zustand, Dexie (IndexedDB) |
+| **Routing** | React Router 7 |
+| **PWA** | vite-plugin-pwa, Workbox |
+| **Icons** | @gravity-ui/icons |
+| **Fonts** | Google Sans (variable) |
+| **Utils** | date-fns, es-toolkit, @reactuses/core, html-to-image |
+
+## Architecture
+
+> **Note:** The app uses a tab-based SPA layout (reader, search, highlights, progress, settings) with no traditional route-based navigation. Reader position is synced to URL query params for permalinks.
+
+- **Offline-first**: Bible data is fetched once, parsed in chunks, and stored in Dexie. Subsequent launches read entirely from IndexedDB.
+- **Service worker**: Built with Workbox `injectManifest` — caches app shell, handles `periodicsync` for daily verse notifications.
+- **Zustand stores**: Reader state (book, chapter, selection) + highlight data + search index.
+- **Dark mode**: Toggled via `.dark` class on `<html>`, read before React mounts to prevent flash.
+
+## Deployment
+
+[![Deploy with Vercel](https://vercel.com/button)](https://vercel.com/new/clone?repository-url=https://github.com/mmmmaharshi/vite-manna)
+
+The app is deployed on Vercel from the `main` branch. Auto-deploys on push.
+
+## License
+
+MIT
