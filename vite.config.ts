@@ -2,7 +2,6 @@ import { defineConfig } from 'vite';
 import react from '@vitejs/plugin-react';
 import tailwindcss from '@tailwindcss/vite';
 import { VitePWA } from 'vite-plugin-pwa';
-import type { RollupLog } from 'rollup';
 
 // https://vite.dev/config/
 export default defineConfig({
@@ -12,10 +11,6 @@ export default defineConfig({
 	},
 	build: {
 		rollupOptions: {
-			onwarn(warning: RollupLog, warn: (warning: string | RollupLog) => void) {
-				if ((warning as { code?: string }).code === 'PLUGIN_WARN' && warning.message?.includes('inlineDynamicImports')) return;
-				warn(warning);
-			},
 			output: {
 				manualChunks(id) {
 					if (id.includes('@heroui')) {
