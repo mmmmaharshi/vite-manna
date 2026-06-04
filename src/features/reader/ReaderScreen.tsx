@@ -66,9 +66,31 @@ const ReaderScreen = () => {
     selectedBookSummary?.chapterCount,
   );
 
+  const recordedRef = useRef<{ book: number; chapter: number } | null>(null);
+  const sentinelRef = useRef<HTMLDivElement | null>(null);
+
   useEffect(() => {
-    if (snapshot) recordChapterRead(book, chapter);
-  }, [book, chapter, snapshot]);
+    recordedRef.current = null;
+  }, [book, chapter]);
+
+  useEffect(() => {
+    if (!snapshot || !sentinelRef.current) return;
+
+    const sentinel = sentinelRef.current;
+    const observer = new IntersectionObserver(
+      (entries) => {
+        if (!entries[0]?.isIntersecting) return;
+        const prev = recordedRef.current;
+        if (prev && prev.book === book && prev.chapter === chapter) return;
+        recordedRef.current = { book, chapter };
+        recordChapterRead(book, chapter);
+      },
+      { threshold: 0.5 },
+    );
+
+    observer.observe(sentinel);
+    return () => observer.disconnect();
+  }, [snapshot, book, chapter]);
 
   const visibleBook = pendingBook ?? snapshot?.book ?? book;
   const visibleBookSummary = books.find(
@@ -135,7 +157,10 @@ const ReaderScreen = () => {
           aria-label={selectedBookSummary ? `${getBibleBookName(selectedBookSummary.id)} ${chapter}` : "Bible reader"}
         >
           {snapshot && (
-            <VerseList verses={snapshot.verses} />
+            <>
+              <VerseList verses={snapshot.verses} />
+              <div ref={sentinelRef} className="h-4" />
+            </>
           )}
           {!snapshot && hasLoadedBooks && (
             <div className="flex flex-col gap-3" aria-busy="true">
