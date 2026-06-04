@@ -75,7 +75,6 @@ export function useUrlSync() {
           chaptersByBook,
         }),
       );
-    } catch {
-    }
+    } catch { /* localStorage write may fail */ }
   }, [book, chapter, chaptersByBook]);
 }

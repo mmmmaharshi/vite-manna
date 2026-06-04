@@ -46,8 +46,7 @@ function readCache(): CacheEntry | null {
 function writeCache(data: DailyVerseData, shown: boolean) {
   try {
     localStorage.setItem(CACHE_KEY, JSON.stringify({ date: getTodayKey(), data, shown }));
-  } catch {
-  }
+  } catch { /* localStorage may be full or unavailable */ }
 }
 
 export function useDailyVerse(): DailyVerseResult {
@@ -121,8 +120,7 @@ export function useDailyVerse(): DailyVerseResult {
             .toArray();
           const found = verses.find((v) => v.verse === parsed.verse);
           if (found) teluguText = found.text;
-        } catch {
-        }
+        } catch { /* verse lookup failed silently */ }
         reference = `${getBibleBookName(parsed.book)} ${parsed.chapter}:${parsed.verse}`;
       }
 
@@ -166,8 +164,7 @@ export function useDailyVerse(): DailyVerseResult {
           tag: "daily-verse",
         });
       }
-    } catch {
-    }
+    } catch { /* notification may fail in some environments */ }
   }, [result.isLoading, result.isFirstOpenToday, result.teluguText, result.reference, notifPref]);
 
   return result;

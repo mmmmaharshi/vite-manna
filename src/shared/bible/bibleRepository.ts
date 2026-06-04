@@ -163,7 +163,7 @@ export function getCachedUserOffset(): number | null {
 }
 
 export function setCachedUserOffset(offset: number) {
-  try { localStorage.setItem(OFFSET_KEY, String(offset)); } catch { }
+  try { localStorage.setItem(OFFSET_KEY, String(offset)); } catch { /* localStorage may be full */ }
 }
 
 export async function getUserOffset(): Promise<number> {
@@ -179,11 +179,11 @@ export async function getUserOffset(): Promise<number> {
         return val;
       }
     }
-  } catch { }
+  } catch { /* DB read failed, use random */ }
 
   const offset = Math.floor(Math.random() * 365);
   setCachedUserOffset(offset);
-  try { await db.meta.put({ key: OFFSET_KEY, value: offset }); } catch { }
+  try { await db.meta.put({ key: OFFSET_KEY, value: offset }); } catch { /* DB write failed */ }
   return offset;
 }
 

@@ -60,6 +60,7 @@ const HighlightsPage = ({ onNavigateToReader }: HighlightsPageProps) => {
   const [noteText, setNoteText] = useState("");
   const [pendingRemove, setPendingRemove] = useState<HighlightEntry | null>(null);
   const [expandedNotes, setExpandedNotes] = useState<Set<number>>(new Set());
+  const colorKeys = useMemo(() => new Set([filterColor]), [filterColor]);
 
   const toggleExpanded = useCallback((id: number) => {
     setExpandedNotes((prev) => {
@@ -129,7 +130,7 @@ const HighlightsPage = ({ onNavigateToReader }: HighlightsPageProps) => {
               <ToggleButtonGroup
                 selectionMode="single"
                 disallowEmptySelection
-                selectedKeys={useMemo(() => new Set([filterColor]), [filterColor])}
+                selectedKeys={colorKeys}
                 onSelectionChange={(keys) => setFilterColor([...keys][0] as HighlightColor | "all")}
               >
                 <ToggleButton id="all">All ({highlights.length})</ToggleButton>

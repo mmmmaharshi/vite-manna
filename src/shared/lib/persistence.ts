@@ -78,10 +78,9 @@ export function loadInitialState(): ReaderInitState {
       if (stored.version === STORAGE_VERSION) {
         chaptersByBook = parseChaptersByBook(stored.chaptersByBook);
       }
-    } catch {
-    }
+      } catch { /* localStorage read may fail */ }
 
-    return {
+      return {
       book: fromUrl.book,
       chapter: fromUrl.chapter,
       chaptersByBook: { ...chaptersByBook, [fromUrl.book]: fromUrl.chapter },
@@ -110,10 +109,9 @@ export function loadInitialState(): ReaderInitState {
         };
       }
     }
-  } catch {
-  }
+    } catch { /* localStorage read may fail */ }
 
-  return { book, chapter, chaptersByBook, permalinkVerse };
+    return { book, chapter, chaptersByBook, permalinkVerse };
 }
 
 export function loadFontSize(): FontSize {
@@ -121,12 +119,12 @@ export function loadFontSize(): FontSize {
   try {
     const stored = localStorage.getItem(FONT_SIZE_KEY) as FontSize | null;
     if (stored && valid.includes(stored)) return stored;
-  } catch { }
+  } catch { /* localStorage read may fail */ }
   return "sm";
 }
 
 export function setStoredFontSize(fontSize: FontSize) {
-  try { localStorage.setItem(FONT_SIZE_KEY, fontSize); } catch { }
+  try { localStorage.setItem(FONT_SIZE_KEY, fontSize); } catch { /* localStorage may be full */ }
 }
 
 export function rememberChapter(

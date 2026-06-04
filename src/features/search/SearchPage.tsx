@@ -19,13 +19,17 @@ const SearchPage = ({ onNavigateToReader }: SearchPageProps) => {
   const [searched, setSearched] = useState(false);
   const timerRef = useRef<ReturnType<typeof setTimeout> | null>(null);
 
-  useEffect(() => {
-    if (timerRef.current) clearTimeout(timerRef.current);
-    if (!query.trim()) {
+  const handleQueryChange = (value: string) => {
+    setQuery(value);
+    if (!value.trim()) {
       setResults([]);
       setSearched(false);
-      return;
     }
+  };
+
+  useEffect(() => {
+    if (timerRef.current) clearTimeout(timerRef.current);
+    if (!query.trim()) return;
     timerRef.current = setTimeout(async () => {
       const verses = await searchVerses(query.trim());
       setResults(verses);
@@ -54,7 +58,7 @@ const SearchPage = ({ onNavigateToReader }: SearchPageProps) => {
         <div className="max-w-md sm:max-w-lg md:max-w-xl lg:max-w-2xl xl:max-w-3xl w-full px-2 mx-auto pt-2">
           <SearchField
             value={query}
-            onChange={setQuery}
+            onChange={handleQueryChange}
             onClear={() => { setResults([]); setSearched(false); }}
             fullWidth
             aria-label="Search verses"

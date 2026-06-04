@@ -13,6 +13,8 @@ import { useReaderStore } from "./store/readerStore";
 import { useUrlSync } from "./useUrlSync";
 import { useSwipeAndKeyboard } from "./hooks/useSwipeAndKeyboard";
 
+const SKELETON_WIDTHS = [75, 85, 65, 90, 70, 80, 60, 95];
+
 const ReaderScreen = () => {
   useUrlSync();
   const { books, hasLoadedBooks } = useBooks();
@@ -133,8 +135,8 @@ const ReaderScreen = () => {
           )}
           {!snapshot && hasLoadedBooks && (
             <div className="flex flex-col gap-3" aria-busy="true">
-              {Array.from({ length: 8 }, (_, i) => (
-                <Skeleton key={i} className="h-5 rounded-lg" style={{ width: `${60 + Math.random() * 35}%` }} />
+              {SKELETON_WIDTHS.map((w, i) => (
+                <Skeleton key={i} className="h-5 rounded-lg" style={{ width: `${w}%` }} />
               ))}
             </div>
           )}

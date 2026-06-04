@@ -50,7 +50,7 @@ const SettingsPage = () => {
         const reg = await navigator.serviceWorker.ready;
         const ps = (reg as unknown as { periodicSync?: PeriodicSyncManager }).periodicSync;
         if (ps?.unregister) await ps.unregister("daily-verse");
-      } catch { }
+      } catch { /* periodicSync may not be available */ }
       setNotifEnabled("false");
       return;
     }
@@ -59,8 +59,8 @@ const SettingsPage = () => {
     try {
       const reg = await navigator.serviceWorker.ready;
       const ps = (reg as unknown as { periodicSync?: PeriodicSyncManager }).periodicSync;
-      if (ps?.register) await ps.register("daily-verse", { minInterval: 24 * 60 * 60 * 1000 });
-    } catch { }
+        if (ps?.register) await ps.register("daily-verse", { minInterval: 24 * 60 * 60 * 1000 });
+    } catch { /* periodicSync may not be available */ }
     setNotifEnabled("true");
   }, [notifEnabled, setNotifEnabled]);
 
