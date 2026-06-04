@@ -1,4 +1,4 @@
-import { lazy, Suspense, useLayoutEffect, useRef, useState, type RefObject } from "react";
+import { lazy, memo, Suspense, useLayoutEffect, useRef, useState, type RefObject } from "react";
 import { Sparkles } from "@gravity-ui/icons";
 import { Button, ScrollShadow } from "@heroui/react";
 
@@ -98,7 +98,7 @@ function useChapterStripScroll({
   };
 }
 
-const ChapterStrip = ({
+const ChapterStrip = memo(({
   chapters,
   currentBook,
   isReaderTransitioning,
@@ -131,7 +131,7 @@ const ChapterStrip = ({
     <div className="flex items-center gap-1">
       <Button isIconOnly size="sm" variant="tertiary" aria-label="Verse of the Day"
         className="shrink-0" onPress={() => setIsDailyVerseOpen(true)}>
-        <Sparkles className="h-4 w-4" />
+        <Sparkles aria-hidden="true" className="h-4 w-4" />
       </Button>
     <ScrollShadow
       ref={chapterStripRef}
@@ -165,6 +165,6 @@ const ChapterStrip = ({
       </Suspense>
     </div>
   );
-};
+});
 
 export default ChapterStrip;

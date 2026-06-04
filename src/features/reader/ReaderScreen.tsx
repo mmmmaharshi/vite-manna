@@ -89,7 +89,7 @@ const ReaderScreen = () => {
   if (hasLoadedBooks && books.length === 0) {
     return (
       <main className="flex flex-col items-center justify-center gap-4 px-4 pb-16 min-h-dvh">
-        <Typography className="text-center">
+        <Typography role="alert" className="text-center">
           Unable to load Bible books. Please try again.
         </Typography>
         <Button variant="primary" onPress={() => window.location.reload()}>
@@ -100,7 +100,7 @@ const ReaderScreen = () => {
   }
 
   return (
-    <div className="h-dvh flex flex-col">
+    <main id="main-content" className="h-dvh flex flex-col">
       <Surface className="sticky top-0 z-30 py-2.5 pt-3.5 border border-b">
         <div className="max-w-md sm:max-w-lg md:max-w-xl lg:max-w-2xl flex flex-col gap-2 w-full px-2 mx-auto">
           <BookSelect
@@ -145,7 +145,7 @@ const ReaderScreen = () => {
         {snapshot && <VerseActionBar verses={snapshot.verses} />}
         <div className="h-[calc(4rem+env(safe-area-inset-bottom))]" />
       </ScrollShadow>
-    </div>
+    </main>
   );
 };
 

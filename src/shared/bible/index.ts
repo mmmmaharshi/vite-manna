@@ -17,7 +17,7 @@ export {
   upsertHighlight,
   removeHighlight,
   getHighlights,
-  getHighlightedVerseIds,
+
   getHighlightsForChapter,
   updateHighlightNote,
   searchVerses,

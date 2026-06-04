@@ -129,11 +129,6 @@ export function getHighlights() {
   return db.highlights.orderBy("updatedAt").reverse().toArray();
 }
 
-export async function getHighlightedVerseIds(): Promise<Map<number, HighlightColor>> {
-  const all = await db.highlights.toArray();
-  return new Map(all.map((h) => [h.verseId, h.color]));
-}
-
 export async function getHighlightsForChapter(
   book: number,
   chapter: number,

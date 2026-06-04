@@ -1,4 +1,4 @@
-import { useLayoutEffect, useRef } from "react";
+import { memo, useLayoutEffect, useRef } from "react";
 import { Typography } from "@heroui/react";
 
 import { cn } from "../../../shared/lib/cn";
@@ -12,7 +12,7 @@ interface VerseListProps {
   verses: BibleVerse[];
 }
 
-const VerseList = ({ verses }: VerseListProps) => {
+const VerseList = memo(({ verses }: VerseListProps) => {
   const selectedVerseIds = useReaderStore((state) => state.selectedVerseIds);
   const toggleVerseSelection = useReaderStore(
     (state) => state.toggleVerseSelection,
@@ -64,7 +64,7 @@ const VerseList = ({ verses }: VerseListProps) => {
             ref={isPermalink ? permalinkRef : null}
             className="relative"
           >
-            {highlightColor && <div className={cn("highlight-strip", `highlight-${highlightColor}`)} />}
+            {highlightColor && <div aria-hidden="true" className={cn("highlight-strip", `highlight-${highlightColor}`)} />}
             <button
               type="button"
               aria-pressed={isSelected}
@@ -78,7 +78,7 @@ const VerseList = ({ verses }: VerseListProps) => {
               <Typography {...SIZE_PROPS[fontSize]} render={({ children, ...dp }) => <span {...dp}>{children}</span>}>
                 <sup className="me-1 text-[0.65em] text-muted">{verse.verse}</sup>
                 {verse.text}
-                {highlightColor && <span className={cn("hl-dot", `hl-dot-${highlightColor}`)} />}
+                {highlightColor && <span aria-hidden="true" className={cn("hl-dot", `hl-dot-${highlightColor}`)} />}
               </Typography>
             </button>
           </li>
@@ -86,6 +86,6 @@ const VerseList = ({ verses }: VerseListProps) => {
       })}
     </ol>
   );
-};
+});
 
 export default VerseList;

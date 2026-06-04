@@ -1,5 +1,5 @@
 import { format } from "date-fns";
-import { useCallback, useEffect, useRef, useState } from "react";
+import { useCallback, useEffect, useState } from "react";
 
 import { getBibleBookName, db } from "../../../shared/bible";
 import { getUserOffset } from "../../../shared/bible/bibleRepository";
@@ -81,26 +81,13 @@ export function useDailyVerse(): DailyVerseResult {
     };
   });
 
-  const offsetRef = useRef(0);
-  const loaded = useRef(false);
-
-  useEffect(() => {
-    if (loaded.current) return;
-    loaded.current = true;
-
-    getUserOffset().then((offset) => {
-      offsetRef.current = offset;
-    });
-  }, []);
-
   useEffect(() => {
     if (!result.isLoading) return;
     let mounted = true;
 
     async function load() {
-      await getUserOffset();
+      const offset = await getUserOffset();
       const dayOfYear = getDayOfYear(new Date());
-      const offset = offsetRef.current;
       const index = ((dayOfYear - 1 + offset) % DAILY_VERSE_REFS.length + DAILY_VERSE_REFS.length) % DAILY_VERSE_REFS.length;
       const verseref = DAILY_VERSE_REFS[index];
       const parsed = parseVerseref(verseref);

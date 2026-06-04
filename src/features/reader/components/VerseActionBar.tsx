@@ -1,4 +1,4 @@
-import { lazy, Suspense, useState } from "react";
+import { lazy, memo, Suspense, useState } from "react";
 import { ArrowUpFromSquare, Copy, Link as LinkIcon, Picture, PencilToSquare } from "@gravity-ui/icons";
 import { Button, Surface, toast, Tooltip } from "@heroui/react";
 
@@ -61,7 +61,7 @@ const COLOR_BORDER: Record<HighlightColor, string> = {
   orange: "border-orange-500/60",
 };
 
-const VerseActionBarInner = ({ verses, onShareAsImage }: VerseActionBarInnerProps) => {
+const VerseActionBarInner = memo(({ verses, onShareAsImage }: VerseActionBarInnerProps) => {
   const selectedVerseIds = useReaderStore((state) => state.selectedVerseIds);
   const clearVerseSelection = useReaderStore(
     (state) => state.clearVerseSelection,
@@ -169,6 +169,7 @@ const VerseActionBarInner = ({ verses, onShareAsImage }: VerseActionBarInnerProp
                   <Button
                     isIconOnly
                     variant="ghost"
+                    aria-label={`Highlight ${color}`}
                     className={cn("h-10 w-10 rounded-full border-2", COLOR_BG[color], COLOR_BORDER[color])}
                     onPress={() => handlePickColor(color)}
                   />
@@ -184,27 +185,27 @@ const VerseActionBarInner = ({ verses, onShareAsImage }: VerseActionBarInnerProp
           <div className={cn("grid", cols, "gap-2")}>
             {singleSelectedVerse !== null && (
               <Tooltip delay={0}>
-                <Button variant="tertiary" isIconOnly className="h-12 w-full rounded-xl" onPress={handleCopyLink}>
-                  <LinkIcon className="h-5 w-5" />
+                <Button variant="tertiary" isIconOnly aria-label="Copy link to verse" className="h-12 w-full rounded-xl" onPress={handleCopyLink}>
+                  <LinkIcon aria-hidden="true" className="h-5 w-5" />
                 </Button>
                 <Tooltip.Content placement="top">Copy Link</Tooltip.Content>
               </Tooltip>
             )}
             <Tooltip delay={0}>
-              <Button variant="tertiary" isIconOnly className="h-12 w-full rounded-xl" onPress={handleShare}>
-                <ArrowUpFromSquare className="h-5 w-5" />
+              <Button variant="tertiary" isIconOnly aria-label="Share verses" className="h-12 w-full rounded-xl" onPress={handleShare}>
+                <ArrowUpFromSquare aria-hidden="true" className="h-5 w-5" />
               </Button>
               <Tooltip.Content placement="top">Share</Tooltip.Content>
             </Tooltip>
             <Tooltip delay={0}>
-              <Button variant="tertiary" isIconOnly className="h-12 w-full rounded-xl" onPress={handleShareAsImage}>
-                <Picture className="h-5 w-5" />
+              <Button variant="tertiary" isIconOnly aria-label="Share as image" className="h-12 w-full rounded-xl" onPress={handleShareAsImage}>
+                <Picture aria-hidden="true" className="h-5 w-5" />
               </Button>
               <Tooltip.Content placement="top">Share as Image</Tooltip.Content>
             </Tooltip>
             <Tooltip delay={0}>
-              <Button variant="tertiary" isIconOnly className="h-12 w-full rounded-xl" onPress={handleCopy}>
-                <Copy className="h-5 w-5" />
+              <Button variant="tertiary" isIconOnly aria-label="Copy verses" className="h-12 w-full rounded-xl" onPress={handleCopy}>
+                <Copy aria-hidden="true" className="h-5 w-5" />
               </Button>
               <Tooltip.Content placement="top">Copy</Tooltip.Content>
             </Tooltip>
@@ -212,10 +213,11 @@ const VerseActionBarInner = ({ verses, onShareAsImage }: VerseActionBarInnerProp
               <Button
                 variant="tertiary"
                 isIconOnly
+                aria-label="Choose highlight color"
                 className="h-12 w-full rounded-xl"
                 onPress={() => setShowHighlightPicker(true)}
               >
-                <PencilToSquare className="h-5 w-5" />
+                <PencilToSquare aria-hidden="true" className="h-5 w-5" />
               </Button>
               <Tooltip.Content placement="top">Highlight</Tooltip.Content>
             </Tooltip>
@@ -224,7 +226,7 @@ const VerseActionBarInner = ({ verses, onShareAsImage }: VerseActionBarInnerProp
       </Surface>
     </div>
   );
-};
+});
 
 const VerseActionBar = ({ verses }: VerseActionBarProps) => {
   const isSelectionMode = useReaderStore((state) => state.isSelectionMode);

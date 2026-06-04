@@ -1,3 +1,4 @@
+import { memo } from "react";
 import { ListBox, Select } from "@heroui/react";
 
 import { getBibleBookName } from "../../../shared/bible";
@@ -10,7 +11,7 @@ interface BookSelectProps {
   visibleBookSummary: BibleBook | undefined;
 }
 
-const BookSelect = ({ books, value, visibleBookSummary }: BookSelectProps) => {
+const BookSelect = memo(({ books, value, visibleBookSummary }: BookSelectProps) => {
   const isBookSelectOpen = useReaderStore((state) => state.isBookSelectOpen);
   const setBookSelectOpen = useReaderStore(
     (state) => state.setBookSelectOpen,
@@ -76,6 +77,6 @@ const BookSelect = ({ books, value, visibleBookSummary }: BookSelectProps) => {
       </Select.Popover>
     </Select>
   );
-};
+});
 
 export default BookSelect;

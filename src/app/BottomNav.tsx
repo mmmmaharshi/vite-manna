@@ -26,10 +26,11 @@ const BottomNav = ({ activeTab, onTabChange }: BottomNavProps) => (
           <Button
             key={id}
             variant="ghost"
+            aria-current={isActive ? "page" : undefined}
             className="flex h-auto min-w-0 flex-col gap-0.5 px-4 py-3 min-h-12"
             onPress={() => onTabChange(id)}
           >
-            <Icon className={cn("h-5 w-5", isActive ? "text-accent" : "text-muted")} />
+            <Icon aria-hidden="true" className={cn("h-5 w-5", isActive ? "text-accent" : "text-muted")} />
             <span
               className={cn("text-[11px] sm:text-xs leading-none", isActive ? "text-accent" : "text-muted")}
             >

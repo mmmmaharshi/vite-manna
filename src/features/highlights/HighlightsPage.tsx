@@ -116,7 +116,7 @@ const HighlightsPage = ({ onNavigateToReader }: HighlightsPageProps) => {
   };
 
   return (
-    <div className="h-dvh flex flex-col">
+    <main id="main-content" className="h-dvh flex flex-col">
       <Surface className="sticky top-0 z-30 bg-surface py-3 border border-b">
         <div className="max-w-md sm:max-w-lg md:max-w-xl lg:max-w-2xl xl:max-w-3xl w-full px-2 mx-auto flex flex-col gap-2">
           <Typography.Heading level={1} className="text-xl">Highlights</Typography.Heading>
@@ -241,6 +241,7 @@ const HighlightsPage = ({ onNavigateToReader }: HighlightsPageProps) => {
                     </div>
                   )}
                   <textarea
+                    aria-label="Edit note"
                     className="w-full min-h-[120px] rounded-lg border border-border bg-field-background p-3 text-sm text-field-foreground placeholder-field-placeholder resize-y focus:outline-none focus:ring-2 focus:ring-accent"
                     placeholder="Write your note..."
                     value={noteText}
@@ -294,7 +295,7 @@ const HighlightsPage = ({ onNavigateToReader }: HighlightsPageProps) => {
           </AlertDialog.Dialog>
         </AlertDialog.Container>
       </AlertDialog.Backdrop>
-    </div>
+    </main>
   );
 };
 

@@ -1,7 +1,6 @@
 import { useCallback, useEffect } from "react";
 
 import {
-  getHighlightedVerseIds,
   getHighlights,
   removeHighlight as removeHl,
   upsertHighlight as upsertHl,
@@ -23,8 +22,8 @@ export function useHighlights() {
     if (loaded) return;
 
     let mounted = true;
-    void Promise.all([getHighlights(), getHighlightedVerseIds()]).then(
-      ([hlList]) => {
+    void getHighlights().then(
+      (hlList) => {
         if (mounted)
           hydrate(
             hlList.map((h) => ({

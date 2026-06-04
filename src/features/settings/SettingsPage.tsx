@@ -65,7 +65,7 @@ const SettingsPage = () => {
   }, [notifEnabled, setNotifEnabled]);
 
   return (
-    <div className="h-dvh flex flex-col">
+    <main id="main-content" className="h-dvh flex flex-col">
       <Surface className="sticky top-0 z-30 bg-surface py-3 border border-b">
         <div className="max-w-md sm:max-w-lg md:max-w-xl lg:max-w-2xl xl:max-w-3xl w-full px-2 mx-auto">
           <Typography.Heading level={1} className="text-xl">Settings</Typography.Heading>
@@ -155,7 +155,7 @@ const SettingsPage = () => {
         </section>
         <div className="h-[calc(4rem+env(safe-area-inset-bottom))]" />
       </ScrollShadow>
-    </div>
+    </main>
   );
 };
 
