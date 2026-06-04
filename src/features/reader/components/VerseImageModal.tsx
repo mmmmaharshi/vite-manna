@@ -4,7 +4,7 @@ import { ArrowUpFromSquare, FileArrowDown } from "@gravity-ui/icons";
 import { Button, Modal, toast } from "@heroui/react";
 
 import VerseImageCard from "./VerseImageCard";
-import { useVerseImage, CARD_WIDTH, CARD_HEIGHT } from "../hooks/useVerseImage";
+import { useVerseImage, RATIOS, type ImageRatio } from "../hooks/useVerseImage";
 
 interface VerseImageModalProps {
   isOpen: boolean;
@@ -13,6 +13,12 @@ interface VerseImageModalProps {
   reference: string;
   teluguText: string;
 }
+
+const RATIO_OPTIONS: { key: ImageRatio; label: string }[] = [
+  { key: "landscape", label: "Landscape" },
+  { key: "square", label: "Square" },
+  { key: "portrait", label: "Story" },
+];
 
 const VerseImageModal = ({
   isOpen,
@@ -23,17 +29,20 @@ const VerseImageModal = ({
 }: VerseImageModalProps) => {
   const { captureRef, shareAsImage, downloadAsImage, isGenerating } = useVerseImage();
   const previewRef = useRef<HTMLDivElement>(null);
+  const [ratio, setRatio] = useState<ImageRatio>("landscape");
   const [scale, setScale] = useState(1);
+
+  const { width: cardW, height: cardH } = RATIOS[ratio];
 
   useLayoutEffect(() => {
     const el = previewRef.current;
     if (!el) return;
-    const update = () => setScale(Math.min(el.clientWidth / CARD_WIDTH, 1));
+    const update = () => setScale(Math.min(el.clientWidth / cardW, 1));
     update();
     const ro = new ResizeObserver(update);
     ro.observe(el);
     return () => ro.disconnect();
-  }, [isOpen]);
+  }, [isOpen, cardW]);
 
   const today = format(new Date(), "yyyy-MM-dd");
 
@@ -64,13 +73,27 @@ const VerseImageModal = ({
               <Modal.Heading>Share Image</Modal.Heading>
             </Modal.Header>
             <Modal.Body>
-              <div className="flex flex-col items-center gap-6">
-                <div ref={previewRef} className="w-full sm:max-w-[500px] rounded-xl overflow-hidden shadow-xl" style={{ aspectRatio: `${CARD_WIDTH}/${CARD_HEIGHT}` }}>
-                  <div style={{ transform: `scale(${scale})`, transformOrigin: "top left", width: CARD_WIDTH, height: CARD_HEIGHT }}>
+              <div className="flex flex-col items-center gap-4">
+                <div className="flex gap-2">
+                  {RATIO_OPTIONS.map((opt) => (
+                    <Button
+                      key={opt.key}
+                      variant={ratio === opt.key ? "primary" : "ghost"}
+                      size="sm"
+                      onPress={() => setRatio(opt.key)}
+                    >
+                      {opt.label}
+                    </Button>
+                  ))}
+                </div>
+
+                <div ref={previewRef} className="w-full sm:max-w-[500px] rounded-xl overflow-hidden shadow-xl" style={{ aspectRatio: `${cardW}/${cardH}` }}>
+                  <div style={{ transform: `scale(${scale})`, transformOrigin: "top left", width: cardW, height: cardH }}>
                     <VerseImageCard
                       verses={verses}
                       reference={reference}
                       teluguText={teluguText}
+                      ratio={ratio}
                     />
                   </div>
                 </div>
@@ -81,6 +104,7 @@ const VerseImageModal = ({
                     verses={verses}
                     reference={reference}
                     teluguText={teluguText}
+                    ratio={ratio}
                   />
                 </div>
               </div>

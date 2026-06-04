@@ -1,7 +1,18 @@
 import { useCallback, useRef, useState } from "react";
 
-export const CARD_WIDTH = 1200;
-export const CARD_HEIGHT = 630;
+export type ImageRatio = "landscape" | "square" | "portrait";
+
+export interface RatioConfig {
+  width: number;
+  height: number;
+  label: string;
+}
+
+export const RATIOS: Record<ImageRatio, RatioConfig> = {
+  landscape: { width: 1200, height: 630, label: "Landscape" },
+  square: { width: 1080, height: 1080, label: "Square" },
+  portrait: { width: 1080, height: 1920, label: "Story" },
+};
 
 function downloadBlob(blob: Blob, filename: string) {
   const url = URL.createObjectURL(blob);
