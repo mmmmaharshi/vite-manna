@@ -1,6 +1,5 @@
 import { defineConfig } from 'vite';
-import react, { reactCompilerPreset } from '@vitejs/plugin-react';
-import babel from '@rolldown/plugin-babel';
+import react from '@vitejs/plugin-react';
 import tailwindcss from '@tailwindcss/vite';
 import { VitePWA } from 'vite-plugin-pwa';
 
@@ -11,7 +10,7 @@ export default defineConfig({
 		allowedHosts: true
 	},
 	build: {
-		rolldownOptions: {
+		rollupOptions: {
 			output: {
 				manualChunks(id) {
 					if (id.includes('@heroui')) {
@@ -32,7 +31,6 @@ export default defineConfig({
 	plugins: [
 		tailwindcss(),
 		react(),
-		babel({ presets: [reactCompilerPreset()] }),
 		VitePWA({
 			strategies: 'injectManifest',
 			srcDir: 'src',
