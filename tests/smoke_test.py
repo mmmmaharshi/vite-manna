@@ -3,6 +3,16 @@ import sys
 
 BASE_URL = "http://localhost:5173"
 
+
+def dismiss_modal(page):
+    try:
+        backdrop = page.locator("[data-slot='modal-backdrop']")
+        if backdrop.is_visible(timeout=1000):
+            page.keyboard.press("Escape")
+            page.wait_for_timeout(500)
+    except:
+        pass
+
 def test_app_loads():
     with sync_playwright() as p:
         browser = p.chromium.launch(headless=True)
@@ -20,6 +30,7 @@ def test_app_loads():
 
         try:
             page.wait_for_selector("nav[aria-label='Main navigation']", timeout=15000)
+            dismiss_modal(page)
             print("PASS: App loaded to reader")
         except:
             page.screenshot(path="/tmp/app_error.png", full_page=True)
@@ -36,6 +47,7 @@ def test_navigation_buttons():
 
         page.goto(BASE_URL)
         page.wait_for_selector("nav[aria-label='Main navigation']", timeout=30000)
+        dismiss_modal(page)
 
         nav_buttons = page.locator("nav[aria-label='Main navigation'] button").all()
         visible = [b for b in nav_buttons if b.is_visible()]
@@ -56,8 +68,9 @@ def test_search_tab():
         page.goto(BASE_URL)
         page.wait_for_selector("nav[aria-label='Main navigation']", timeout=30000)
 
+        dismiss_modal(page)
         search_btn = page.locator("nav[aria-label='Main navigation'] button:has-text('Search')")
-        search_btn.click()
+        search_btn.click(force=True)
         page.wait_for_timeout(1000)
 
         search_input = page.locator("input[aria-label='Search verses']")
@@ -78,6 +91,7 @@ def test_settings_tab():
 
         page.goto(BASE_URL)
         page.wait_for_selector("nav[aria-label='Main navigation']", timeout=30000)
+        dismiss_modal(page)
 
         settings_btn = page.locator("nav[aria-label='Main navigation'] button:has-text('Settings')")
         settings_btn.click(force=True)
