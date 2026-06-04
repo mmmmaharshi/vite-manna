@@ -1,30 +1,25 @@
-const REQUIRED_CACHE_URLS = ["/index.html"];
-const CACHE_CHECK_INTERVAL_MS = 1000;
+const RETRY_INTERVAL_MS = 2_000;
 
-function waitForNextCacheCheck() {
-  return new Promise<void>((resolve) => {
-    setTimeout(resolve, CACHE_CHECK_INTERVAL_MS);
-  });
-}
-
-async function hasRequiredCacheEntries() {
-  const matches = await Promise.all(
-    REQUIRED_CACHE_URLS.map((url) => caches.match(url)),
-  );
-
-  return matches.every(Boolean);
+async function isAppShellCached() {
+  try {
+    return Boolean(await caches.match("/index.html"));
+  } catch {
+    return false;
+  }
 }
 
 export async function waitForOfflineReadiness() {
   if (!import.meta.env.PROD || !("serviceWorker" in navigator) || !("caches" in window)) {
-    return true;
+    return;
   }
 
-  await navigator.serviceWorker.ready;
-
-  while (!(await hasRequiredCacheEntries())) {
-    await waitForNextCacheCheck();
+  try {
+    await navigator.serviceWorker.ready;
+  } catch {
+    return;
   }
 
-  return true;
+  while (!(await isAppShellCached())) {
+    await new Promise((r) => setTimeout(r, RETRY_INTERVAL_MS));
+  }
 }
