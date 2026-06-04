@@ -144,7 +144,7 @@ const ChapterStrip = memo(({
           <Button
             ref={visibleChapter === chapterNumber ? activeChapterRef : null}
             key={chapterNumber}
-            aria-label={`Chapter ${chapterNumber}`}
+            aria-label={`${chapterNumber}వ అధ్యాయం`}
             size="sm"
             variant={
               visibleChapter === chapterNumber ? "primary" : "secondary"

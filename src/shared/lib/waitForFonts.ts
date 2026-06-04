@@ -22,7 +22,7 @@ export async function waitForFonts() {
       }),
     ]);
   } catch (error) {
-    console.warn("[Fonts] Unable to preload fonts", error);
+    if (import.meta.env.DEV) console.warn("[Fonts] Unable to preload fonts", error);
   } finally {
     clearTimeout(timeoutId);
   }

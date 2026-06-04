@@ -3,6 +3,7 @@ import { registerRoute } from "workbox-routing";
 import { CacheFirst } from "workbox-strategies";
 import { ExpirationPlugin } from "workbox-expiration";
 
+import { DB_NAME } from "./shared/bible/db";
 import { BIBLE_BOOK_NAMES } from "./shared/bible/books";
 import {
   DAILY_VERSE_REFS,
@@ -31,9 +32,8 @@ registerRoute(
   }),
 );
 
-self.addEventListener("message", (event: Event) => {
-  const msgEvent = event as ExtendableMessageEvent;
-  if (msgEvent.data?.type === "SKIP_WAITING") {
+self.addEventListener("message", (event: ExtendableMessageEvent) => {
+  if (event.data?.type === "SKIP_WAITING") {
     self.skipWaiting();
   }
 });
@@ -109,7 +109,7 @@ self.addEventListener("notificationclick", (event: Event) => {
 function getUserOffsetFromDB(): Promise<number> {
   return new Promise((resolve) => {
     try {
-      const request = indexedDB.open("BibleDB");
+      const request = indexedDB.open(DB_NAME);
       request.onsuccess = () => {
         const db = request.result;
         if (!db.objectStoreNames.contains("meta")) { resolve(0); return; }
@@ -131,7 +131,7 @@ function lookupVerseText(
   verse: number,
 ): Promise<string | null> {
   return new Promise((resolve, reject) => {
-    const request = indexedDB.open("BibleDB");
+    const request = indexedDB.open(DB_NAME);
 
     request.onerror = () => reject(request.error);
 

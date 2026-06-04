@@ -47,7 +47,7 @@ export function useBooks(): UseBooksResult {
         setHasLoadedBooks(true);
       })
       .catch((error) => {
-        console.error("[Bible] Unable to load books", error);
+        if (import.meta.env.DEV) console.error("[Bible] Unable to load books", error);
 
         if (mounted) {
           cachedLoaded = true;

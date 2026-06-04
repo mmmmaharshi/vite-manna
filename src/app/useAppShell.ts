@@ -85,7 +85,7 @@ export function useAppShell(): ShellStatus {
           }
         })
         .catch((error) => {
-          console.error("[Bible] Failed to initialize database", error);
+          if (import.meta.env.DEV) console.error("[Bible] Failed to initialize database", error);
           if (mounted) setDownloadError(DOWNLOAD_ERROR_MESSAGE);
         });
     });

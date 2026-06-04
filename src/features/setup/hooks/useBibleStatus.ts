@@ -17,7 +17,7 @@ export function useBibleStatus(): BibleStatus {
         }
       })
       .catch((error) => {
-        console.error("[Bible] Unable to verify IndexedDB", error);
+        if (import.meta.env.DEV) console.error("[Bible] Unable to verify IndexedDB", error);
 
         if (mounted) {
           setStatus("missing");

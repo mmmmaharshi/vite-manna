@@ -44,6 +44,8 @@ export const HIGHLIGHT_COLOR_VALUES: Record<HighlightColor, string> = {
   orange: "var(--highlight-orange)",
 };
 
+export const DB_NAME = "BibleDB";
+
 class BibleDB extends Dexie {
   verses!: Table<BibleVerse, number>;
   meta!: Table<MetaEntry, string>;
