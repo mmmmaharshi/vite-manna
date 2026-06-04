@@ -1,7 +1,7 @@
-import { useEffect, useRef } from "react";
+import { useCallback, useEffect, useRef, useState } from "react";
 import { Button, ScrollShadow, Surface, Typography } from "@heroui/react";
 
-import { getBibleBookName } from "../../shared/bible";
+import { getBibleBookName, getVerses } from "../../shared/bible";
 import { useBooks } from "./hooks/useBooks";
 import { useReaderSnapshot } from "./hooks/useReaderSnapshot";
 import BookSelect from "./components/BookSelect";
@@ -10,6 +10,13 @@ import VerseActionBar from "./components/VerseActionBar";
 import VerseList from "./components/VerseList";
 import { useReaderStore } from "./store/readerStore";
 import { useUrlSync } from "./useUrlSync";
+import type { BibleVerse } from "../../shared/bible";
+
+interface ExtraChapter {
+  book: number;
+  chapter: number;
+  verses: BibleVerse[];
+}
 
 const ReaderScreen = () => {
   useUrlSync();
@@ -28,6 +35,8 @@ const ReaderScreen = () => {
   }, [book, books, setBook]);
 
   const scrollRef = useRef<HTMLDivElement>(null);
+  const sentinelRef = useRef<HTMLDivElement>(null);
+  const isLoadingExtra = useRef(false);
 
   const prevBookChapter = useRef({ book, chapter });
   useEffect(() => {
@@ -38,17 +47,72 @@ const ReaderScreen = () => {
     }
   }, [book, chapter]);
 
+  const [extraChapters, setExtraChapters] = useState<ExtraChapter[]>([]);
+
+  useEffect(() => {
+    setExtraChapters([]);
+  }, [book, chapter]);
+
+  const loadNextChapter = useCallback(async () => {
+    if (isLoadingExtra.current) return;
+    isLoadingExtra.current = true;
+
+    try {
+      const lastExtra = extraChapters[extraChapters.length - 1];
+      const currentBook = lastExtra ? lastExtra.book : book;
+      const currentChapter = lastExtra ? lastExtra.chapter : chapter;
+      const chapters = snapshot?.chapters ?? [];
+      const chapterIdx = chapters.indexOf(currentChapter);
+
+      let nextBook: number;
+      let nextChapter: number;
+
+      if (chapterIdx >= 0 && chapterIdx < chapters.length - 1) {
+        nextBook = currentBook;
+        nextChapter = chapters[chapterIdx + 1];
+      } else {
+        const next = books.find((b) => b.id > currentBook);
+        if (!next) { isLoadingExtra.current = false; return; }
+        nextBook = next.id;
+        nextChapter = 1;
+      }
+
+      const verses = await getVerses(nextBook, nextChapter);
+      if (verses.length === 0) { isLoadingExtra.current = false; return; }
+
+      setExtraChapters((prev) => [...prev, { book: nextBook, chapter: nextChapter, verses }]);
+    } finally {
+      isLoadingExtra.current = false;
+    }
+  }, [book, chapter, books, extraChapters, snapshot?.chapters]);
+
+  const snapshot = useReaderSnapshot(
+    book,
+    chapter,
+    selectedBookSummary?.chapterCount,
+  );
+
+  useEffect(() => {
+    const sentinel = sentinelRef.current;
+    if (!sentinel) return;
+
+    const observer = new IntersectionObserver(
+      (entries) => {
+        if (entries[0].isIntersecting) loadNextChapter();
+      },
+      { rootMargin: "300px" },
+    );
+
+    observer.observe(sentinel);
+    return () => observer.disconnect();
+  }, [loadNextChapter]);
+
   const selectedBookSummary = books.find((candidate) => candidate.id === book);
 
   useEffect(() => {
     const name = selectedBookSummary ? getBibleBookName(selectedBookSummary.id) : "";
     document.title = name ? `మన్నా - ${name} ${chapter}` : "మన్నా - తెలుగు బైబిల్";
   }, [selectedBookSummary, chapter]);
-  const snapshot = useReaderSnapshot(
-    book,
-    chapter,
-    selectedBookSummary?.chapterCount,
-  );
 
   const visibleBook = pendingBook ?? snapshot?.book ?? book;
   const visibleBookSummary = books.find(
@@ -127,6 +191,17 @@ const ReaderScreen = () => {
               ))}
             </div>
           )}
+
+          {extraChapters.map((ec) => (
+            <div key={`${ec.book}-${ec.chapter}`}>
+              <Typography className="text-xs text-muted text-center py-3 border-t border-b my-4">
+                {getBibleBookName(ec.book)} {ec.chapter}
+              </Typography>
+              <VerseList verses={ec.verses} />
+            </div>
+          ))}
+
+          <div ref={sentinelRef} className="h-4" />
         </section>
 
         {snapshot && <VerseActionBar verses={snapshot.verses} />}
