@@ -144,6 +144,76 @@ export function updateHighlightNote(verseId: number, note: string) {
   return db.highlights.where("verseId").equals(verseId).modify({ note, updatedAt: Date.now() });
 }
 
+/* ───── Reading History ───── */
+
+export function recordChapterRead(book: number, chapter: number) {
+  return db.readingHistory.put({ book, chapter, lastReadAt: Date.now() });
+}
+
+export function getReadChapters(book: number) {
+  return db.readingHistory.where("book").equals(book).toArray();
+}
+
+export function getAllReadChapters() {
+  return db.readingHistory.toArray();
+}
+
+export async function getReadingStreak(): Promise<number> {
+  const all = await db.readingHistory.toArray();
+  if (all.length === 0) return 0;
+
+  const dates = new Set<number>();
+  for (const entry of all) {
+    const d = new Date(entry.lastReadAt);
+    dates.add(Date.UTC(d.getFullYear(), d.getMonth(), d.getDate()));
+  }
+
+  const sorted = [...dates].sort((a, b) => b - a);
+  const today = new Date();
+  const todayUTC = Date.UTC(today.getFullYear(), today.getMonth(), today.getDate());
+  const yesterdayUTC = todayUTC - 86_400_000;
+
+  if (sorted[0] !== todayUTC && sorted[0] !== yesterdayUTC) return 0;
+
+  let streak = 1;
+  for (let i = 1; i < sorted.length; i++) {
+    if (sorted[i - 1] - sorted[i] === 86_400_000) {
+      streak++;
+    } else {
+      break;
+    }
+  }
+  return streak;
+}
+
+export async function getLastReadChapter() {
+  const all = await db.readingHistory.orderBy("lastReadAt").reverse().limit(1).toArray();
+  return all[0] ?? null;
+}
+
+export async function getBookProgress(book: number, totalChapters: number) {
+  const read = await db.readingHistory.where("book").equals(book).count();
+  return { read, total: totalChapters, percentage: totalChapters > 0 ? read / totalChapters : 0 };
+}
+
+export async function getBookChapterCounts(): Promise<Map<number, number>> {
+  const keys = await db.verses.orderBy("[book+chapter]").uniqueKeys();
+  const counts = new Map<number, number>();
+  for (const [book] of keys as unknown as [number, number][]) {
+    counts.set(book, (counts.get(book) ?? 0) + 1);
+  }
+  return counts;
+}
+
+export async function getOverallProgress(): Promise<{ read: number; total: number; percentage: number }> {
+  const [readCount, counts] = await Promise.all([
+    db.readingHistory.count(),
+    getBookChapterCounts(),
+  ]);
+  const total = [...counts.values()].reduce((sum, c) => sum + c, 0);
+  return { read: readCount, total, percentage: total > 0 ? readCount / total : 0 };
+}
+
 export { parseVerseref } from "./dailyVerseData";
 
 const OFFSET_KEY = "daily-verse-offset";

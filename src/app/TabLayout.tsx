@@ -11,6 +11,7 @@ import type { TabId } from "./BottomNav";
 const HighlightsPage = lazy(() => import("../features/highlights/HighlightsPage"));
 const SearchPage = lazy(() => import("../features/search/SearchPage"));
 const SettingsPage = lazy(() => import("../features/settings/SettingsPage"));
+const StatsPage = lazy(() => import("../features/stats/StatsPage"));
 
 const TabLayout = () => {
   const [activeTab, setActiveTab] = useState<TabId>("reader");
@@ -44,6 +45,11 @@ const TabLayout = () => {
       {activeTab === "highlights" && (
         <Suspense fallback={<div className="min-h-dvh flex items-center justify-center"><Spinner size="lg" aria-label="Loading" /></div>}>
           <HighlightsPage onNavigateToReader={() => setActiveTab("reader")} />
+        </Suspense>
+      )}
+      {activeTab === "progress" && (
+        <Suspense fallback={<div className="min-h-dvh flex items-center justify-center"><Spinner size="lg" aria-label="Loading" /></div>}>
+          <StatsPage onNavigateToReader={() => setActiveTab("reader")} />
         </Suspense>
       )}
       {activeTab === "settings" && (

@@ -76,7 +76,7 @@ const VerseImageModal = ({
               <Modal.Heading>Share Image</Modal.Heading>
             </Modal.Header>
             <Modal.Body>
-              <div className="flex flex-col items-center gap-4">
+              <div className="flex flex-col items-center justify-center gap-4 w-full max-w-[500px] mx-auto">
                 <div className="flex gap-2">
                   {RATIO_OPTIONS.map((opt) => (
                     <Button
@@ -90,7 +90,7 @@ const VerseImageModal = ({
                   ))}
                 </div>
 
-                <div ref={previewRef} className="w-full sm:max-w-[500px] max-h-[65vh] rounded-xl overflow-hidden shadow-xl" style={{ aspectRatio: `${cardW}/${cardH}` }}>
+                <div ref={previewRef} className="w-full max-h-[65vh] rounded-xl overflow-hidden shadow-xl" style={{ aspectRatio: `${cardW}/${cardH}` }}>
                   <div style={{ transform: `scale(${scale})`, transformOrigin: "top left", width: cardW, height: cardH }}>
                     <VerseImageCard
                       verses={verses}
@@ -112,16 +112,16 @@ const VerseImageModal = ({
                 </div>
               </div>
             </Modal.Body>
-            <Modal.Footer>
-              <Button variant="primary" isDisabled={isGenerating} onPress={handleShare}>
+            <Modal.Footer className="flex-wrap gap-2">
+              <Button variant="primary" size="sm" isDisabled={isGenerating} onPress={handleShare}>
                 <ArrowUpFromSquare className="h-4 w-4" />
                 Share
               </Button>
-              <Button variant="secondary" isDisabled={isGenerating} onPress={handleDownload}>
+              <Button variant="secondary" size="sm" isDisabled={isGenerating} onPress={handleDownload}>
                 <FileArrowDown className="h-4 w-4" />
                 Download
               </Button>
-              <Button slot="close" variant="tertiary">Cancel</Button>
+              <Button slot="close" variant="tertiary" size="sm">Cancel</Button>
             </Modal.Footer>
           </Modal.Dialog>
         </Modal.Container>
