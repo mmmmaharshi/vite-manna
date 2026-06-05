@@ -3,6 +3,7 @@ import { ArrowRotateLeft, Bell, FileArrowDown, FileArrowUp, Moon, Sun } from "@g
 import { Button, ScrollShadow, Surface, ToggleButton, ToggleButtonGroup, Tooltip, toast, Typography } from "@heroui/react";
 import { useLocalStorage } from "@reactuses/core";
 
+import { version } from "../../../package.json";
 import { useTheme } from "../../shared/hooks/useTheme";
 import { type FontSize } from "../../shared/lib/fontSize";
 import { cn } from "../../shared/lib/cn";
@@ -203,7 +204,7 @@ const SettingsPage = () => {
 
           <Surface className="p-3">
             <Typography className="text-sm font-medium mb-2">About</Typography>
-            <Typography className="text-xs text-muted">మన్నా · Manna v1.0.0</Typography>
+            <Typography className="text-xs text-muted">మన్నా · Manna v{version}</Typography>
             <Typography className="text-xs text-muted mt-0.5">
               Offline Telugu Bible reader
             </Typography>
