@@ -2,7 +2,7 @@
 
 > **Offline-first Telugu Bible reader** — Read, highlight, search, and share scripture. Works fully offline. Built with React 19, HeroUI v3, and Tailwind CSS v4.
 
-[![Live Demo](https://img.shields.io/badge/demo-vite--manna.vercel.app-000?style=flat&logo=vercel)](https://vite-manna.vercel.app)
+[![Live Demo](https://img.shields.io/badge/demo-holymanna.vercel.app-000?style=flat&logo=vercel)](https://holymanna.vercel.app)
 [![GitHub](https://img.shields.io/badge/github-mmmmaharshi/vite--manna-181717?style=flat&logo=github)](https://github.com/mmmmaharshi/vite-manna)
 
 ---
