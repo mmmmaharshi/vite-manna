@@ -158,64 +158,62 @@ export const ReadingProgressCard = () => {
         )}
       </Surface>
 
-      <Modal>
-        <Modal.Backdrop isOpen={modalTestament !== null} onOpenChange={(open) => { if (!open) setModalTestament(null); }}>
-          <Modal.Container scroll="inside">
-            <Modal.Dialog className="sm:max-w-md max-h-dvh">
-              <Modal.CloseTrigger />
-              <Modal.Header>
-                <Modal.Heading>
-                  {modalTestament === "ot" ? "Old Testament" : "New Testament"}
-                </Modal.Heading>
-              </Modal.Header>
-              <Modal.Body className="p-0">
-                <ScrollShadow className="max-h-[60vh] px-6 py-4" hideScrollBar>
-                  {activeTestament && (
-                    <div className="flex flex-col gap-2">
-                      {activeTestament.books.map((b) => {
-                        const isComplete = b.read === b.total;
-                        return (
-                          <div key={b.book} className="flex items-center gap-2">
-                            {isComplete && <span className="text-xs text-success shrink-0">✓</span>}
-                            <Typography className={cn("text-sm flex-1 truncate", isComplete && "text-success")}>
-                              {b.name}
-                            </Typography>
-                            <div className="h-1.5 w-20 rounded-full bg-muted/20 overflow-hidden shrink-0">
-                              <div className={cn("h-full rounded-full transition-all duration-1000 ease-out", isComplete ? "bg-success" : "bg-primary/60")} style={{ width: `${b.percentage * 100}%` }} />
-                            </div>
-                            <Typography className="text-xs text-muted w-10 text-right shrink-0">
-                              {b.read}/{b.total}
-                            </Typography>
-                          </div>
-                        );
-                      })}
-                    </div>
-                  )}
-                </ScrollShadow>
-              </Modal.Body>
-              <Modal.Footer>
-                <div className="flex items-center justify-between w-full">
-                  {activeTestament && (
-                    <>
-                      <Typography className="text-xs text-muted">
-                        {activeTestament.read} / {activeTestament.total} chapters
-                      </Typography>
-                      {(() => {
-                        const completed = activeTestament.books.filter((b) => b.read === b.total).length;
-                        return completed > 0 ? (
-                          <Typography className="text-xs text-success">
-                            {completed} book{completed > 1 ? "s" : ""} completed ✓
+      <Modal.Backdrop isOpen={modalTestament !== null} onOpenChange={(open) => { if (!open) setModalTestament(null); }}>
+        <Modal.Container scroll="inside">
+          <Modal.Dialog className="sm:max-w-md max-h-dvh">
+            <Modal.CloseTrigger />
+            <Modal.Header>
+              <Modal.Heading>
+                {modalTestament === "ot" ? "Old Testament" : "New Testament"}
+              </Modal.Heading>
+            </Modal.Header>
+            <Modal.Body className="p-0">
+              <ScrollShadow className="max-h-[60vh] px-6 py-4" hideScrollBar>
+                {activeTestament && (
+                  <div className="flex flex-col gap-2">
+                    {activeTestament.books.map((b) => {
+                      const isComplete = b.read === b.total;
+                      return (
+                        <div key={b.book} className="flex items-center gap-2">
+                          {isComplete && <span className="text-xs text-success shrink-0">✓</span>}
+                          <Typography className={cn("text-sm flex-1 truncate", isComplete && "text-success")}>
+                            {b.name}
                           </Typography>
-                        ) : null;
-                      })()}
-                    </>
-                  )}
-                </div>
-              </Modal.Footer>
-            </Modal.Dialog>
-          </Modal.Container>
-        </Modal.Backdrop>
-      </Modal>
+                          <div className="h-1.5 w-20 rounded-full bg-muted/20 overflow-hidden shrink-0">
+                            <div className={cn("h-full rounded-full transition-all duration-1000 ease-out", isComplete ? "bg-success" : "bg-primary/60")} style={{ width: `${b.percentage * 100}%` }} />
+                          </div>
+                          <Typography className="text-xs text-muted w-10 text-right shrink-0">
+                            {b.read}/{b.total}
+                          </Typography>
+                        </div>
+                      );
+                    })}
+                  </div>
+                )}
+              </ScrollShadow>
+            </Modal.Body>
+            <Modal.Footer>
+              <div className="flex items-center justify-between w-full">
+                {activeTestament && (
+                  <>
+                    <Typography className="text-xs text-muted">
+                      {activeTestament.read} / {activeTestament.total} chapters
+                    </Typography>
+                    {(() => {
+                      const completed = activeTestament.books.filter((b) => b.read === b.total).length;
+                      return completed > 0 ? (
+                        <Typography className="text-xs text-success">
+                          {completed} book{completed > 1 ? "s" : ""} completed ✓
+                        </Typography>
+                      ) : null;
+                    })()}
+                  </>
+                )}
+              </div>
+            </Modal.Footer>
+          </Modal.Dialog>
+        </Modal.Container>
+      </Modal.Backdrop>
     </>
   );
 };

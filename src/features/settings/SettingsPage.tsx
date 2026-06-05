@@ -4,8 +4,8 @@ import { Button, ScrollShadow, Surface, ToggleButton, ToggleButtonGroup, Tooltip
 import { useLocalStorage } from "@reactuses/core";
 
 import { useTheme } from "../../shared/hooks/useTheme";
-import { SIZE_PROPS } from "../../shared/lib/fontSize";
 import { type FontSize } from "../../shared/lib/fontSize";
+import { cn } from "../../shared/lib/cn";
 import { useReaderStore } from "../reader/store/readerStore";
 
 interface PeriodicSyncManager {
@@ -125,10 +125,16 @@ const SettingsPage = () => {
               ))}
             </ToggleButtonGroup>
             <div className="rounded-lg border bg-field-background p-3">
-              <Typography {...SIZE_PROPS[fontSize]} render={({ children, ...dp }) => <span {...dp}>{children}</span>}>
+              <span className={cn(
+                fontSize === "sm" && "text-sm",
+                fontSize === "base" && "text-base",
+                fontSize === "lg" && "text-lg",
+                fontSize === "xl" && "text-xl",
+                fontSize === "2xl" && "text-2xl",
+              )}>
                 <sup className="me-1 text-[0.65em] text-muted">1</sup>
                 {PREVIEW_TEXT}
-              </Typography>
+              </span>
             </div>
           </Surface>
           <Surface className="p-3">
