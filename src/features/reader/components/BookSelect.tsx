@@ -1,5 +1,6 @@
 import { memo } from "react";
 import { ListBox, Select } from "@heroui/react";
+import { cn } from "../../../shared/lib/cn";
 
 import { getBibleBookName } from "../../../shared/bible";
 import { useReaderStore } from "../store/readerStore";
@@ -9,9 +10,10 @@ interface BookSelectProps {
   books: BibleBook[];
   value: number;
   visibleBookSummary: BibleBook | undefined;
+  className?: string;
 }
 
-const BookSelect = memo(({ books, value, visibleBookSummary }: BookSelectProps) => {
+const BookSelect = memo(({ books, value, visibleBookSummary, className }: BookSelectProps) => {
   const isBookSelectOpen = useReaderStore((state) => state.isBookSelectOpen);
   const setBookSelectOpen = useReaderStore(
     (state) => state.setBookSelectOpen,
@@ -21,7 +23,7 @@ const BookSelect = memo(({ books, value, visibleBookSummary }: BookSelectProps) 
   return (
     <Select
       aria-label="Select book"
-      className="rounded-md overflow-auto"
+      className={cn("overflow-auto", className)}
       isDisabled={books.length === 0}
       isOpen={isBookSelectOpen}
       value={value}
@@ -56,8 +58,8 @@ const BookSelect = memo(({ books, value, visibleBookSummary }: BookSelectProps) 
         </Select.Value>
         <Select.Indicator />
       </Select.Trigger>
-      <Select.Popover className={"rounded-md"}>
-        <ListBox className="rounded-md!">
+      <Select.Popover>
+        <ListBox >
           {books.map((book) => (
             <ListBox.Item
               id={book.id}
