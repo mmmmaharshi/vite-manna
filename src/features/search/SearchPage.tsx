@@ -87,7 +87,7 @@ const SearchPage = ({ onNavigateToReader }: SearchPageProps) => {
             </Typography.Paragraph>
           </section>
         ) : (
-          <section className="max-w-md sm:max-w-lg md:max-w-xl lg:max-w-2xl xl:max-w-3xl w-full px-2 py-4 mx-auto flex flex-col gap-2">
+          <section role="status" aria-live="polite" className="max-w-md sm:max-w-lg md:max-w-xl lg:max-w-2xl xl:max-w-3xl w-full px-2 py-4 mx-auto flex flex-col gap-2">
             <Typography.Paragraph size="sm" color="muted" className="px-1">
               {results.length} result{results.length !== 1 ? "s" : ""}
             </Typography.Paragraph>

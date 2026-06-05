@@ -13,17 +13,17 @@ interface PeriodicSyncManager {
   unregister: (tag: string) => Promise<void>;
 }
 
+const SystemIcon = () => (
+  <svg className="h-4 w-4" viewBox="0 0 16 16" fill="currentColor">
+    <circle cx="8" cy="8" r="3" />
+    <path d="M8 1v2M8 13v2M2.05 2.05l1.41 1.41M12.54 12.54l1.41 1.41M1 8h2M13 8h2M2.05 13.95l1.41-1.41M12.54 3.46l1.41-1.41" stroke="currentColor" strokeWidth="1.3" fill="none" strokeLinecap="round" />
+  </svg>
+);
+
 const OPTIONS: { mode: "light" | "dark" | "system"; label: string; Icon: typeof Sun }[] = [
   { mode: "light", label: "Light", Icon: Sun },
   { mode: "dark", label: "Dark", Icon: Moon },
-  {
-    mode: "system", label: "System", Icon: () => (
-      <svg className="h-4 w-4" viewBox="0 0 16 16" fill="currentColor">
-        <circle cx="8" cy="8" r="3" />
-        <path d="M8 1v2M8 13v2M2.05 2.05l1.41 1.41M12.54 12.54l1.41 1.41M1 8h2M13 8h2M2.05 13.95l1.41-1.41M12.54 3.46l1.41-1.41" stroke="currentColor" strokeWidth="1.3" fill="none" strokeLinecap="round" />
-      </svg>
-    )
-  },
+  { mode: "system", label: "System", Icon: SystemIcon },
 ];
 
 const FONT_SIZES: { value: FontSize; label: string }[] = [
