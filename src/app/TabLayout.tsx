@@ -6,6 +6,8 @@ import { cn } from "../shared/lib/cn";
 import { ReaderScreen } from "../features/reader";
 import { useReaderStore } from "../features/reader/store/readerStore";
 import BottomNav from "./BottomNav";
+import InstallPrompt from "../features/update/InstallPrompt";
+import UpdatePrompt from "../features/update/UpdatePrompt";
 import type { TabId } from "./BottomNav";
 
 const HighlightsPage = lazy(() => import("../features/highlights/HighlightsPage"));
@@ -64,6 +66,14 @@ const TabLayout = () => {
         </Suspense>
       )}
       <BottomNav activeTab={activeTab} onTabChange={handleTabChange} />
+      <div className="fixed bottom-0 inset-x-0 z-50 flex flex-col gap-2 p-4 pb-20 pointer-events-none">
+        <div className="pointer-events-auto">
+          <InstallPrompt />
+        </div>
+        <div className="pointer-events-auto">
+          <UpdatePrompt />
+        </div>
+      </div>
     </div>
   );
 };
