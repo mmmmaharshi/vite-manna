@@ -45,7 +45,7 @@ const TestamentProgress = memo(function TestamentProgress({ data, label, onClick
           {data && (
             <div className="h-2.5 flex-1 rounded-full bg-muted/20 overflow-hidden">
               <div
-                className="h-full rounded-full bg-primary transition-all duration-500"
+                className="h-full rounded-full bg-primary transition-all duration-1000 ease-out"
                 style={{ width: `${data.percentage * 100}%` }}
               />
             </div>
@@ -128,26 +128,34 @@ export const ReadingProgressCard = () => {
     <>
       <Surface className="p-3">
         <Typography className="text-sm font-medium mb-2">Reading Progress</Typography>
-        {overall !== null && (
-          <div className="mb-2.5">
-            <div className="flex items-center justify-between mb-1">
-              <Typography className="text-xs text-muted">Total</Typography>
-              <Typography className="text-xs text-muted">
-                {overall.read}/{overall.total}
-              </Typography>
-            </div>
-            <div className="h-3 rounded-full bg-muted/20 overflow-hidden">
-              <div
-                className="h-full rounded-full bg-primary transition-all duration-500"
-                style={{ width: `${overall.percentage * 100}%` }}
-              />
-            </div>
+        {overall === null ? (
+          <div className="flex flex-col gap-2">
+            <div className="skeleton-shimmer h-4 w-full rounded" />
+            <div className="skeleton-shimmer h-10 w-full rounded" />
+            <div className="skeleton-shimmer h-10 w-full rounded" />
           </div>
+        ) : (
+          <>
+            <div className="mb-2.5">
+              <div className="flex items-center justify-between mb-1">
+                <Typography className="text-xs text-muted">Total</Typography>
+                <Typography className="text-xs text-muted">
+                  {overall.read}/{overall.total}
+                </Typography>
+              </div>
+              <div className="h-3 rounded-full bg-muted/20 overflow-hidden">
+                <div
+                  className="h-full rounded-full bg-primary transition-all duration-1000 ease-out"
+                  style={{ width: `${overall.percentage * 100}%` }}
+                />
+              </div>
+            </div>
+            <div className="flex flex-col gap-1.5">
+              <TestamentProgress data={ot} label="Old Testament" onClick={openOt} />
+              <TestamentProgress data={nt} label="New Testament" onClick={openNt} />
+            </div>
+          </>
         )}
-        <div className="flex flex-col gap-1.5">
-          <TestamentProgress data={ot} label="Old Testament" onClick={openOt} />
-          <TestamentProgress data={nt} label="New Testament" onClick={openNt} />
-        </div>
       </Surface>
 
       <Modal>
@@ -173,7 +181,7 @@ export const ReadingProgressCard = () => {
                               {b.name}
                             </Typography>
                             <div className="h-1.5 w-20 rounded-full bg-muted/20 overflow-hidden shrink-0">
-                              <div className={cn("h-full rounded-full transition-all duration-500", isComplete ? "bg-success" : "bg-primary/60")} style={{ width: `${b.percentage * 100}%` }} />
+                              <div className={cn("h-full rounded-full transition-all duration-1000 ease-out", isComplete ? "bg-success" : "bg-primary/60")} style={{ width: `${b.percentage * 100}%` }} />
                             </div>
                             <Typography className="text-xs text-muted w-10 text-right shrink-0">
                               {b.read}/{b.total}

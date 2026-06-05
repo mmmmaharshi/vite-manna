@@ -7,7 +7,7 @@ import { VitePWA } from 'vite-plugin-pwa';
 export default defineConfig({
 	server: {
 		host: true,
-		allowedHosts: true
+		allowedHosts: true,
 	},
 	build: {
 		rollupOptions: {

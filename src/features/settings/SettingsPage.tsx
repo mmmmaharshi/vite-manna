@@ -152,6 +152,14 @@ const SettingsPage = () => {
               </Typography>
             )}
           </Surface>
+
+          <Surface className="p-3">
+            <Typography className="text-sm font-medium mb-2">About</Typography>
+            <Typography className="text-xs text-muted">మన్నా · Manna v1.0.0</Typography>
+            <Typography className="text-xs text-muted mt-0.5">
+              Offline Telugu Bible reader
+            </Typography>
+          </Surface>
         </section>
         <div className="h-[calc(4rem+env(safe-area-inset-bottom))]" />
       </ScrollShadow>
