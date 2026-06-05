@@ -55,7 +55,7 @@ const DailyVerseModal = ({
   };
 
   return (
-    <Modal>
+    <>
       <Modal.Backdrop isOpen={isOpen} onOpenChange={onOpenChange}>
         <Modal.Container size="sm">
           <Modal.Dialog>
@@ -125,7 +125,7 @@ const DailyVerseModal = ({
           />
         </Suspense>
       )}
-    </Modal>
+    </>
   );
 };
 

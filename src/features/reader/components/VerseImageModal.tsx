@@ -67,43 +67,31 @@ const VerseImageModal = ({
   }, [reference, downloadAsImage, today]);
 
   return (
-    <Modal>
-      <Modal.Backdrop isOpen={isOpen} onOpenChange={onOpenChange}>
-        <Modal.Container size="sm">
-          <Modal.Dialog>
-            <Modal.CloseTrigger />
-            <Modal.Header>
-              <Modal.Heading>Share Image</Modal.Heading>
-            </Modal.Header>
-            <Modal.Body>
-              <div className="flex flex-col items-center justify-center gap-4 w-full max-w-[500px] mx-auto">
-                <div className="flex gap-2">
-                  {RATIO_OPTIONS.map((opt) => (
-                    <Button
-                      key={opt.key}
-                      variant={ratio === opt.key ? "primary" : "ghost"}
-                      size="sm"
-                      onPress={() => setRatio(opt.key)}
-                    >
-                      {opt.label}
-                    </Button>
-                  ))}
-                </div>
+    <Modal.Backdrop isOpen={isOpen} onOpenChange={onOpenChange}>
+      <Modal.Container size="sm">
+        <Modal.Dialog>
+          <Modal.CloseTrigger />
+          <Modal.Header>
+            <Modal.Heading>Share Image</Modal.Heading>
+          </Modal.Header>
+          <Modal.Body>
+            <div className="flex flex-col items-center justify-center gap-4 w-full max-w-[500px] mx-auto">
+              <div className="flex gap-2">
+                {RATIO_OPTIONS.map((opt) => (
+                  <Button
+                    key={opt.key}
+                    variant={ratio === opt.key ? "primary" : "ghost"}
+                    size="sm"
+                    onPress={() => setRatio(opt.key)}
+                  >
+                    {opt.label}
+                  </Button>
+                ))}
+              </div>
 
-                <div ref={previewRef} className="w-full max-h-[65vh] rounded-xl overflow-hidden shadow-xl" style={{ aspectRatio: `${cardW}/${cardH}` }}>
-                  <div style={{ transform: `scale(${scale})`, transformOrigin: "top left", width: cardW, height: cardH }}>
-                    <VerseImageCard
-                      verses={verses}
-                      reference={reference}
-                      teluguText={teluguText}
-                      ratio={ratio}
-                    />
-                  </div>
-                </div>
-
-                <div className="absolute -left-[9999px] top-0" aria-hidden="true">
+              <div ref={previewRef} className="w-full max-h-[65vh] rounded-xl overflow-hidden shadow-xl" style={{ aspectRatio: `${cardW}/${cardH}` }}>
+                <div style={{ transform: `scale(${scale})`, transformOrigin: "top left", width: cardW, height: cardH }}>
                   <VerseImageCard
-                    ref={captureRef}
                     verses={verses}
                     reference={reference}
                     teluguText={teluguText}
@@ -111,22 +99,32 @@ const VerseImageModal = ({
                   />
                 </div>
               </div>
-            </Modal.Body>
-            <Modal.Footer className="flex-wrap gap-2">
-              <Button variant="primary" size="sm" isDisabled={isGenerating} onPress={handleShare}>
-                <ArrowUpFromSquare className="h-4 w-4" />
-                Share
-              </Button>
-              <Button variant="secondary" size="sm" isDisabled={isGenerating} onPress={handleDownload}>
-                <FileArrowDown className="h-4 w-4" />
-                Download
-              </Button>
-              <Button slot="close" variant="tertiary" size="sm">Cancel</Button>
-            </Modal.Footer>
-          </Modal.Dialog>
-        </Modal.Container>
-      </Modal.Backdrop>
-    </Modal>
+
+              <div className="absolute -left-[9999px] top-0" aria-hidden="true">
+                <VerseImageCard
+                  ref={captureRef}
+                  verses={verses}
+                  reference={reference}
+                  teluguText={teluguText}
+                  ratio={ratio}
+                />
+              </div>
+            </div>
+          </Modal.Body>
+          <Modal.Footer className="flex-wrap gap-2">
+            <Button variant="primary" size="sm" isDisabled={isGenerating} onPress={handleShare}>
+              <ArrowUpFromSquare className="h-4 w-4" />
+              Share
+            </Button>
+            <Button variant="secondary" size="sm" isDisabled={isGenerating} onPress={handleDownload}>
+              <FileArrowDown className="h-4 w-4" />
+              Download
+            </Button>
+            <Button slot="close" variant="tertiary" size="sm">Cancel</Button>
+          </Modal.Footer>
+        </Modal.Dialog>
+      </Modal.Container>
+    </Modal.Backdrop>
   );
 };
 

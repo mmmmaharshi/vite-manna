@@ -1,10 +1,7 @@
 import { memo, useLayoutEffect, useRef } from "react";
-import { Typography } from "@heroui/react";
-
 import { cn } from "../../../shared/lib/cn";
 import { useHighlights } from "../../highlights/hooks/useHighlights";
 import { useReaderStore } from "../store/readerStore";
-import { SIZE_PROPS } from "../../../shared/lib/fontSize";
 import type { BibleVerse, HighlightColor } from "../../../shared/bible";
 import "./verseList.css";
 
@@ -76,11 +73,17 @@ const VerseList = memo(({ verses }: VerseListProps) => {
               )}
               onClick={() => toggleVerseSelection(verse.id)}
             >
-              <Typography {...SIZE_PROPS[fontSize]} render={({ children, ...dp }) => <span {...dp}>{children}</span>}>
+              <span className={cn(
+                fontSize === "sm" && "text-sm",
+                fontSize === "base" && "text-base",
+                fontSize === "lg" && "text-lg",
+                fontSize === "xl" && "text-xl",
+                fontSize === "2xl" && "text-2xl",
+              )}>
                 <sup className="me-1 text-[0.65em] text-muted">{verse.verse}</sup>
                 {verse.text}
                 {highlightColor && <span aria-hidden="true" className={cn("hl-dot", `hl-dot-${highlightColor}`)} />}
-              </Typography>
+              </span>
             </button>
           </li>
         );
