@@ -76,7 +76,7 @@ export default defineConfig({
 					},
 				],
 			},
-			registerType: 'autoUpdate',
+			registerType: 'prompt',
 			injectManifest: {
 				globPatterns: ['**/*.{css,js,html,svg,woff2}'],
 				globIgnores: ['**/bible.json'],

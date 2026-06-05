@@ -47,7 +47,7 @@ html {
     --highlight-orange: oklch(80% 0.16 65 / 0.4);
 
     /* Theme Colors (Light Mode) */
-    --accent: oklch(52.82% 0.2628 262.87);
+    --accent: oklch(43% 0.22 262.87);
     --accent-foreground: oklch(99.11% 0 0);
     --background: oklch(97.02% 0.002 262.87);
     --border: oklch(90% 0.002 262.87);
