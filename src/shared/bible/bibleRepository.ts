@@ -158,9 +158,14 @@ export function getAllReadChapters() {
   return db.readingHistory.toArray();
 }
 
-export async function getReadingStreak(): Promise<number> {
+export interface ReadingStreak {
+  count: number;
+  readToday: boolean;
+}
+
+export async function getReadingStreak(): Promise<ReadingStreak> {
   const all = await db.readingHistory.toArray();
-  if (all.length === 0) return 0;
+  if (all.length === 0) return { count: 0, readToday: false };
 
   const dates = new Set<number>();
   for (const entry of all) {
@@ -172,8 +177,9 @@ export async function getReadingStreak(): Promise<number> {
   const today = new Date();
   const todayUTC = Date.UTC(today.getFullYear(), today.getMonth(), today.getDate());
   const yesterdayUTC = todayUTC - 86_400_000;
+  const readToday = sorted[0] === todayUTC;
 
-  if (sorted[0] !== todayUTC && sorted[0] !== yesterdayUTC) return 0;
+  if (sorted[0] !== todayUTC && sorted[0] !== yesterdayUTC) return { count: 0, readToday };
 
   let streak = 1;
   for (let i = 1; i < sorted.length; i++) {
@@ -183,7 +189,7 @@ export async function getReadingStreak(): Promise<number> {
       break;
     }
   }
-  return streak;
+  return { count: streak, readToday };
 }
 
 export async function getLastReadChapter() {
