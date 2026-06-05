@@ -26,6 +26,7 @@ Bible reading app (manna) built with Vite + React 19.
 - PR from `dev` into `main` for production releases
 - No direct commits to `dev` or `main`
 - Always run `bun run lint` and `bun run test` before committing
+- **Bump `package.json` version** before every PR into `main` (use semver: `major.minor.patch`)
 
 ## Testing
 
