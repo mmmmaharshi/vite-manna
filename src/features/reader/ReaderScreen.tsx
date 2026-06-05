@@ -1,8 +1,11 @@
-import { useEffect, useRef } from "react";
+import { useEffect, useMemo, useRef } from "react";
+import { ChevronLeft, ChevronRight } from "@gravity-ui/icons";
 import { Button, ScrollShadow, Skeleton, Surface, Typography } from "@heroui/react";
 
 import { cn } from "../../shared/lib/cn";
 import { getBibleBookName, recordChapterRead } from "../../shared/bible";
+import { navigateChapter } from "./hooks/navigateChapter";
+
 import { useBooks } from "./hooks/useBooks";
 import { useReaderSnapshot } from "./hooks/useReaderSnapshot";
 import BookSelect from "./components/BookSelect";
@@ -100,17 +103,43 @@ const ReaderScreen = () => {
   const visibleChapters =
     isReaderTransitioning && visibleBookSummary
       ? Array.from(
-          { length: visibleBookSummary.chapterCount },
-          (_, index) => index + 1,
-        )
+        { length: visibleBookSummary.chapterCount },
+        (_, index) => index + 1,
+      )
       : (snapshot?.chapters ??
-          (visibleBookSummary
-            ? Array.from(
-                { length: visibleBookSummary.chapterCount },
-                (_, index) => index + 1,
-              )
-            : []));
+        (visibleBookSummary
+          ? Array.from(
+            { length: visibleBookSummary.chapterCount },
+            (_, index) => index + 1,
+          )
+          : []));
   const visibleChapter = isReaderTransitioning ? 1 : chapter;
+
+  const isFirstChapter = useMemo(() => {
+    const first = books.at(0);
+    return book === first?.id && chapter === 1;
+  }, [books, book, chapter]);
+
+  const isLastChapter = useMemo(() => {
+    const last = books.at(-1);
+    return book === last?.id && chapter === last?.chapterCount;
+  }, [books, book, chapter]);
+
+  const handlePrevChapter = () => {
+    const next = navigateChapter(books, book, chapter, "prev");
+    if (next) {
+      if (next.book !== book) setBook(next.book);
+      setChapter(next.chapter);
+    }
+  };
+
+  const handleNextChapter = () => {
+    const next = navigateChapter(books, book, chapter, "next");
+    if (next) {
+      if (next.book !== book) setBook(next.book);
+      setChapter(next.chapter);
+    }
+  };
 
   if (hasLoadedBooks && books.length === 0) {
     return (
@@ -129,11 +158,28 @@ const ReaderScreen = () => {
     <main id="main-content" className="h-dvh flex flex-col">
       <Surface className="sticky top-0 z-30 py-2.5 pt-3.5 border border-b">
         <div className="max-w-md sm:max-w-lg md:max-w-xl lg:max-w-2xl flex flex-col gap-2 w-full px-2 mx-auto">
-          <BookSelect
-            books={books}
-            value={visibleBook}
-            visibleBookSummary={visibleBookSummary}
-          />
+          <div className="flex items-stretch gap-1">
+            <Button variant="tertiary" aria-label="Previous chapter" size="sm"
+              isDisabled={isFirstChapter}
+              onPress={handlePrevChapter}
+              className="px-1.5 h-auto"
+            >
+              <ChevronLeft className="h-4 w-4" />
+            </Button>
+            <BookSelect
+              books={books}
+              value={visibleBook}
+              visibleBookSummary={visibleBookSummary}
+              className="flex-1"
+            />
+            <Button variant="tertiary" aria-label="Next chapter"
+              isDisabled={isLastChapter} size="sm"
+              onPress={handleNextChapter}
+              className="px-1.5 h-auto"
+            >
+              <ChevronRight className="h-4 w-4" />
+            </Button>
+          </div>
           <ChapterStrip
             chapters={visibleChapters}
             currentBook={visibleBook}
