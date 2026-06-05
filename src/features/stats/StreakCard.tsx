@@ -1,16 +1,16 @@
 import { useEffect, useState } from "react";
 
-import { getReadingStreak } from "../../shared/bible";
+import { getReadingStreak, type ReadingStreak } from "../../shared/bible";
 import { Surface, Typography } from "@heroui/react";
 
 export const StreakCard = () => {
-  const [streak, setStreak] = useState<number | null>(null);
+  const [data, setData] = useState<ReadingStreak | null>(null);
 
   useEffect(() => {
-    getReadingStreak().then(setStreak);
+    getReadingStreak().then(setData);
   }, []);
 
-  if (streak === null) {
+  if (data === null) {
     return (
       <Surface className="p-3">
         <div className="skeleton-shimmer h-5 w-32 rounded" />
@@ -18,15 +18,27 @@ export const StreakCard = () => {
     );
   }
 
-  if (streak === 0) return null;
+  if (data.count === 0) {
+    return (
+      <Surface className="p-3 flex items-center gap-3">
+        <span className="text-2xl" aria-hidden="true">🔥</span>
+        <div>
+          <Typography className="text-lg font-bold">No streak yet</Typography>
+          <Typography className="text-xs text-muted">
+            Read a chapter today to start your streak
+          </Typography>
+        </div>
+      </Surface>
+    );
+  }
 
   return (
     <Surface className="p-3 flex items-center gap-3">
       <span className="text-2xl" aria-hidden="true">🔥</span>
       <div>
-        <Typography className="text-lg font-bold">{streak}-day streak</Typography>
+        <Typography className="text-lg font-bold">{data.count}-day streak</Typography>
         <Typography className="text-xs text-muted">
-          {streak === 1 ? "Read yesterday to keep it going" : "Keep reading daily to maintain it"}
+          {data.readToday ? "Read again tomorrow to keep it going" : "Read today to keep it going"}
         </Typography>
       </div>
     </Surface>

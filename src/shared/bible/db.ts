@@ -69,6 +69,7 @@ class BibleDB extends Dexie {
     this.version(6).stores({ meta: "key" });
     this.version(8).stores({ highlights: "++id, verseId, book, [book+chapter], updatedAt" });
     this.version(9).stores({ readingHistory: "[book+chapter], book" });
+    this.version(10).stores({ readingHistory: "[book+chapter], book, lastReadAt" });
   }
 }
 

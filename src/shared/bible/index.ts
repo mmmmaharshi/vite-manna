@@ -31,4 +31,5 @@ export {
   getBookChapterCounts,
   getLastReadChapter,
   getReadingStreak,
+  type ReadingStreak,
 } from "./bibleRepository";
