@@ -63,6 +63,7 @@ const VerseList = memo(({ verses }: VerseListProps) => {
             key={verse.id}
             ref={isPermalink ? permalinkRef : null}
             className="relative"
+            style={{ contentVisibility: "auto", containIntrinsicSize: "auto 2.5rem" }}
           >
             {highlightColor && <div aria-hidden="true" className={cn("highlight-strip", `highlight-${highlightColor}`)} />}
             <button

@@ -48,11 +48,12 @@ function useChapterStripScroll({
     lastScrollRestoreKeyRef.current = scrollRestoreKey;
 
     const savedScrollLeft = scrollByBookRef.current.get(currentBook);
-
-    chapterStrip.scrollLeft =
+    const targetScrollLeft =
       savedScrollLeft ??
       activeChapter.offsetLeft -
         (chapterStrip.clientWidth - activeChapter.offsetWidth) / 2;
+
+    chapterStrip.scrollLeft = targetScrollLeft;
 
     if (savedScrollLeft === undefined) {
       activeChapter.scrollIntoView({

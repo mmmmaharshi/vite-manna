@@ -3,6 +3,7 @@
 
 html {
     overflow: hidden;
+    touch-action: manipulation;
 }
 
 @keyframes splash-progress-slide {

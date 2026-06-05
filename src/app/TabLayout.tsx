@@ -13,6 +13,12 @@ const SearchPage = lazy(() => import("../features/search/SearchPage"));
 const SettingsPage = lazy(() => import("../features/settings/SettingsPage"));
 const StatsPage = lazy(() => import("../features/stats/StatsPage"));
 
+const pageFallback = (
+  <div className="min-h-dvh flex items-center justify-center">
+    <Spinner size="lg" aria-label="Loading" />
+  </div>
+);
+
 const TabLayout = () => {
   const [activeTab, setActiveTab] = useState<TabId>("reader");
   const [searchParams, setSearchParams] = useSearchParams();
@@ -38,22 +44,22 @@ const TabLayout = () => {
         <ReaderScreen />
       </div>
       {activeTab === "search" && (
-        <Suspense fallback={<div className="min-h-dvh flex items-center justify-center"><Spinner size="lg" aria-label="Loading" /></div>}>
+        <Suspense fallback={pageFallback}>
           <SearchPage onNavigateToReader={() => setActiveTab("reader")} />
         </Suspense>
       )}
       {activeTab === "highlights" && (
-        <Suspense fallback={<div className="min-h-dvh flex items-center justify-center"><Spinner size="lg" aria-label="Loading" /></div>}>
+        <Suspense fallback={pageFallback}>
           <HighlightsPage onNavigateToReader={() => setActiveTab("reader")} />
         </Suspense>
       )}
       {activeTab === "progress" && (
-        <Suspense fallback={<div className="min-h-dvh flex items-center justify-center"><Spinner size="lg" aria-label="Loading" /></div>}>
+        <Suspense fallback={pageFallback}>
           <StatsPage onNavigateToReader={() => setActiveTab("reader")} />
         </Suspense>
       )}
       {activeTab === "settings" && (
-        <Suspense fallback={<div className="min-h-dvh flex items-center justify-center"><Spinner size="lg" aria-label="Loading" /></div>}>
+        <Suspense fallback={pageFallback}>
           <SettingsPage />
         </Suspense>
       )}
