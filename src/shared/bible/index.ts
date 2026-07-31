@@ -4,8 +4,6 @@ export {
   type BibleVerse,
   type Highlight,
   type HighlightColor,
-  HIGHLIGHT_COLORS,
-  HIGHLIGHT_COLOR_VALUES,
 } from "./db";
 export {
   countVerses,

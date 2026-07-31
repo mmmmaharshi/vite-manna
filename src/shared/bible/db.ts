@@ -27,22 +27,6 @@ export interface Highlight {
   updatedAt: number;
 }
 
-export const HIGHLIGHT_COLORS: HighlightColor[] = [
-  "yellow",
-  "green",
-  "blue",
-  "pink",
-  "orange",
-];
-
-export const HIGHLIGHT_COLOR_VALUES: Record<HighlightColor, string> = {
-  yellow: "var(--highlight-yellow)",
-  green: "var(--highlight-green)",
-  blue: "var(--highlight-blue)",
-  pink: "var(--highlight-pink)",
-  orange: "var(--highlight-orange)",
-};
-
 export const DB_NAME = "BibleDB";
 
 class BibleDB extends Dexie {

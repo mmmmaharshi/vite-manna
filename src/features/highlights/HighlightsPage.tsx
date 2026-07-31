@@ -1,12 +1,10 @@
-import { useMemo, useState } from "react";
+import { useState } from "react";
 import { Copy, PencilToSquare, TrashBin } from "@gravity-ui/icons";
 import {
   AlertDialog,
   Button,
   ScrollShadow,
   Surface,
-  ToggleButton,
-  ToggleButtonGroup,
   toast,
   Tooltip,
   Typography,
@@ -14,7 +12,6 @@ import {
 
 import {
   getBibleBookName,
-  HIGHLIGHT_COLORS,
   type HighlightColor,
 } from "../../shared/bible";
 import { copyToClipboard } from "../../shared/lib/browser";
@@ -39,29 +36,9 @@ const COLOR_STYLES: Record<HighlightColor, string> = {
   orange: "bg-orange-200/60 border-orange-400/40",
 };
 
-const DOT_STYLES: Record<HighlightColor, string> = {
-  yellow: "bg-yellow-400",
-  green: "bg-green-500",
-  blue: "bg-blue-500",
-  pink: "bg-pink-500",
-  orange: "bg-orange-500",
-};
-
 const HighlightsPage = ({ onNavigateToReader }: HighlightsPageProps) => {
   const { highlights, remove, loaded } = useHighlights();
-  const [filterColor, setFilterColor] = useState<HighlightColor | "all">("all");
   const [pendingRemove, setPendingRemove] = useState<HighlightEntry | null>(null);
-  const colorKeys = useMemo(() => new Set([filterColor]), [filterColor]);
-
-  const uniqueColors = useMemo(() => {
-    const set = new Set(highlights.map((h) => h.color));
-    return HIGHLIGHT_COLORS.filter((c) => set.has(c));
-  }, [highlights]);
-
-  const filtered = useMemo(() => {
-    if (filterColor === "all") return highlights;
-    return highlights.filter((h) => h.color === filterColor);
-  }, [highlights, filterColor]);
 
   const navigateToVerse = (book: number, chapter: number, verse: number) => {
     const store = useReaderStore.getState();
@@ -91,28 +68,7 @@ const HighlightsPage = ({ onNavigateToReader }: HighlightsPageProps) => {
             <div className="skeleton-shimmer h-20 w-full max-w-sm rounded-lg" />
             <div className="skeleton-shimmer h-20 w-full max-w-sm rounded-lg" />
           </section>
-        ) : highlights.length > 0 && uniqueColors.length > 1 && (
-          <div className="max-w-md sm:max-w-lg md:max-w-xl lg:max-w-2xl xl:max-w-3xl w-full px-2 mx-auto pt-2">
-            <ScrollShadow hideScrollBar orientation="horizontal">
-              <ToggleButtonGroup
-                selectionMode="single"
-                disallowEmptySelection
-                selectedKeys={colorKeys}
-                onSelectionChange={(keys) => setFilterColor([...keys][0] as HighlightColor | "all")}
-              >
-                <ToggleButton id="all">All ({highlights.length})</ToggleButton>
-                {uniqueColors.map((color) => (
-                  <ToggleButton key={color} id={color}>
-                    <span className={cn("inline-block w-2.5 h-2.5 rounded-full me-1.5", DOT_STYLES[color])} />
-                    {color} ({highlights.filter((h) => h.color === color).length})
-                  </ToggleButton>
-                ))}
-              </ToggleButtonGroup>
-            </ScrollShadow>
-          </div>
-        )}
-
-        {loaded && highlights.length === 0 ? (
+        ) : loaded && highlights.length === 0 ? (
           <section className="max-w-md sm:max-w-lg md:max-w-xl lg:max-w-2xl xl:max-w-3xl w-full px-2 py-24 mx-auto flex flex-col items-center gap-4 text-center">
             <PencilToSquare aria-hidden="true" className="h-10 w-10 sm:h-12 sm:w-12 text-muted" />
             <Typography className="text-base font-medium">No highlights yet</Typography>
@@ -120,13 +76,9 @@ const HighlightsPage = ({ onNavigateToReader }: HighlightsPageProps) => {
               Select a verse and tap the highlight icon to color it
             </Typography.Paragraph>
           </section>
-        ) : loaded && filtered.length === 0 ? (
-          <section className="max-w-md sm:max-w-lg md:max-w-xl lg:max-w-2xl xl:max-w-3xl w-full px-2 py-16 mx-auto text-center">
-            <Typography.Paragraph size="sm" color="muted">No matching highlights</Typography.Paragraph>
-          </section>
-        ) : loaded && (
+        ) : (
           <section className="max-w-md sm:max-w-lg md:max-w-xl lg:max-w-2xl xl:max-w-3xl w-full px-2 py-4 mx-auto flex flex-col gap-2" aria-live="polite" aria-atomic="true">
-            {filtered.map((hl) => (
+            {highlights.map((hl) => (
               <Surface key={hl.id} className={cn("flex flex-col p-3 gap-2 border-l-4", COLOR_STYLES[hl.color])}>
                 <div className="flex items-center gap-2">
                   <button type="button" className="flex-1 min-w-0 text-left" onClick={() => navigateToVerse(hl.book, hl.chapter, hl.verse)}>

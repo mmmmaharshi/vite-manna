@@ -1,11 +1,10 @@
-import { memo, useState } from "react";
-import { ArrowUpFromSquare, Link as LinkIcon, PencilToSquare } from "@gravity-ui/icons";
+import { memo } from "react";
+import { ArrowUpFromSquare, Link as LinkIcon, PencilToSquare, TrashBin } from "@gravity-ui/icons";
 import { Button, Surface, toast, Tooltip } from "@heroui/react";
 
-import { cn } from "../../../shared/lib/cn";
-
-import { getBibleBookName, HIGHLIGHT_COLORS, type BibleVerse, type HighlightColor } from "../../../shared/bible";
+import { getBibleBookName, type BibleVerse } from "../../../shared/bible";
 import { canNativeShare, copyToClipboard } from "../../../shared/lib/browser";
+import { cn } from "../../../shared/lib/cn";
 import { useHighlights } from "../../highlights/hooks/useHighlights";
 import { useReaderStore } from "../store/readerStore";
 
@@ -33,22 +32,6 @@ function buildPermalinkUrl(book: number, chapter: number, verse: number) {
   return url.toString();
 }
 
-const COLOR_BG: Record<HighlightColor, string> = {
-  yellow: "bg-yellow-300/60",
-  green: "bg-green-400/50",
-  blue: "bg-blue-400/50",
-  pink: "bg-pink-400/40",
-  orange: "bg-orange-400/50",
-};
-
-const COLOR_BORDER: Record<HighlightColor, string> = {
-  yellow: "border-yellow-500/60",
-  green: "border-green-500/60",
-  blue: "border-blue-500/60",
-  pink: "border-pink-500/60",
-  orange: "border-orange-500/60",
-};
-
 const VerseActionBarInner = memo(({ verses }: VerseActionBarProps) => {
   const selectedVerseIds = useReaderStore((state) => state.selectedVerseIds);
   const clearVerseSelection = useReaderStore(
@@ -60,14 +43,15 @@ const VerseActionBarInner = memo(({ verses }: VerseActionBarProps) => {
   const book = useReaderStore((state) => state.book);
   const chapter = useReaderStore((state) => state.chapter);
 
-  const { toggle: toggleHighlight } = useHighlights();
-  const [showHighlightPicker, setShowHighlightPicker] = useState(false);
+  const { toggle: toggleHighlight, remove: removeHighlight, highlightedMap } = useHighlights();
   const selectedSet = new Set(selectedVerseIds);
   const selectedVerses = verses.filter((verse) => selectedSet.has(verse.id));
   const sortedVerses = selectedVerses.toSorted((a, b) => a.verse - b.verse);
   const text = buildShareText(sortedVerses, book, chapter);
   const singleSelectedVerse =
     sortedVerses.length === 1 ? sortedVerses[0] : null;
+  const allSelectedHighlighted =
+    sortedVerses.length > 0 && sortedVerses.every((verse) => highlightedMap.has(verse.id));
 
   const handleShare = async () => {
     if (selectedVerses.length === 0) return;
@@ -99,15 +83,24 @@ const VerseActionBarInner = memo(({ verses }: VerseActionBarProps) => {
     }
   };
 
-  const handlePickColor = (color: HighlightColor) => {
+  const handleToggleHighlight = () => {
     for (const verse of selectedVerses) {
-      toggleHighlight(verse, color);
+      toggleHighlight(verse, "yellow");
     }
-    setShowHighlightPicker(false);
     clearVerseSelection();
   };
 
-  const cols = singleSelectedVerse !== null ? "grid-cols-3" : "grid-cols-2";
+  const handleRemoveHighlight = () => {
+    for (const verse of selectedVerses) {
+      removeHighlight(verse.id);
+    }
+    toast("Highlight removed", { variant: "success" });
+    clearVerseSelection();
+  };
+
+  const cols = singleSelectedVerse !== null
+    ? (allSelectedHighlighted ? "grid-cols-4" : "grid-cols-3")
+    : (allSelectedHighlighted ? "grid-cols-3" : "grid-cols-2");
 
   return (
     <div className="fixed inset-x-0 bottom-[3.5rem] z-40 px-3 pb-[max(0.75rem,env(safe-area-inset-bottom))] pt-3 pointer-events-none" style={{ overscrollBehavior: "contain" }}>
@@ -121,57 +114,42 @@ const VerseActionBarInner = memo(({ verses }: VerseActionBarProps) => {
           </Button>
         </div>
 
-        {showHighlightPicker ? (
-          <div className="flex flex-col gap-2">
-            <span className="text-xs text-muted font-medium">Highlight color</span>
-            <div className="flex gap-2 justify-center">
-              {HIGHLIGHT_COLORS.map((color) => (
-                <Tooltip key={color} delay={0}>
-                  <Button
-                    isIconOnly
-                    variant="ghost"
-                    aria-label={`Highlight ${color}`}
-                    className={cn("h-10 w-10 rounded-full border-2", COLOR_BG[color], COLOR_BORDER[color])}
-                    onPress={() => handlePickColor(color)}
-                  />
-                  <Tooltip.Content placement="top">{color}</Tooltip.Content>
-                </Tooltip>
-              ))}
-            </div>
-            <Button variant="tertiary" size="sm" className="mt-1" onPress={() => setShowHighlightPicker(false)}>
-              Back
+        <div className={cn("grid", cols, "gap-2")}>
+          {singleSelectedVerse !== null && (
+            <Tooltip delay={0}>
+              <Button variant="tertiary" isIconOnly aria-label="Copy link to verse" className="h-12 w-full rounded-xl" onPress={handleCopyLink}>
+                <LinkIcon aria-hidden="true" className="h-5 w-5" />
+              </Button>
+              <Tooltip.Content placement="top">Copy Link</Tooltip.Content>
+            </Tooltip>
+          )}
+          <Tooltip delay={0}>
+            <Button variant="tertiary" isIconOnly aria-label="Share verses" className="h-12 w-full rounded-xl" onPress={handleShare}>
+              <ArrowUpFromSquare aria-hidden="true" className="h-5 w-5" />
             </Button>
-          </div>
-        ) : (
-          <div className={cn("grid", cols, "gap-2")}>
-            {singleSelectedVerse !== null && (
-              <Tooltip delay={0}>
-                <Button variant="tertiary" isIconOnly aria-label="Copy link to verse" className="h-12 w-full rounded-xl" onPress={handleCopyLink}>
-                  <LinkIcon aria-hidden="true" className="h-5 w-5" />
-                </Button>
-                <Tooltip.Content placement="top">Copy Link</Tooltip.Content>
-              </Tooltip>
-            )}
+            <Tooltip.Content placement="top">Share</Tooltip.Content>
+          </Tooltip>
+          <Tooltip delay={0}>
+            <Button
+              variant="tertiary"
+              isIconOnly
+              aria-label="Toggle highlight"
+              className="h-12 w-full rounded-xl"
+              onPress={handleToggleHighlight}
+            >
+              <PencilToSquare aria-hidden="true" className="h-5 w-5" />
+            </Button>
+            <Tooltip.Content placement="top">Highlight</Tooltip.Content>
+          </Tooltip>
+          {allSelectedHighlighted && (
             <Tooltip delay={0}>
-              <Button variant="tertiary" isIconOnly aria-label="Share verses" className="h-12 w-full rounded-xl" onPress={handleShare}>
-                <ArrowUpFromSquare aria-hidden="true" className="h-5 w-5" />
+              <Button variant="tertiary" isIconOnly aria-label="Remove highlight" className="h-12 w-full rounded-xl" onPress={handleRemoveHighlight}>
+                <TrashBin aria-hidden="true" className="h-5 w-5" />
               </Button>
-              <Tooltip.Content placement="top">Share</Tooltip.Content>
+              <Tooltip.Content placement="top">Remove Highlight</Tooltip.Content>
             </Tooltip>
-            <Tooltip delay={0}>
-              <Button
-                variant="tertiary"
-                isIconOnly
-                aria-label="Choose highlight color"
-                className="h-12 w-full rounded-xl"
-                onPress={() => setShowHighlightPicker(true)}
-              >
-                <PencilToSquare aria-hidden="true" className="h-5 w-5" />
-              </Button>
-              <Tooltip.Content placement="top">Highlight</Tooltip.Content>
-            </Tooltip>
-          </div>
-        )}
+          )}
+        </div>
       </Surface>
     </div>
   );
