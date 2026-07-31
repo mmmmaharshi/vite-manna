@@ -1,5 +1,5 @@
-import { lazy, memo, Suspense, useState } from "react";
-import { ArrowUpFromSquare, Copy, Link as LinkIcon, Picture, PencilToSquare } from "@gravity-ui/icons";
+import { memo, useState } from "react";
+import { ArrowUpFromSquare, Copy, Link as LinkIcon, PencilToSquare } from "@gravity-ui/icons";
 import { Button, Surface, toast, Tooltip } from "@heroui/react";
 
 import { cn } from "../../../shared/lib/cn";
@@ -9,16 +9,8 @@ import { canNativeShare, copyToClipboard } from "../../../shared/lib/browser";
 import { useHighlights } from "../../highlights/hooks/useHighlights";
 import { useReaderStore } from "../store/readerStore";
 
-const VerseImageModal = lazy(() => import("./VerseImageModal"));
-
 interface VerseActionBarProps {
   verses: BibleVerse[];
-}
-
-interface ImageModalState {
-  verses: { text: string; verse: number }[];
-  reference: string;
-  teluguText: string;
 }
 
 function formatReference(book: number, chapter: number) {
@@ -41,10 +33,6 @@ function buildPermalinkUrl(book: number, chapter: number, verse: number) {
   return url.toString();
 }
 
-interface VerseActionBarInnerProps extends VerseActionBarProps {
-  onShareAsImage: (data: ImageModalState) => void;
-}
-
 const COLOR_BG: Record<HighlightColor, string> = {
   yellow: "bg-yellow-300/60 dark:bg-yellow-400/30",
   green: "bg-green-400/50 dark:bg-green-400/25",
@@ -61,7 +49,7 @@ const COLOR_BORDER: Record<HighlightColor, string> = {
   orange: "border-orange-500/60",
 };
 
-const VerseActionBarInner = memo(({ verses, onShareAsImage }: VerseActionBarInnerProps) => {
+const VerseActionBarInner = memo(({ verses }: VerseActionBarProps) => {
   const selectedVerseIds = useReaderStore((state) => state.selectedVerseIds);
   const clearVerseSelection = useReaderStore(
     (state) => state.clearVerseSelection,
@@ -80,13 +68,6 @@ const VerseActionBarInner = memo(({ verses, onShareAsImage }: VerseActionBarInne
   const text = buildShareText(sortedVerses, book, chapter);
   const singleSelectedVerse =
     sortedVerses.length === 1 ? sortedVerses[0] : null;
-
-  const imageTeluguText = sortedVerses.map((v) => v.text).join("  ");
-  const bookName = getBibleBookName(book);
-  const imageReference =
-    sortedVerses.length === 1
-      ? `${bookName} ${chapter}:${sortedVerses[0].verse}`
-      : `${bookName} ${chapter}:${sortedVerses[0].verse}-${sortedVerses[sortedVerses.length - 1].verse}`;
 
   const handleCopy = async () => {
     if (selectedVerses.length === 0) return;
@@ -115,15 +96,6 @@ const VerseActionBarInner = memo(({ verses, onShareAsImage }: VerseActionBarInne
     }
   };
 
-  const handleShareAsImage = () => {
-    if (sortedVerses.length === 0) return;
-    onShareAsImage({
-      verses: sortedVerses,
-      reference: imageReference,
-      teluguText: imageTeluguText,
-    });
-  };
-
   const handleCopyLink = async () => {
     if (singleSelectedVerse === null) return;
 
@@ -146,7 +118,7 @@ const VerseActionBarInner = memo(({ verses, onShareAsImage }: VerseActionBarInne
     clearVerseSelection();
   };
 
-  const cols = singleSelectedVerse !== null ? "grid-cols-3 sm:grid-cols-5" : "grid-cols-3 sm:grid-cols-4";
+  const cols = singleSelectedVerse !== null ? "grid-cols-4" : "grid-cols-3";
 
   return (
     <div className="fixed inset-x-0 bottom-[3.5rem] z-40 px-3 pb-[max(0.75rem,env(safe-area-inset-bottom))] pt-3 pointer-events-none" style={{ overscrollBehavior: "contain" }}>
@@ -198,12 +170,6 @@ const VerseActionBarInner = memo(({ verses, onShareAsImage }: VerseActionBarInne
               <Tooltip.Content placement="top">Share</Tooltip.Content>
             </Tooltip>
             <Tooltip delay={0}>
-              <Button variant="tertiary" isIconOnly aria-label="Share as image" className="h-12 w-full rounded-xl" onPress={handleShareAsImage}>
-                <Picture aria-hidden="true" className="h-5 w-5" />
-              </Button>
-              <Tooltip.Content placement="top">Share as Image</Tooltip.Content>
-            </Tooltip>
-            <Tooltip delay={0}>
               <Button variant="tertiary" isIconOnly aria-label="Copy verses" className="h-12 w-full rounded-xl" onPress={handleCopy}>
                 <Copy aria-hidden="true" className="h-5 w-5" />
               </Button>
@@ -230,32 +196,10 @@ const VerseActionBarInner = memo(({ verses, onShareAsImage }: VerseActionBarInne
 
 const VerseActionBar = ({ verses }: VerseActionBarProps) => {
   const isSelectionMode = useReaderStore((state) => state.isSelectionMode);
-  const clearVerseSelection = useReaderStore((state) => state.clearVerseSelection);
-  const [imageModalData, setImageModalData] = useState<ImageModalState | null>(null);
 
-  if (!isSelectionMode && !imageModalData) return null;
+  if (!isSelectionMode) return null;
 
-  return (
-    <>
-      {isSelectionMode && <VerseActionBarInner verses={verses} onShareAsImage={setImageModalData} />}
-      {imageModalData && (
-        <Suspense fallback={null}>
-          <VerseImageModal
-            isOpen={!!imageModalData}
-            onOpenChange={(open) => {
-              if (!open) {
-                setImageModalData(null);
-                clearVerseSelection();
-              }
-            }}
-            verses={imageModalData.verses}
-            reference={imageModalData.reference}
-            teluguText={imageModalData.teluguText}
-          />
-        </Suspense>
-      )}
-    </>
-  );
+  return <VerseActionBarInner verses={verses} />;
 };
 
 export default VerseActionBar;
