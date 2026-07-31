@@ -20,5 +20,4 @@ export {
   getHighlightsForChapter,
   updateHighlightNote,
   searchVerses,
-  parseVerseref,
 } from "./bibleRepository";

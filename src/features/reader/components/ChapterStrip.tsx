@@ -1,10 +1,7 @@
-import { lazy, memo, Suspense, useLayoutEffect, useRef, useState, type RefObject } from "react";
-import { Sparkles } from "@gravity-ui/icons";
+import { memo, useLayoutEffect, useRef, type RefObject } from "react";
 import { Button, ScrollShadow } from "@heroui/react";
 
 import { useReaderStore } from "../store/readerStore";
-
-const DailyVerseModal = lazy(() => import("./DailyVerseModal"));
 
 interface ChapterStripProps {
   chapters: number[];
@@ -118,23 +115,11 @@ const ChapterStrip = memo(({
     visibleChaptersLength: chapters.length,
   });
 
-  const [isDailyVerseOpen, setIsDailyVerseOpen] = useState(false);
-  const handleDailyVerseNavigate = (book: number, chapter: number, verse: number) => {
-    setIsDailyVerseOpen(false);
-    useReaderStore.getState().setBook(book);
-    useReaderStore.getState().setChapter(chapter);
-    useReaderStore.getState().setPermalinkVerse(verse);
-  };
-
   if (chapters.length === 0) return null;
 
   return (
     <div className="flex items-center gap-1">
-      <Button isIconOnly size="sm" variant="tertiary" aria-label="Verse of the Day"
-        className="shrink-0" onPress={() => setIsDailyVerseOpen(true)}>
-        <Sparkles aria-hidden="true" className="h-4 w-4" />
-      </Button>
-    <ScrollShadow
+      <ScrollShadow
       ref={chapterStripRef}
       hideScrollBar
       orientation="horizontal"
@@ -156,14 +141,7 @@ const ChapterStrip = memo(({
           </Button>
         ))}
       </div>
-    </ScrollShadow>
-      <Suspense fallback={null}>
-        <DailyVerseModal
-          isOpen={isDailyVerseOpen}
-          onOpenChange={setIsDailyVerseOpen}
-          onNavigateToChapter={handleDailyVerseNavigate}
-        />
-      </Suspense>
+      </ScrollShadow>
     </div>
   );
 });

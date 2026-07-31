@@ -1,7 +1,6 @@
 import { useCallback, useMemo, useRef } from "react";
-import { ArrowRotateLeft, Bell, FileArrowDown, FileArrowUp, Moon, Sun } from "@gravity-ui/icons";
+import { ArrowRotateLeft, FileArrowDown, FileArrowUp, Moon, Sun } from "@gravity-ui/icons";
 import { Button, ScrollShadow, Surface, ToggleButton, ToggleButtonGroup, Tooltip, toast, Typography } from "@heroui/react";
-import { useLocalStorage } from "@reactuses/core";
 
 import { version } from "../../../package.json";
 import { useTheme } from "../../shared/hooks/useTheme";
@@ -9,11 +8,6 @@ import { type FontSize } from "../../shared/lib/fontSize";
 import { cn } from "../../shared/lib/cn";
 import { useReaderStore } from "../reader/store/readerStore";
 import { exportBackup, importBackup } from "../../shared/lib/backup";
-
-interface PeriodicSyncManager {
-  register: (tag: string, options: { minInterval: number }) => Promise<void>;
-  unregister: (tag: string) => Promise<void>;
-}
 
 const SystemIcon = () => (
   <svg className="h-4 w-4" viewBox="0 0 16 16" fill="currentColor">
@@ -38,13 +32,10 @@ const FONT_SIZES: { value: FontSize; label: string }[] = [
 
 const PREVIEW_TEXT = "ఆదియందు దేవుడు ఆకాశమును భూమిని సృష్టించెను. భూమి నిరాకారముగా నిర్జనముగా ఉండెను. అగాధజలముల మీదను అంధకారము కమ్ముకొని యుండెను. దేవుని ఆత్మ జలముల మీద కదలాడుచుండెను. అప్పుడు దేవుడు వెలుగు కలుగునని చెప్పగా వెలుగు కలిగెను.";
 
-const NOTIF_PREF_KEY = "manna.notifications-enabled";
-
 const SettingsPage = () => {
   const { mode, setMode } = useTheme();
   const fontSize = useReaderStore((state) => state.fontSize);
   const setFontSize = useReaderStore((state) => state.setFontSize);
-  const [notifEnabled, setNotifEnabled] = useLocalStorage(NOTIF_PREF_KEY, "false");
 
   const importRef = useRef<HTMLInputElement>(null);
 
@@ -68,26 +59,6 @@ const SettingsPage = () => {
     }
     e.target.value = "";
   }, []);
-
-  const toggleNotifications = useCallback(async () => {
-    if (notifEnabled === "true") {
-      try {
-        const reg = await navigator.serviceWorker.ready;
-        const ps = (reg as unknown as { periodicSync?: PeriodicSyncManager }).periodicSync;
-        if (ps?.unregister) await ps.unregister("daily-verse");
-      } catch { /* periodicSync may not be available */ }
-      setNotifEnabled("false");
-      return;
-    }
-    const perm = await Notification.requestPermission();
-    if (perm !== "granted") return;
-    try {
-      const reg = await navigator.serviceWorker.ready;
-      const ps = (reg as unknown as { periodicSync?: PeriodicSyncManager }).periodicSync;
-        if (ps?.register) await ps.register("daily-verse", { minInterval: 24 * 60 * 60 * 1000 });
-    } catch { /* periodicSync may not be available */ }
-    setNotifEnabled("true");
-  }, [notifEnabled, setNotifEnabled]);
 
   return (
     <main id="main-content" className="h-dvh flex flex-col">
@@ -162,27 +133,6 @@ const SettingsPage = () => {
               </span>
             </div>
           </Surface>
-          <Surface className="p-3">
-            <div className="flex items-center justify-between">
-              <Typography className="text-sm font-medium">Daily Notifications</Typography>
-              <Button
-                variant={notifEnabled === "true" ? "primary" : "tertiary"}
-                size="sm"
-                onPress={toggleNotifications}
-              >
-                <Bell aria-hidden="true" className="h-4 w-4" />
-                {notifEnabled === "true" ? "Enabled" : "Disabled"}
-              </Button>
-            </div>
-            <Typography className="text-xs text-muted mt-1">
-              Receive a daily notification with the verse of the day.
-            </Typography>
-            {typeof Notification !== "undefined" && Notification.permission === "denied" && (
-              <Typography className="text-xs text-danger mt-1">
-                Notification permission was denied. Update your browser settings to re-enable.
-              </Typography>
-            )}
-          </Surface>
 
           <Surface className="p-3">
             <Typography className="text-sm font-medium mb-2">Data</Typography>
@@ -198,7 +148,7 @@ const SettingsPage = () => {
               </Button>
             </div>
             <Typography className="text-xs text-muted mt-2">
-              Export your highlights and reading history as JSON. Import a backup to restore.
+              Export your highlights as JSON. Import a backup to restore.
             </Typography>
           </Surface>
 

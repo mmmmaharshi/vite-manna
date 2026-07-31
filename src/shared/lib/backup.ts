@@ -3,11 +3,8 @@ import { db, type Highlight, type MetaEntry } from "../bible/db";
 const BACKUP_VERSION = 1;
 const LS_KEYS = [
   "theme",
-  "manna.notifications-enabled",
   "manna.reader-location",
   "manna.reader-font-size",
-  "daily-verse-offset",
-  "manna.daily-verse",
 ] as const;
 
 interface BackupData {
