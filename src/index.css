@@ -34,6 +34,12 @@ html {
     will-change: width;
 }
 
+:root {
+    /* Preserve pre-v3.2 tooltip timing */
+    --tooltip-delay: 700ms;
+    --tooltip-close-delay: 0ms;
+}
+
 :root,
 .light,
 .default,
