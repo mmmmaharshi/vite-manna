@@ -83,9 +83,11 @@ const VerseActionBarInner = memo(({ verses }: VerseActionBarProps) => {
     }
   };
 
-  const handleToggleHighlight = () => {
+  const handleHighlight = () => {
     for (const verse of selectedVerses) {
-      toggleHighlight(verse, "yellow");
+      if (!highlightedMap.has(verse.id)) {
+        toggleHighlight(verse, "yellow");
+      }
     }
     clearVerseSelection();
   };
@@ -133,9 +135,9 @@ const VerseActionBarInner = memo(({ verses }: VerseActionBarProps) => {
             <Button
               variant="tertiary"
               isIconOnly
-              aria-label="Toggle highlight"
+              aria-label="Highlight"
               className="h-12 w-full rounded-xl"
-              onPress={handleToggleHighlight}
+              onPress={handleHighlight}
             >
               <PencilToSquare aria-hidden="true" className="h-5 w-5" />
             </Button>
