@@ -1,9 +1,9 @@
-import { Book, ChartLineArrowUp, Gear, Magnifier, PencilToSquare } from "@gravity-ui/icons";
+import { Book, Gear, Magnifier, PencilToSquare } from "@gravity-ui/icons";
 import { Button, Surface } from "@heroui/react";
 
 import { cn } from "../shared/lib/cn";
 
-export type TabId = "reader" | "search" | "highlights" | "progress" | "settings";
+export type TabId = "reader" | "search" | "highlights" | "settings";
 
 interface BottomNavProps {
   activeTab: TabId;
@@ -14,7 +14,6 @@ const TABS: { id: TabId; label: string; Icon: typeof Book }[] = [
   { id: "reader", label: "Reading", Icon: Book },
   { id: "search", label: "Search", Icon: Magnifier },
   { id: "highlights", label: "Highlights", Icon: PencilToSquare },
-  { id: "progress", label: "Progress", Icon: ChartLineArrowUp },
   { id: "settings", label: "Settings", Icon: Gear },
 ];
 

@@ -15,14 +15,30 @@ interface BookSelectProps {
 
 const OT_BOOK_COUNT = 39;
 
+function scrollSelectedBookIntoView() {
+  requestAnimationFrame(() => {
+    requestAnimationFrame(() => {
+      document
+        .querySelector('[role="listbox"] [role="option"][aria-selected="true"]')
+        ?.scrollIntoView({ block: "center" });
+    });
+  });
+}
+
 function renderBookItem(book: BibleBook) {
   return (
-    <ListBox.Item id={book.id} key={book.id} textValue={book.name}>
-      <div className="flex flex-col gap-1">
-        <span>{book.name}</span>
-        <span className="text-xs text-muted">{book.chapterCount} అధ్యాయాలు</span>
-      </div>
-      <ListBox.ItemIndicator />
+    <ListBox.Item
+      id={book.id}
+      key={book.id}
+      textValue={book.name}
+      className="rounded-lg data-[focused=true]:bg-accent/10 data-[selected=true]:bg-accent/15"
+    >
+      {({ isSelected }) => (
+        <div className="flex flex-col gap-1">
+          <span className={cn(isSelected && "font-semibold text-accent")}>{book.name}</span>
+          <span className="text-xs text-muted">{book.chapterCount} అధ్యాయాలు</span>
+        </div>
+      )}
     </ListBox.Item>
   );
 }
@@ -45,7 +61,12 @@ const BookSelect = memo(({ books, value, visibleBookSummary, className }: BookSe
       isOpen={isBookSelectOpen}
       value={value}
       variant="secondary"
-      onOpenChange={setBookSelectOpen}
+      onOpenChange={(open) => {
+        setBookSelectOpen(open);
+        if (open) {
+          scrollSelectedBookIntoView();
+        }
+      }}
       onChange={(bookId) => {
         if (bookId === null) return;
         selectBook(Number(bookId));

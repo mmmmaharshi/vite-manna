@@ -2,7 +2,7 @@ import { memo, useLayoutEffect, useRef } from "react";
 import { cn } from "../../../shared/lib/cn";
 import { useHighlights } from "../../highlights/hooks/useHighlights";
 import { useReaderStore } from "../store/readerStore";
-import type { BibleVerse, HighlightColor } from "../../../shared/bible";
+import type { BibleVerse } from "../../../shared/bible";
 import "./verseList.css";
 
 interface VerseListProps {
@@ -49,11 +49,11 @@ const VerseList = memo(({ verses }: VerseListProps) => {
   }, [permalinkVerse, verses]);
 
   return (
-    <ol className="flex flex-col gap-1">
+    <ol className="flex flex-col gap-0">
       {verses.map((verse) => {
         const isSelected = selectedSet.has(verse.id);
         const isPermalink = verse.verse === permalinkVerse;
-        const highlightColor = highlightedMap.get(verse.id) as HighlightColor | undefined;
+        const highlightColor = highlightedMap.get(verse.id);
 
         return (
           <li
@@ -79,6 +79,7 @@ const VerseList = memo(({ verses }: VerseListProps) => {
                 fontSize === "lg" && "text-lg",
                 fontSize === "xl" && "text-xl",
                 fontSize === "2xl" && "text-2xl",
+                "leading-relaxed",
               )}>
                 <sup className="me-1 text-[0.65em] text-muted">{verse.verse}</sup>
                 {verse.text}

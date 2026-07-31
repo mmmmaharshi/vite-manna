@@ -2,14 +2,12 @@ import { create } from "zustand";
 import type { HighlightColor } from "../../../shared/bible";
 
 export interface HighlightEntry {
-  id: number;
   verseId: number;
   book: number;
   chapter: number;
   verse: number;
   text: string;
   color: HighlightColor;
-  note: string;
   createdAt: number;
   updatedAt: number;
 }
