@@ -120,7 +120,7 @@ export function loadFontSize(): FontSize {
     const stored = localStorage.getItem(FONT_SIZE_KEY) as FontSize | null;
     if (stored && valid.includes(stored)) return stored;
   } catch { /* localStorage read may fail */ }
-  return "base";
+  return "sm";
 }
 
 export function setStoredFontSize(fontSize: FontSize) {
