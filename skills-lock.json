@@ -19,6 +19,24 @@
       "skillPath": "skills/core-web-vitals/SKILL.md",
       "computedHash": "4684e264c8e3dd529aefe97c3102814e3b63a9ea21a163d0f835ed506773e3f8"
     },
+    "heroui-migration": {
+      "source": "heroui-inc/heroui",
+      "sourceType": "github",
+      "skillPath": "skills/heroui-migration/SKILL.md",
+      "computedHash": "9696b5cf0009120bfe03e00cc94c0e2defc1f5af981fc5bb10b1eeffa53e34cf"
+    },
+    "heroui-native": {
+      "source": "heroui-inc/heroui",
+      "sourceType": "github",
+      "skillPath": "skills/heroui-native/SKILL.md",
+      "computedHash": "d2fc03a13d03678d40799726a144ba72ba1cb08126176ddbf0a0461c901aef29"
+    },
+    "heroui-react": {
+      "source": "heroui-inc/heroui",
+      "sourceType": "github",
+      "skillPath": "skills/heroui-react/SKILL.md",
+      "computedHash": "c9e1bb41fbc3cee782faae08bd465ae05cd685a6ed7cc3392464fdf29b3ab467"
+    },
     "performance": {
       "source": "addyosmani/web-quality-skills",
       "sourceType": "github",
