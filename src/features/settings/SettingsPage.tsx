@@ -1,26 +1,12 @@
 import { useCallback, useMemo, useRef } from "react";
-import { ArrowRotateLeft, FileArrowDown, FileArrowUp, Moon, Sun } from "@gravity-ui/icons";
+import { ArrowRotateLeft, FileArrowDown, FileArrowUp } from "@gravity-ui/icons";
 import { Button, ScrollShadow, Surface, ToggleButton, ToggleButtonGroup, Tooltip, toast, Typography } from "@heroui/react";
 
 import { version } from "../../../package.json";
-import { useTheme } from "../../shared/hooks/useTheme";
 import { type FontSize } from "../../shared/lib/fontSize";
 import { cn } from "../../shared/lib/cn";
 import { useReaderStore } from "../reader/store/readerStore";
 import { exportBackup, importBackup } from "../../shared/lib/backup";
-
-const SystemIcon = () => (
-  <svg className="h-4 w-4" viewBox="0 0 16 16" fill="currentColor">
-    <circle cx="8" cy="8" r="3" />
-    <path d="M8 1v2M8 13v2M2.05 2.05l1.41 1.41M12.54 12.54l1.41 1.41M1 8h2M13 8h2M2.05 13.95l1.41-1.41M12.54 3.46l1.41-1.41" stroke="currentColor" strokeWidth="1.3" fill="none" strokeLinecap="round" />
-  </svg>
-);
-
-const OPTIONS: { mode: "light" | "dark" | "system"; label: string; Icon: typeof Sun }[] = [
-  { mode: "light", label: "Light", Icon: Sun },
-  { mode: "dark", label: "Dark", Icon: Moon },
-  { mode: "system", label: "System", Icon: SystemIcon },
-];
 
 const FONT_SIZES: { value: FontSize; label: string }[] = [
   { value: "sm", label: "S" },
@@ -33,7 +19,6 @@ const FONT_SIZES: { value: FontSize; label: string }[] = [
 const PREVIEW_TEXT = "ఆదియందు దేవుడు ఆకాశమును భూమిని సృష్టించెను. భూమి నిరాకారముగా నిర్జనముగా ఉండెను. అగాధజలముల మీదను అంధకారము కమ్ముకొని యుండెను. దేవుని ఆత్మ జలముల మీద కదలాడుచుండెను. అప్పుడు దేవుడు వెలుగు కలుగునని చెప్పగా వెలుగు కలిగెను.";
 
 const SettingsPage = () => {
-  const { mode, setMode } = useTheme();
   const fontSize = useReaderStore((state) => state.fontSize);
   const setFontSize = useReaderStore((state) => state.setFontSize);
 
@@ -70,26 +55,6 @@ const SettingsPage = () => {
 
       <ScrollShadow hideScrollBar className="flex-1">
         <section className="max-w-md sm:max-w-lg md:max-w-xl lg:max-w-2xl xl:max-w-3xl w-full px-2 py-4 mx-auto flex flex-col gap-2">
-          <Surface className="p-3">
-            <Typography className="text-sm font-medium mb-2">Appearance</Typography>
-            <ToggleButtonGroup
-              fullWidth
-              selectionMode="single"
-              selectedKeys={useMemo(() => new Set([mode]), [mode])}
-              onSelectionChange={(keys) => {
-                const value = [...keys][0] as string;
-                if (value) setMode(value as "light" | "dark" | "system");
-              }}
-            >
-              {OPTIONS.map(({ mode: m, label, Icon }) => (
-                <ToggleButton key={m} id={m}>
-                  <Icon aria-hidden="true" className="h-4 w-4" />
-                  {label}
-                </ToggleButton>
-              ))}
-            </ToggleButtonGroup>
-          </Surface>
-
           <Surface className="p-3">
             <div className="flex items-center justify-between mb-2">
               <Typography className="text-sm font-medium">Font Size</Typography>

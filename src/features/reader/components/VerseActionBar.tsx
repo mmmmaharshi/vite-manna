@@ -34,11 +34,11 @@ function buildPermalinkUrl(book: number, chapter: number, verse: number) {
 }
 
 const COLOR_BG: Record<HighlightColor, string> = {
-  yellow: "bg-yellow-300/60 dark:bg-yellow-400/30",
-  green: "bg-green-400/50 dark:bg-green-400/25",
-  blue: "bg-blue-400/50 dark:bg-blue-400/25",
-  pink: "bg-pink-400/40 dark:bg-pink-400/20",
-  orange: "bg-orange-400/50 dark:bg-orange-400/25",
+  yellow: "bg-yellow-300/60",
+  green: "bg-green-400/50",
+  blue: "bg-blue-400/50",
+  pink: "bg-pink-400/40",
+  orange: "bg-orange-400/50",
 };
 
 const COLOR_BORDER: Record<HighlightColor, string> = {

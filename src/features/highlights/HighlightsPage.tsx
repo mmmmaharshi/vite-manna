@@ -38,19 +38,19 @@ function formatRef(book: number, chapter: number, verse: number) {
 const MAX_NOTE_LENGTH = 120;
 
 const COLOR_STYLES: Record<HighlightColor, string> = {
-  yellow: "bg-yellow-200/70 dark:bg-yellow-500/20 border-yellow-400/40",
-  green: "bg-green-200/60 dark:bg-green-500/20 border-green-400/40",
-  blue: "bg-blue-200/60 dark:bg-blue-500/20 border-blue-400/40",
-  pink: "bg-pink-200/50 dark:bg-pink-500/15 border-pink-400/40",
-  orange: "bg-orange-200/60 dark:bg-orange-500/20 border-orange-400/40",
+  yellow: "bg-yellow-200/70 border-yellow-400/40",
+  green: "bg-green-200/60 border-green-400/40",
+  blue: "bg-blue-200/60 border-blue-400/40",
+  pink: "bg-pink-200/50 border-pink-400/40",
+  orange: "bg-orange-200/60 border-orange-400/40",
 };
 
 const DOT_STYLES: Record<HighlightColor, string> = {
-  yellow: "bg-yellow-400 dark:bg-yellow-400",
-  green: "bg-green-500 dark:bg-green-400",
-  blue: "bg-blue-500 dark:bg-blue-400",
-  pink: "bg-pink-500 dark:bg-pink-400",
-  orange: "bg-orange-500 dark:bg-orange-400",
+  yellow: "bg-yellow-400",
+  green: "bg-green-500",
+  blue: "bg-blue-500",
+  pink: "bg-pink-500",
+  orange: "bg-orange-500",
 };
 
 const HighlightsPage = ({ onNavigateToReader }: HighlightsPageProps) => {
