@@ -1,5 +1,5 @@
 import { memo, useState } from "react";
-import { ArrowUpFromSquare, Copy, Link as LinkIcon, PencilToSquare } from "@gravity-ui/icons";
+import { ArrowUpFromSquare, Link as LinkIcon, PencilToSquare } from "@gravity-ui/icons";
 import { Button, Surface, toast, Tooltip } from "@heroui/react";
 
 import { cn } from "../../../shared/lib/cn";
@@ -69,17 +69,6 @@ const VerseActionBarInner = memo(({ verses }: VerseActionBarProps) => {
   const singleSelectedVerse =
     sortedVerses.length === 1 ? sortedVerses[0] : null;
 
-  const handleCopy = async () => {
-    if (selectedVerses.length === 0) return;
-
-    try {
-      await copyToClipboard(text);
-      toast("Verses copied to clipboard", { variant: "success" });
-    } catch {
-      toast("Failed to copy verses", { variant: "danger" });
-    }
-  };
-
   const handleShare = async () => {
     if (selectedVerses.length === 0) return;
 
@@ -118,7 +107,7 @@ const VerseActionBarInner = memo(({ verses }: VerseActionBarProps) => {
     clearVerseSelection();
   };
 
-  const cols = singleSelectedVerse !== null ? "grid-cols-4" : "grid-cols-3";
+  const cols = singleSelectedVerse !== null ? "grid-cols-3" : "grid-cols-2";
 
   return (
     <div className="fixed inset-x-0 bottom-[3.5rem] z-40 px-3 pb-[max(0.75rem,env(safe-area-inset-bottom))] pt-3 pointer-events-none" style={{ overscrollBehavior: "contain" }}>
@@ -168,12 +157,6 @@ const VerseActionBarInner = memo(({ verses }: VerseActionBarProps) => {
                 <ArrowUpFromSquare aria-hidden="true" className="h-5 w-5" />
               </Button>
               <Tooltip.Content placement="top">Share</Tooltip.Content>
-            </Tooltip>
-            <Tooltip delay={0}>
-              <Button variant="tertiary" isIconOnly aria-label="Copy verses" className="h-12 w-full rounded-xl" onPress={handleCopy}>
-                <Copy aria-hidden="true" className="h-5 w-5" />
-              </Button>
-              <Tooltip.Content placement="top">Copy</Tooltip.Content>
             </Tooltip>
             <Tooltip delay={0}>
               <Button
