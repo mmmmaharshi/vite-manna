@@ -52,7 +52,7 @@ const BookSelect = memo(({ books, value, visibleBookSummary, className }: BookSe
             requestAnimationFrame(() => {
               document
                 .querySelector('[role="option"][aria-selected="true"]')
-                ?.scrollIntoView({ block: "nearest" });
+                ?.scrollIntoView({ block: "center" });
             });
           });
         }
