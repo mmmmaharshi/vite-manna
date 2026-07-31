@@ -45,7 +45,18 @@ const BookSelect = memo(({ books, value, visibleBookSummary, className }: BookSe
       isOpen={isBookSelectOpen}
       value={value}
       variant="secondary"
-      onOpenChange={setBookSelectOpen}
+      onOpenChange={(open) => {
+        setBookSelectOpen(open);
+        if (open) {
+          requestAnimationFrame(() => {
+            requestAnimationFrame(() => {
+              document
+                .querySelector('[role="option"][aria-selected="true"]')
+                ?.scrollIntoView({ block: "nearest" });
+            });
+          });
+        }
+      }}
       onChange={(bookId) => {
         if (bookId === null) return;
         selectBook(Number(bookId));
