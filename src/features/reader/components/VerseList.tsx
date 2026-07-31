@@ -49,7 +49,7 @@ const VerseList = memo(({ verses }: VerseListProps) => {
   }, [permalinkVerse, verses]);
 
   return (
-    <ol className="flex flex-col gap-1">
+    <ol className="flex flex-col gap-0">
       {verses.map((verse) => {
         const isSelected = selectedSet.has(verse.id);
         const isPermalink = verse.verse === permalinkVerse;
@@ -79,6 +79,7 @@ const VerseList = memo(({ verses }: VerseListProps) => {
                 fontSize === "lg" && "text-lg",
                 fontSize === "xl" && "text-xl",
                 fontSize === "2xl" && "text-2xl",
+                "leading-relaxed",
               )}>
                 <sup className="me-1 text-[0.65em] text-muted">{verse.verse}</sup>
                 {verse.text}

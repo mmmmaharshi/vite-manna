@@ -68,6 +68,7 @@ const SettingsPage = () => {
                 fontSize === "lg" && "text-lg",
                 fontSize === "xl" && "text-xl",
                 fontSize === "2xl" && "text-2xl",
+                "leading-relaxed",
               )}>
                 <sup className="me-1 text-[0.65em] text-muted">1</sup>
                 {PREVIEW_TEXT}
