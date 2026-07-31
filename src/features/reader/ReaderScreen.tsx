@@ -26,6 +26,7 @@ const ReaderScreen = () => {
   const isSelectionMode = useReaderStore((state) => state.isSelectionMode);
   const setBook = useReaderStore((state) => state.setBook);
   const setChapter = useReaderStore((state) => state.setChapter);
+  const selectBook = useReaderStore((state) => state.selectBook);
 
   useEffect(() => {
     if (books.length > 0 && !books.some((candidate) => candidate.id === book)) {
@@ -94,12 +95,12 @@ const ReaderScreen = () => {
 
   const handlePrevBook = () => {
     const next = books[bookIndex - 1];
-    if (next) setBook(next.id);
+    if (next) selectBook(next.id);
   };
 
   const handleNextBook = () => {
     const next = books[bookIndex + 1];
-    if (next) setBook(next.id);
+    if (next) selectBook(next.id);
   };
 
   if (hasLoadedBooks && books.length === 0) {
@@ -163,11 +164,7 @@ const ReaderScreen = () => {
           )}
           aria-label={selectedBookSummary ? `${getBibleBookName(selectedBookSummary.id)} ${chapter}` : "Bible reader"}
         >
-          {snapshot && (
-            <>
-              <VerseList verses={snapshot.verses} />
-            </>
-          )}
+          {snapshot && <VerseList verses={snapshot.verses} />}
           {!snapshot && hasLoadedBooks && (
             <div className="flex flex-col gap-3" aria-busy="true">
               {SKELETON_WIDTHS.map((w, i) => (

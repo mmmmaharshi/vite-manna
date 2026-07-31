@@ -15,6 +15,16 @@ interface BookSelectProps {
 
 const OT_BOOK_COUNT = 39;
 
+function scrollSelectedBookIntoView() {
+  requestAnimationFrame(() => {
+    requestAnimationFrame(() => {
+      document
+        .querySelector('[role="listbox"] [role="option"][aria-selected="true"]')
+        ?.scrollIntoView({ block: "center" });
+    });
+  });
+}
+
 function renderBookItem(book: BibleBook) {
   return (
     <ListBox.Item
@@ -54,13 +64,7 @@ const BookSelect = memo(({ books, value, visibleBookSummary, className }: BookSe
       onOpenChange={(open) => {
         setBookSelectOpen(open);
         if (open) {
-          requestAnimationFrame(() => {
-            requestAnimationFrame(() => {
-              document
-                .querySelector('[role="option"][aria-selected="true"]')
-                ?.scrollIntoView({ block: "center" });
-            });
-          });
+          scrollSelectedBookIntoView();
         }
       }}
       onChange={(bookId) => {

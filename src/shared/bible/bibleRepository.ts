@@ -1,4 +1,4 @@
-import { db, type BibleVerse } from "./db";
+import { db, DEFAULT_HIGHLIGHT_COLOR, type BibleVerse } from "./db";
 
 export function countVerses() {
   return db.verses.count();
@@ -95,17 +95,12 @@ export function searchVerses(query: string) {
     .toArray();
 }
 
-/* ───── Highlight CRUD ───── */
-
-import type { HighlightColor } from "./db";
-
 export function upsertHighlight(
   verseId: number,
   book: number,
   chapter: number,
   verse: number,
   text: string,
-  color: HighlightColor,
 ) {
   return db.highlights.put({
     verseId,
@@ -113,29 +108,18 @@ export function upsertHighlight(
     chapter,
     verse,
     text,
-    color,
+    color: DEFAULT_HIGHLIGHT_COLOR,
     createdAt: Date.now(),
     updatedAt: Date.now(),
   });
 }
 
 export function removeHighlight(verseId: number) {
-  return db.highlights.where("verseId").equals(verseId).delete();
+  return db.highlights.delete(verseId);
 }
 
 export function getHighlights() {
   return db.highlights.orderBy("updatedAt").reverse().toArray();
-}
-
-export async function getHighlightsForChapter(
-  book: number,
-  chapter: number,
-): Promise<Map<number, HighlightColor>> {
-  const all = await db.highlights
-    .where("[book+chapter]")
-    .equals([book, chapter])
-    .toArray();
-  return new Map(all.map((h) => [h.verseId, h.color]));
 }
 
 

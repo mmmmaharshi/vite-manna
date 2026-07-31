@@ -2,7 +2,7 @@ import { memo, useLayoutEffect, useRef } from "react";
 import { cn } from "../../../shared/lib/cn";
 import { useHighlights } from "../../highlights/hooks/useHighlights";
 import { useReaderStore } from "../store/readerStore";
-import type { BibleVerse, HighlightColor } from "../../../shared/bible";
+import type { BibleVerse } from "../../../shared/bible";
 import "./verseList.css";
 
 interface VerseListProps {
@@ -53,7 +53,7 @@ const VerseList = memo(({ verses }: VerseListProps) => {
       {verses.map((verse) => {
         const isSelected = selectedSet.has(verse.id);
         const isPermalink = verse.verse === permalinkVerse;
-        const highlightColor = highlightedMap.get(verse.id) as HighlightColor | undefined;
+        const highlightColor = highlightedMap.get(verse.id);
 
         return (
           <li

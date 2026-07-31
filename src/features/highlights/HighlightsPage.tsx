@@ -73,13 +73,13 @@ const HighlightsPage = ({ onNavigateToReader }: HighlightsPageProps) => {
             <PencilToSquare aria-hidden="true" className="h-10 w-10 sm:h-12 sm:w-12 text-muted" />
             <Typography className="text-base font-medium">No highlights yet</Typography>
             <Typography.Paragraph size="sm" color="muted">
-              Select a verse and tap the highlight icon to color it
+              Select a verse and tap the highlight icon to highlight it
             </Typography.Paragraph>
           </section>
         ) : (
           <section className="max-w-md sm:max-w-lg md:max-w-xl lg:max-w-2xl xl:max-w-3xl w-full px-2 py-4 mx-auto flex flex-col gap-2" aria-live="polite" aria-atomic="true">
             {highlights.map((hl) => (
-              <Surface key={hl.id} className={cn("flex flex-col p-3 gap-2 border-l-4", COLOR_STYLES[hl.color])}>
+              <Surface key={hl.verseId} className={cn("flex flex-col p-3 gap-2 border-l-4", COLOR_STYLES[hl.color])}>
                 <div className="flex items-center gap-2">
                   <button type="button" className="flex-1 min-w-0 text-left" onClick={() => navigateToVerse(hl.book, hl.chapter, hl.verse)}>
                     <Typography className="text-sm font-medium text-accent">

@@ -43,15 +43,16 @@ const VerseActionBarInner = memo(({ verses }: VerseActionBarProps) => {
   const book = useReaderStore((state) => state.book);
   const chapter = useReaderStore((state) => state.chapter);
 
-  const { toggle: toggleHighlight, remove: removeHighlight, highlightedMap } = useHighlights();
+  const { add: addHighlight, remove: removeHighlight, highlightedMap } = useHighlights();
   const selectedSet = new Set(selectedVerseIds);
-  const selectedVerses = verses.filter((verse) => selectedSet.has(verse.id));
-  const sortedVerses = selectedVerses.toSorted((a, b) => a.verse - b.verse);
-  const text = buildShareText(sortedVerses, book, chapter);
+  const selectedVerses = verses
+    .filter((verse) => selectedSet.has(verse.id))
+    .toSorted((a, b) => a.verse - b.verse);
+  const text = buildShareText(selectedVerses, book, chapter);
   const singleSelectedVerse =
-    sortedVerses.length === 1 ? sortedVerses[0] : null;
+    selectedVerses.length === 1 ? selectedVerses[0] : null;
   const allSelectedHighlighted =
-    sortedVerses.length > 0 && sortedVerses.every((verse) => highlightedMap.has(verse.id));
+    selectedVerses.length > 0 && selectedVerses.every((verse) => highlightedMap.has(verse.id));
 
   const handleShare = async () => {
     if (selectedVerses.length === 0) return;
@@ -86,7 +87,7 @@ const VerseActionBarInner = memo(({ verses }: VerseActionBarProps) => {
   const handleHighlight = () => {
     for (const verse of selectedVerses) {
       if (!highlightedMap.has(verse.id)) {
-        toggleHighlight(verse, "yellow");
+        addHighlight(verse);
       }
     }
     clearVerseSelection();

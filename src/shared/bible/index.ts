@@ -1,6 +1,7 @@
 export { getBibleBookName, BIBLE_BOOK_NAMES } from "./books";
 export {
   db,
+  DEFAULT_HIGHLIGHT_COLOR,
   type BibleVerse,
   type Highlight,
   type HighlightColor,
@@ -15,6 +16,5 @@ export {
   upsertHighlight,
   removeHighlight,
   getHighlights,
-  getHighlightsForChapter,
   searchVerses,
 } from "./bibleRepository";

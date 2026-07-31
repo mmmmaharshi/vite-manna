@@ -35,13 +35,13 @@ const SettingsPage = () => {
             <div className="flex items-center justify-between mb-2">
               <Typography className="text-sm font-medium">Font Size</Typography>
               <Tooltip>
-                <Button variant="tertiary" size="sm" onPress={() => setFontSize("sm")}>
+                <Button variant="tertiary" size="sm" onPress={() => setFontSize("base")}>
                   <ArrowRotateLeft aria-hidden="true" className="h-3 w-3" />
                   Reset
                 </Button>
                 <Tooltip.Content showArrow placement="top">
                   <Tooltip.Arrow />
-                  Reset to default (S)
+                  Reset to default (M)
                 </Tooltip.Content>
               </Tooltip>
             </div>

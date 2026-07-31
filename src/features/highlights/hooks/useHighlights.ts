@@ -1,11 +1,11 @@
 import { useCallback, useEffect } from "react";
 
 import {
+  DEFAULT_HIGHLIGHT_COLOR,
   getHighlights,
   removeHighlight as removeHl,
   upsertHighlight as upsertHl,
   type BibleVerse,
-  type HighlightColor,
 } from "../../../shared/bible";
 import { useHighlightStore } from "../store/highlightStore";
 
@@ -23,13 +23,7 @@ export function useHighlights() {
     let mounted = true;
     void getHighlights().then(
       (hlList) => {
-        if (mounted)
-          hydrate(
-            hlList.map((h) => ({
-              ...h,
-              id: h.id!,
-            })),
-          );
+        if (mounted) hydrate(hlList);
       },
     );
 
@@ -39,22 +33,25 @@ export function useHighlights() {
   }, [loaded, hydrate]);
 
   const add = useCallback(
-    (verse: BibleVerse, color: HighlightColor) => {
-      void upsertHl(verse.id, verse.book, verse.chapter, verse.verse, verse.text, color).then(
-        () => {
-          upsertLocal({
-            id: verse.id,
-            verseId: verse.id,
-            book: verse.book,
-            chapter: verse.chapter,
-            verse: verse.verse,
-            text: verse.text,
-            color,
-            createdAt: Date.now(),
-            updatedAt: Date.now(),
-          });
-        },
-      );
+    (verse: BibleVerse) => {
+      void upsertHl(
+        verse.id,
+        verse.book,
+        verse.chapter,
+        verse.verse,
+        verse.text,
+      ).then(() => {
+        upsertLocal({
+          verseId: verse.id,
+          book: verse.book,
+          chapter: verse.chapter,
+          verse: verse.verse,
+          text: verse.text,
+          color: DEFAULT_HIGHLIGHT_COLOR,
+          createdAt: Date.now(),
+          updatedAt: Date.now(),
+        });
+      });
     },
     [upsertLocal],
   );
@@ -66,30 +63,11 @@ export function useHighlights() {
     [removeLocal],
   );
 
-  const toggle = useCallback(
-    (verse: BibleVerse, color: HighlightColor) => {
-      const existing = highlightedMap.get(verse.id);
-      if (existing === color) {
-        remove(verse.id);
-      } else {
-        add(verse, color);
-      }
-    },
-    [highlightedMap, add, remove],
-  );
-
-  const getColor = useCallback(
-    (verseId: number): HighlightColor | undefined => highlightedMap.get(verseId),
-    [highlightedMap],
-  );
-
   return {
     highlights,
     highlightedMap,
     loaded,
     add,
     remove,
-    toggle,
-    getColor,
   };
 }
