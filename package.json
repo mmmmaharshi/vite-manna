@@ -1,7 +1,7 @@
 {
   "name": "vite-manna",
   "private": true,
-  "version": "1.4.0",
+  "version": "1.4.1",
   "type": "module",
   "scripts": {
     "dev": "vite",
@@ -21,7 +21,6 @@
     "date-fns": "^4.4.0",
     "dexie": "^4.4.4",
     "es-toolkit": "^1.50.0",
-    "html-to-image": "^1.11.13",
     "react": "^19.2.8",
     "react-aria": "^3.50.0",
     "react-aria-components": "^1.19.0",

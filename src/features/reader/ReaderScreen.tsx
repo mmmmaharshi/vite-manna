@@ -1,10 +1,9 @@
-import { useEffect, useMemo, useRef } from "react";
+import { useEffect, useRef } from "react";
 import { ChevronLeft, ChevronRight } from "@gravity-ui/icons";
 import { Button, ScrollShadow, Skeleton, Surface, Typography } from "@heroui/react";
 
 import { cn } from "../../shared/lib/cn";
-import { getBibleBookName, recordChapterRead } from "../../shared/bible";
-import { navigateChapter } from "./hooks/navigateChapter";
+import { getBibleBookName } from "../../shared/bible";
 
 import { useBooks } from "./hooks/useBooks";
 import { useReaderSnapshot } from "./hooks/useReaderSnapshot";
@@ -27,6 +26,7 @@ const ReaderScreen = () => {
   const isSelectionMode = useReaderStore((state) => state.isSelectionMode);
   const setBook = useReaderStore((state) => state.setBook);
   const setChapter = useReaderStore((state) => state.setChapter);
+  const selectBook = useReaderStore((state) => state.selectBook);
 
   useEffect(() => {
     if (books.length > 0 && !books.some((candidate) => candidate.id === book)) {
@@ -69,32 +69,6 @@ const ReaderScreen = () => {
     selectedBookSummary?.chapterCount,
   );
 
-  const recordedRef = useRef<{ book: number; chapter: number } | null>(null);
-  const sentinelRef = useRef<HTMLDivElement | null>(null);
-
-  useEffect(() => {
-    recordedRef.current = null;
-  }, [book, chapter]);
-
-  useEffect(() => {
-    if (!snapshot || !sentinelRef.current) return;
-
-    const sentinel = sentinelRef.current;
-    const observer = new IntersectionObserver(
-      (entries) => {
-        if (!entries[0]?.isIntersecting) return;
-        const prev = recordedRef.current;
-        if (prev && prev.book === book && prev.chapter === chapter) return;
-        recordedRef.current = { book, chapter };
-        recordChapterRead(book, chapter);
-      },
-      { threshold: 0.5 },
-    );
-
-    observer.observe(sentinel);
-    return () => observer.disconnect();
-  }, [snapshot, book, chapter]);
-
   const visibleBook = pendingBook ?? snapshot?.book ?? book;
   const visibleBookSummary = books.find(
     (candidate) => candidate.id === visibleBook,
@@ -115,30 +89,18 @@ const ReaderScreen = () => {
           : []));
   const visibleChapter = isReaderTransitioning ? 1 : chapter;
 
-  const isFirstChapter = useMemo(() => {
-    const first = books.at(0);
-    return book === first?.id && chapter === 1;
-  }, [books, book, chapter]);
+  const bookIndex = books.findIndex((candidate) => candidate.id === book);
+  const isFirstBook = bookIndex <= 0;
+  const isLastBook = bookIndex >= books.length - 1;
 
-  const isLastChapter = useMemo(() => {
-    const last = books.at(-1);
-    return book === last?.id && chapter === last?.chapterCount;
-  }, [books, book, chapter]);
-
-  const handlePrevChapter = () => {
-    const next = navigateChapter(books, book, chapter, "prev");
-    if (next) {
-      if (next.book !== book) setBook(next.book);
-      setChapter(next.chapter);
-    }
+  const handlePrevBook = () => {
+    const next = books[bookIndex - 1];
+    if (next) selectBook(next.id);
   };
 
-  const handleNextChapter = () => {
-    const next = navigateChapter(books, book, chapter, "next");
-    if (next) {
-      if (next.book !== book) setBook(next.book);
-      setChapter(next.chapter);
-    }
+  const handleNextBook = () => {
+    const next = books[bookIndex + 1];
+    if (next) selectBook(next.id);
   };
 
   if (hasLoadedBooks && books.length === 0) {
@@ -159,9 +121,9 @@ const ReaderScreen = () => {
       <Surface className="sticky top-0 z-30 py-2.5 pt-3.5 border border-b">
         <div className="max-w-md sm:max-w-lg md:max-w-xl lg:max-w-2xl flex flex-col gap-2 w-full px-2 mx-auto">
           <div className="flex items-stretch gap-1">
-            <Button variant="tertiary" aria-label="Previous chapter" size="sm"
-              isDisabled={isFirstChapter}
-              onPress={handlePrevChapter}
+            <Button variant="tertiary" aria-label="Previous book" size="sm"
+              isDisabled={isFirstBook}
+              onPress={handlePrevBook}
               className="px-1.5 h-auto"
             >
               <ChevronLeft className="h-4 w-4" />
@@ -172,9 +134,9 @@ const ReaderScreen = () => {
               visibleBookSummary={visibleBookSummary}
               className="flex-1"
             />
-            <Button variant="tertiary" aria-label="Next chapter"
-              isDisabled={isLastChapter} size="sm"
-              onPress={handleNextChapter}
+            <Button variant="tertiary" aria-label="Next book"
+              isDisabled={isLastBook} size="sm"
+              onPress={handleNextBook}
               className="px-1.5 h-auto"
             >
               <ChevronRight className="h-4 w-4" />
@@ -202,12 +164,7 @@ const ReaderScreen = () => {
           )}
           aria-label={selectedBookSummary ? `${getBibleBookName(selectedBookSummary.id)} ${chapter}` : "Bible reader"}
         >
-          {snapshot && (
-            <>
-              <VerseList verses={snapshot.verses} />
-              <div ref={sentinelRef} className="h-4" />
-            </>
-          )}
+          {snapshot && <VerseList verses={snapshot.verses} />}
           {!snapshot && hasLoadedBooks && (
             <div className="flex flex-col gap-3" aria-busy="true">
               {SKELETON_WIDTHS.map((w, i) => (

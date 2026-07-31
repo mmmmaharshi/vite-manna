@@ -13,7 +13,6 @@ import type { TabId } from "./BottomNav";
 const HighlightsPage = lazy(() => import("../features/highlights/HighlightsPage"));
 const SearchPage = lazy(() => import("../features/search/SearchPage"));
 const SettingsPage = lazy(() => import("../features/settings/SettingsPage"));
-const StatsPage = lazy(() => import("../features/stats/StatsPage"));
 
 const pageFallback = (
   <div className="min-h-dvh flex items-center justify-center">
@@ -53,11 +52,6 @@ const TabLayout = () => {
       {activeTab === "highlights" && (
         <Suspense fallback={pageFallback}>
           <HighlightsPage onNavigateToReader={() => setActiveTab("reader")} />
-        </Suspense>
-      )}
-      {activeTab === "progress" && (
-        <Suspense fallback={pageFallback}>
-          <StatsPage onNavigateToReader={() => setActiveTab("reader")} />
         </Suspense>
       )}
       {activeTab === "settings" && (
