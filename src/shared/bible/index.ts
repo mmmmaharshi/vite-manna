@@ -2,7 +2,6 @@ export { getBibleBookName, BIBLE_BOOK_NAMES } from "./books";
 export {
   db,
   type BibleVerse,
-  type ReadingEntry,
   type Highlight,
   type HighlightColor,
   HIGHLIGHT_COLORS,
@@ -18,18 +17,8 @@ export {
   upsertHighlight,
   removeHighlight,
   getHighlights,
-
   getHighlightsForChapter,
   updateHighlightNote,
   searchVerses,
   parseVerseref,
-  recordChapterRead,
-  getReadChapters,
-  getAllReadChapters,
-  getBookProgress,
-  getOverallProgress,
-  getBookChapterCounts,
-  getLastReadChapter,
-  getReadingStreak,
-  type ReadingStreak,
 } from "./bibleRepository";

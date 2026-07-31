@@ -15,12 +15,6 @@ export interface MetaEntry {
 
 export type HighlightColor = "yellow" | "green" | "blue" | "pink" | "orange";
 
-export interface ReadingEntry {
-  book: number;
-  chapter: number;
-  lastReadAt: number;
-}
-
 export interface Highlight {
   id?: number;
   verseId: number;
@@ -56,20 +50,12 @@ class BibleDB extends Dexie {
   verses!: Table<BibleVerse, number>;
   meta!: Table<MetaEntry, string>;
   highlights!: Table<Highlight, number>;
-  readingHistory!: Table<ReadingEntry, [number, number]>;
 
   constructor() {
     super("BibleDB");
 
-    this.version(1).stores({ verses: "Verseid" });
-    this.version(2).stores({ verses: null });
-    this.version(3).stores({ verses: "id" });
-    this.version(4).stores({ verses: "id, book" });
-    this.version(5).stores({ verses: "id, book, [book+chapter]" });
-    this.version(6).stores({ meta: "key" });
-    this.version(8).stores({ highlights: "++id, verseId, book, [book+chapter], updatedAt" });
-    this.version(9).stores({ readingHistory: "[book+chapter], book" });
-    this.version(10).stores({ readingHistory: "[book+chapter], book, lastReadAt" });
+    this.version(1).stores({ verses: "id, book, [book+chapter]", meta: "key", highlights: "++id, verseId, book, [book+chapter], updatedAt" });
+    this.version(11).stores({ readingHistory: null });
   }
 }
 

@@ -3,7 +3,7 @@ import { ChevronLeft, ChevronRight } from "@gravity-ui/icons";
 import { Button, ScrollShadow, Skeleton, Surface, Typography } from "@heroui/react";
 
 import { cn } from "../../shared/lib/cn";
-import { getBibleBookName, recordChapterRead } from "../../shared/bible";
+import { getBibleBookName } from "../../shared/bible";
 import { navigateChapter } from "./hooks/navigateChapter";
 
 import { useBooks } from "./hooks/useBooks";
@@ -68,32 +68,6 @@ const ReaderScreen = () => {
     chapter,
     selectedBookSummary?.chapterCount,
   );
-
-  const recordedRef = useRef<{ book: number; chapter: number } | null>(null);
-  const sentinelRef = useRef<HTMLDivElement | null>(null);
-
-  useEffect(() => {
-    recordedRef.current = null;
-  }, [book, chapter]);
-
-  useEffect(() => {
-    if (!snapshot || !sentinelRef.current) return;
-
-    const sentinel = sentinelRef.current;
-    const observer = new IntersectionObserver(
-      (entries) => {
-        if (!entries[0]?.isIntersecting) return;
-        const prev = recordedRef.current;
-        if (prev && prev.book === book && prev.chapter === chapter) return;
-        recordedRef.current = { book, chapter };
-        recordChapterRead(book, chapter);
-      },
-      { threshold: 0.5 },
-    );
-
-    observer.observe(sentinel);
-    return () => observer.disconnect();
-  }, [snapshot, book, chapter]);
 
   const visibleBook = pendingBook ?? snapshot?.book ?? book;
   const visibleBookSummary = books.find(
@@ -205,7 +179,6 @@ const ReaderScreen = () => {
           {snapshot && (
             <>
               <VerseList verses={snapshot.verses} />
-              <div ref={sentinelRef} className="h-4" />
             </>
           )}
           {!snapshot && hasLoadedBooks && (

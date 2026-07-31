@@ -1,4 +1,4 @@
-import { db, type Highlight, type ReadingEntry, type MetaEntry } from "../bible/db";
+import { db, type Highlight, type MetaEntry } from "../bible/db";
 
 const BACKUP_VERSION = 1;
 const LS_KEYS = [
@@ -14,7 +14,6 @@ interface BackupData {
   version: number;
   exportedAt: string;
   highlights: Highlight[];
-  readingHistory: ReadingEntry[];
   meta: MetaEntry[];
   localStorage: Record<string, string | null>;
 }
@@ -45,9 +44,8 @@ function writeLocalStorage(data: Record<string, string | null>) {
 }
 
 export async function exportBackup(): Promise<void> {
-  const [highlights, readingHistory, meta] = await Promise.all([
+  const [highlights, meta] = await Promise.all([
     db.highlights.toArray(),
-    db.readingHistory.toArray(),
     db.meta.toArray(),
   ]);
 
@@ -55,7 +53,6 @@ export async function exportBackup(): Promise<void> {
     version: BACKUP_VERSION,
     exportedAt: new Date().toISOString(),
     highlights,
-    readingHistory,
     meta,
     localStorage: readLocalStorage(),
   };
@@ -84,20 +81,18 @@ export async function importBackup(file: File): Promise<void> {
     throw new Error(`Unsupported backup version ${data.version}`);
   }
 
-  if (!Array.isArray(data.highlights) || !Array.isArray(data.readingHistory) || !Array.isArray(data.meta)) {
+  if (!Array.isArray(data.highlights) || !Array.isArray(data.meta)) {
     throw new Error("Invalid backup structure");
   }
 
-  await db.transaction("rw", [db.highlights, db.readingHistory, db.meta], async () => {
+  await db.transaction("rw", [db.highlights, db.meta], async () => {
     await Promise.all([
       db.highlights.clear(),
-      db.readingHistory.clear(),
       db.meta.clear(),
     ]);
 
     await Promise.all([
       db.highlights.bulkAdd(data.highlights),
-      db.readingHistory.bulkAdd(data.readingHistory),
       db.meta.bulkAdd(data.meta),
     ]);
   });
