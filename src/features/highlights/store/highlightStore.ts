@@ -9,7 +9,6 @@ export interface HighlightEntry {
   verse: number;
   text: string;
   color: HighlightColor;
-  note: string;
   createdAt: number;
   updatedAt: number;
 }

@@ -1,9 +1,5 @@
-import { useCallback, useMemo, useState } from "react";
-import {
-  Copy,
-  PencilToSquare,
-  TrashBin,
-} from "@gravity-ui/icons";
+import { useMemo, useState } from "react";
+import { Copy, PencilToSquare, TrashBin } from "@gravity-ui/icons";
 import {
   AlertDialog,
   Button,
@@ -35,8 +31,6 @@ function formatRef(book: number, chapter: number, verse: number) {
   return `${getBibleBookName(book)} ${chapter}:${verse}`;
 }
 
-const MAX_NOTE_LENGTH = 120;
-
 const COLOR_STYLES: Record<HighlightColor, string> = {
   yellow: "bg-yellow-200/70 border-yellow-400/40",
   green: "bg-green-200/60 border-green-400/40",
@@ -54,22 +48,10 @@ const DOT_STYLES: Record<HighlightColor, string> = {
 };
 
 const HighlightsPage = ({ onNavigateToReader }: HighlightsPageProps) => {
-  const { highlights, remove, updateNote, loaded } = useHighlights();
+  const { highlights, remove, loaded } = useHighlights();
   const [filterColor, setFilterColor] = useState<HighlightColor | "all">("all");
-  const [editingNote, setEditingNote] = useState<HighlightEntry | null>(null);
-  const [noteText, setNoteText] = useState("");
   const [pendingRemove, setPendingRemove] = useState<HighlightEntry | null>(null);
-  const [expandedNotes, setExpandedNotes] = useState<Set<number>>(new Set());
   const colorKeys = useMemo(() => new Set([filterColor]), [filterColor]);
-
-  const toggleExpanded = useCallback((id: number) => {
-    setExpandedNotes((prev) => {
-      const next = new Set(prev);
-      if (next.has(id)) next.delete(id);
-      else next.add(id);
-      return next;
-    });
-  }, []);
 
   const uniqueColors = useMemo(() => {
     const set = new Set(highlights.map((h) => h.color));
@@ -92,27 +74,6 @@ const HighlightsPage = ({ onNavigateToReader }: HighlightsPageProps) => {
   const handleRemove = (hl: HighlightEntry) => {
     remove(hl.verseId);
     toast("Highlight removed", { variant: "success" });
-  };
-
-  const handleEditNote = (hl: HighlightEntry) => {
-    setEditingNote(hl);
-    setNoteText(hl.note);
-  };
-
-  const handleSaveNote = () => {
-    if (!editingNote) return;
-    updateNote(editingNote.verseId, noteText);
-    setEditingNote(null);
-    setNoteText("");
-    toast("Note saved", { variant: "success" });
-  };
-
-  const handleClearNote = () => {
-    if (!editingNote) return;
-    updateNote(editingNote.verseId, "");
-    setEditingNote(null);
-    setNoteText("");
-    toast("Note cleared", { variant: "success" });
   };
 
   return (
@@ -175,12 +136,6 @@ const HighlightsPage = ({ onNavigateToReader }: HighlightsPageProps) => {
                   </button>
                   <div className="flex gap-0.5 shrink-0">
                     <Tooltip delay={0}>
-                      <Button isIconOnly size="sm" variant="tertiary" aria-label="Edit note" onPress={() => handleEditNote(hl)}>
-                        <PencilToSquare aria-hidden="true" className="h-3.5 w-3.5 text-muted" />
-                      </Button>
-                      <Tooltip.Content placement="top">Add Note</Tooltip.Content>
-                    </Tooltip>
-                    <Tooltip delay={0}>
                       <Button isIconOnly size="sm" variant="tertiary" aria-label="Copy verse"
                         onPress={async () => {
                           try {
@@ -204,23 +159,6 @@ const HighlightsPage = ({ onNavigateToReader }: HighlightsPageProps) => {
                 <Typography.Paragraph size="sm" color="muted" className="line-clamp-4 sm:line-clamp-3 break-words">
                   {hl.text}
                 </Typography.Paragraph>
-
-                {hl.note && (
-                  <div className="mt-1 pt-2 border-t border-separator">
-                    <Typography.Paragraph
-                      size="xs"
-                      color="muted"
-                      className={cn("italic break-words whitespace-pre-wrap", !expandedNotes.has(hl.id) && "line-clamp-2")}
-                    >
-                      {hl.note}
-                    </Typography.Paragraph>
-                    {hl.note.length > MAX_NOTE_LENGTH && (
-                      <button type="button" className="text-xs text-accent mt-0.5 hover:underline" onClick={() => toggleExpanded(hl.id)}>
-                        {expandedNotes.has(hl.id) ? "Show less" : "Show more"}
-                      </button>
-                    )}
-                  </div>
-                )}
               </Surface>
             ))}
           </section>
@@ -228,53 +166,6 @@ const HighlightsPage = ({ onNavigateToReader }: HighlightsPageProps) => {
 
         <div className="h-[calc(4rem+env(safe-area-inset-bottom))]" />
       </ScrollShadow>
-
-      <AlertDialog.Backdrop isOpen={editingNote !== null} onOpenChange={(open) => { if (!open) { setEditingNote(null); setNoteText(""); }}}>
-        <AlertDialog.Container>
-          <AlertDialog.Dialog className="sm:max-w-[400px]">
-            {({ close }) => (
-              <>
-                <AlertDialog.CloseTrigger />
-                <AlertDialog.Header>
-                  <AlertDialog.Heading>{editingNote?.note ? "Edit Note" : "Add Note"}</AlertDialog.Heading>
-                </AlertDialog.Header>
-                <AlertDialog.Body>
-                  {editingNote && (
-                    <div className="mb-3">
-                      <Typography.Paragraph size="sm" color="muted">
-                        {formatRef(editingNote.book, editingNote.chapter, editingNote.verse)}
-                      </Typography.Paragraph>
-                    </div>
-                  )}
-                  <textarea
-                    aria-label="Edit note"
-                    className="w-full min-h-[120px] rounded-lg border border-border bg-field-background p-3 text-sm text-field-foreground placeholder-field-placeholder resize-y focus:outline-none focus:ring-2 focus:ring-accent"
-                    placeholder="Write your note..."
-                    value={noteText}
-                    onChange={(e) => setNoteText(e.target.value)}
-                    autoFocus
-                  />
-                </AlertDialog.Body>
-                <AlertDialog.Footer>
-                  <div className="flex w-full gap-2 justify-between">
-                    <div>
-                      {editingNote?.note && (
-                        <Button variant="danger" size="sm" onPress={() => { handleClearNote(); close(); }}>
-                          Clear Note
-                        </Button>
-                      )}
-                    </div>
-                    <div className="flex gap-2">
-                      <Button slot="close" variant="tertiary" size="sm" onPress={() => { setEditingNote(null); setNoteText(""); }}>Cancel</Button>
-                      <Button variant="primary" size="sm" isDisabled={!noteText.trim()} onPress={() => { handleSaveNote(); close(); }}>Save</Button>
-                    </div>
-                  </div>
-                </AlertDialog.Footer>
-              </>
-            )}
-          </AlertDialog.Dialog>
-        </AlertDialog.Container>
-      </AlertDialog.Backdrop>
 
       <AlertDialog.Backdrop isOpen={pendingRemove !== null} onOpenChange={(open) => { if (!open) setPendingRemove(null); }}>
         <AlertDialog.Container>

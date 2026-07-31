@@ -106,7 +106,6 @@ export function upsertHighlight(
   verse: number,
   text: string,
   color: HighlightColor,
-  note = "",
 ) {
   return db.highlights.put({
     verseId,
@@ -115,7 +114,6 @@ export function upsertHighlight(
     verse,
     text,
     color,
-    note,
     createdAt: Date.now(),
     updatedAt: Date.now(),
   });
@@ -138,10 +136,6 @@ export async function getHighlightsForChapter(
     .equals([book, chapter])
     .toArray();
   return new Map(all.map((h) => [h.verseId, h.color]));
-}
-
-export function updateHighlightNote(verseId: number, note: string) {
-  return db.highlights.where("verseId").equals(verseId).modify({ note, updatedAt: Date.now() });
 }
 
 

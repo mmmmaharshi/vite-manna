@@ -23,7 +23,6 @@ export interface Highlight {
   verse: number;
   text: string;
   color: HighlightColor;
-  note: string;
   createdAt: number;
   updatedAt: number;
 }

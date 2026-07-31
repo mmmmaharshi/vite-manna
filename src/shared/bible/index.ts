@@ -18,6 +18,5 @@ export {
   removeHighlight,
   getHighlights,
   getHighlightsForChapter,
-  updateHighlightNote,
   searchVerses,
 } from "./bibleRepository";
