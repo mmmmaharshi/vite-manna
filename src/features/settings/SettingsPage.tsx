@@ -1,12 +1,11 @@
-import { useCallback, useMemo, useRef } from "react";
-import { ArrowRotateLeft, FileArrowDown, FileArrowUp } from "@gravity-ui/icons";
-import { Button, ScrollShadow, Surface, ToggleButton, ToggleButtonGroup, Tooltip, toast, Typography } from "@heroui/react";
+import { useMemo } from "react";
+import { ArrowRotateLeft } from "@gravity-ui/icons";
+import { Button, ScrollShadow, Surface, ToggleButton, ToggleButtonGroup, Tooltip, Typography } from "@heroui/react";
 
 import { version } from "../../../package.json";
 import { type FontSize } from "../../shared/lib/fontSize";
 import { cn } from "../../shared/lib/cn";
 import { useReaderStore } from "../reader/store/readerStore";
-import { exportBackup, importBackup } from "../../shared/lib/backup";
 
 const FONT_SIZES: { value: FontSize; label: string }[] = [
   { value: "sm", label: "S" },
@@ -21,29 +20,6 @@ const PREVIEW_TEXT = "ఆదియందు దేవుడు ఆకాశమ�
 const SettingsPage = () => {
   const fontSize = useReaderStore((state) => state.fontSize);
   const setFontSize = useReaderStore((state) => state.setFontSize);
-
-  const importRef = useRef<HTMLInputElement>(null);
-
-  const handleExport = useCallback(async () => {
-    try {
-      await exportBackup();
-      toast("Backup downloaded", { variant: "success" });
-    } catch {
-      toast("Failed to export data", { variant: "danger" });
-    }
-  }, []);
-
-  const handleImport = useCallback(async (e: React.ChangeEvent<HTMLInputElement>) => {
-    const file = e.target.files?.[0];
-    if (!file) return;
-    try {
-      await importBackup(file);
-      toast("Data restored successfully. Reload to see changes.", { variant: "success" });
-    } catch (err) {
-      toast(err instanceof Error ? err.message : "Failed to import data", { variant: "danger" });
-    }
-    e.target.value = "";
-  }, []);
 
   return (
     <main id="main-content" className="h-dvh flex flex-col">
@@ -97,24 +73,6 @@ const SettingsPage = () => {
                 {PREVIEW_TEXT}
               </span>
             </div>
-          </Surface>
-
-          <Surface className="p-3">
-            <Typography className="text-sm font-medium mb-2">Data</Typography>
-            <input ref={importRef} type="file" accept=".json" className="hidden" onChange={handleImport} />
-            <div className="flex gap-2">
-              <Button variant="secondary" size="sm" onPress={handleExport}>
-                <FileArrowDown className="h-4 w-4" />
-                Export
-              </Button>
-              <Button variant="secondary" size="sm" onPress={() => importRef.current?.click()}>
-                <FileArrowUp className="h-4 w-4" />
-                Import
-              </Button>
-            </div>
-            <Typography className="text-xs text-muted mt-2">
-              Export your highlights as JSON. Import a backup to restore.
-            </Typography>
           </Surface>
 
           <Surface className="p-3">
