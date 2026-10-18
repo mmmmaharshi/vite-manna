@@ -1,3 +1,3 @@
-export { default as AppShell } from "./AppShell";
-export { useAppShell, type ShellStatus } from "./useAppShell";
-export { default as RootRoutes } from "./RootRoutes";
+export { default as AppShell } from "./app-shell";
+export { useAppShell, type ShellStatus } from "./use-app-shell";
+export { default as RootRoutes } from "./root-routes";

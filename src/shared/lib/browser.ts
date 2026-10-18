@@ -1,8 +1,7 @@
-export function canNativeShare() {
-  return typeof navigator !== "undefined" && typeof navigator.share === "function";
-}
+export const canNativeShare = () =>
+  typeof navigator !== "undefined" && typeof navigator.share === "function";
 
-export async function copyToClipboard(text: string) {
+export const copyToClipboard = async (text: string) => {
   if (navigator.clipboard?.writeText) {
     await navigator.clipboard.writeText(text);
     return;
@@ -13,8 +12,8 @@ export async function copyToClipboard(text: string) {
   textarea.setAttribute("readonly", "");
   textarea.style.position = "fixed";
   textarea.style.opacity = "0";
-  document.body.appendChild(textarea);
+  document.body.append(textarea);
   textarea.select();
   document.execCommand("copy");
-  document.body.removeChild(textarea);
-}
+  textarea.remove();
+};

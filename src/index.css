@@ -2,42 +2,42 @@
 @import "@heroui/styles";
 
 html {
-    overflow: hidden;
-    touch-action: manipulation;
+  overflow: hidden;
+  touch-action: manipulation;
 }
 
 @keyframes splash-progress-slide {
-    from {
-        transform: translateX(-56px);
-    }
+  from {
+    transform: translateX(-56px);
+  }
 
-    to {
-        transform: translateX(160px);
-    }
+  to {
+    transform: translateX(160px);
+  }
 }
 
 .splash-progress {
-    overflow: hidden;
+  overflow: hidden;
 }
 
 @media (prefers-reduced-motion: no-preference) {
-    .splash-progress__bar {
-        animation: splash-progress-slide 1150ms ease-in-out infinite;
-        transform-box: fill-box;
-        will-change: transform;
-    }
+  .splash-progress__bar {
+    animation: splash-progress-slide 1150ms ease-in-out infinite;
+    transform-box: fill-box;
+    will-change: transform;
+  }
 }
 
 .splash-progress__bar--determinate {
-    animation: none;
-    transform: none;
-    will-change: width;
+  animation: none;
+  transform: none;
+  will-change: width;
 }
 
 :root {
-    /* Preserve pre-v3.2 tooltip timing */
-    --tooltip-delay: 700ms;
-    --tooltip-close-delay: 0ms;
+  /* Preserve pre-v3.2 tooltip timing */
+  --tooltip-delay: 700ms;
+  --tooltip-close-delay: 0ms;
 }
 
 :root,
@@ -45,67 +45,76 @@ html {
 .default,
 [data-theme="light"],
 [data-theme="default"] {
-    /* Highlight Colors (Light Mode) */
-    --highlight-yellow: oklch(92% 0.12 95 / 0.45);
-    --highlight-green: oklch(80% 0.18 145 / 0.35);
-    --highlight-blue: oklch(75% 0.14 225 / 0.35);
-    --highlight-pink: oklch(78% 0.16 345 / 0.3);
-    --highlight-orange: oklch(80% 0.16 65 / 0.4);
+  /* Highlight Colors (Light Mode) */
+  --highlight-yellow: oklch(92% 0.12 95 / 0.45);
+  --highlight-green: oklch(80% 0.18 145 / 0.35);
+  --highlight-blue: oklch(75% 0.14 225 / 0.35);
+  --highlight-pink: oklch(78% 0.16 345 / 0.3);
+  --highlight-orange: oklch(80% 0.16 65 / 0.4);
 
-    /* Theme Colors (Light Mode) */
-    --accent: oklch(43% 0.22 262.87);
-    --accent-foreground: oklch(99.11% 0 0);
-    --background: oklch(97.02% 0.002 262.87);
-    --border: oklch(90% 0.002 262.87);
-    --danger: oklch(0.5507 0.2062 24);
-    --danger-foreground: oklch(98% 0.02 24);
-    --default: oklch(94% 0.002 262.87);
-    --default-foreground: oklch(21.03% 0.0059 262.87);
-    --field-background: oklch(100% 0.001 262.87);
-    --field-border: transparent;
-    --field-foreground: oklch(21.03% 0.002 262.87);
-    --field-placeholder: oklch(55.17% 0.004 262.87);
-    --focus: oklch(52.82% 0.2628 262.87);
-    --foreground: oklch(21.03% 0.002 262.87);
-    --muted: oklch(42% 0.005 262.87);
-    --overlay: oklch(100% 0.0006 262.87);
-    --overlay-foreground: oklch(21.03% 0.002 262.87);
-    --segment: oklch(100% 0.002 262.87);
-    --segment-foreground: oklch(21.03% 0.002 262.87);
-    --separator: oklch(92% 0.002 262.87);
-    --success: oklch(0.5438 0.1268 157.17);
-    --success-foreground: oklch(98% 0.0127 157.17);
-    --surface: oklch(100% 0.001 262.87);
-    --surface-foreground: oklch(21.03% 0.002 262.87);
-    --surface-secondary: oklch(95.24% 0.0016 262.87);
-    --surface-secondary-foreground: oklch(21.03% 0.002 262.87);
-    --surface-tertiary: oklch(93.73% 0.0016 262.87);
-    --surface-tertiary-foreground: oklch(21.03% 0.002 262.87);
-    --warning: oklch(0.8095 0.1119 61.69);
-    --warning-foreground: oklch(15% 0.0336 61.69);
+  /* Theme Colors (Light Mode) */
+  --accent: oklch(43% 0.22 262.87);
+  --accent-foreground: oklch(99.11% 0 0);
+  --background: oklch(97.02% 0.002 262.87);
+  --border: oklch(90% 0.002 262.87);
+  --danger: oklch(0.5507 0.2062 24);
+  --danger-foreground: oklch(98% 0.02 24);
+  --default: oklch(94% 0.002 262.87);
+  --default-foreground: oklch(21.03% 0.0059 262.87);
+  --field-background: oklch(100% 0.001 262.87);
+  --field-border: transparent;
+  --field-foreground: oklch(21.03% 0.002 262.87);
+  --field-placeholder: oklch(55.17% 0.004 262.87);
+  --focus: oklch(52.82% 0.2628 262.87);
+  --foreground: oklch(21.03% 0.002 262.87);
+  --muted: oklch(42% 0.005 262.87);
+  --overlay: oklch(100% 0.0006 262.87);
+  --overlay-foreground: oklch(21.03% 0.002 262.87);
+  --segment: oklch(100% 0.002 262.87);
+  --segment-foreground: oklch(21.03% 0.002 262.87);
+  --separator: oklch(92% 0.002 262.87);
+  --success: oklch(0.5438 0.1268 157.17);
+  --success-foreground: oklch(98% 0.0127 157.17);
+  --surface: oklch(100% 0.001 262.87);
+  --surface-foreground: oklch(21.03% 0.002 262.87);
+  --surface-secondary: oklch(95.24% 0.0016 262.87);
+  --surface-secondary-foreground: oklch(21.03% 0.002 262.87);
+  --surface-tertiary: oklch(93.73% 0.0016 262.87);
+  --surface-tertiary-foreground: oklch(21.03% 0.002 262.87);
+  --warning: oklch(0.8095 0.1119 61.69);
+  --warning-foreground: oklch(15% 0.0336 61.69);
 
-    /* Border Radius */
-    --radius: 0.125rem;
-    --field-radius: 0.75rem;
+  /* Border Radius */
+  --radius: 0.125rem;
+  --field-radius: 0.75rem;
 
-    /* Font Family */
-    --font-sans: "Google Sans Variable";
+  /* Font Family */
+  --font-sans: "Google Sans Variable";
 }
 
 @keyframes skeleton-shimmer {
-    from { background-position: 200% 0; }
-    to { background-position: -200% 0; }
+  from {
+    background-position: 200% 0;
+  }
+  to {
+    background-position: -200% 0;
+  }
 }
 
 @media (prefers-reduced-motion: no-preference) {
-    .skeleton-shimmer {
-        background: linear-gradient(90deg, var(--default) 25%, var(--surface-secondary) 50%, var(--default) 75%);
-        background-size: 200% 100%;
-        animation: skeleton-shimmer 1.5s ease-in-out infinite;
-    }
+  .skeleton-shimmer {
+    background: linear-gradient(
+      90deg,
+      var(--default) 25%,
+      var(--surface-secondary) 50%,
+      var(--default) 75%
+    );
+    background-size: 200% 100%;
+    animation: skeleton-shimmer 1.5s ease-in-out infinite;
+  }
 }
 
 *:focus-visible {
-    outline: 2px solid var(--accent);
-    outline-offset: 2px;
+  outline: 2px solid var(--accent);
+  outline-offset: 2px;
 }

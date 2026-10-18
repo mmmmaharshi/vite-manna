@@ -26,16 +26,17 @@ bun install && bun run dev
 
 ## Scripts
 
-| Command | What it does |
-|---|---|
-| `bun run dev` | Dev server |
-| `bun run build` | Type-check + production build |
-| `bun run test` | Vitest |
-| `bun run lint` | ESLint |
+| Command           | What it does                   |
+| ----------------- | ------------------------------ |
+| `bun run dev`     | Dev server                     |
+| `bun run build`   | Type-check + production build  |
+| `bun run test`    | Tests (Vitest 5)               |
+| `bun run lint`    | Lint + format (Oxlint / Oxfmt) |
+| `bun run preview` | Preview the production build   |
 
 ## Stack
 
-React 19 · TypeScript 6 · Vite 8 · HeroUI v3 · Tailwind v4 · Zustand · Dexie · React Router 7 · Workbox PWA · Google Sans
+React 19 · TypeScript 6 · Vite+ 1.3 (Vite 8) · HeroUI v3 · Tailwind v4 · Zustand · Dexie · React Router 7 · Workbox PWA · Google Sans
 
 ## Deploy
 

@@ -1,4 +1,5 @@
-import Dexie, { type Table } from "dexie";
+import { Dexie } from "dexie";
+import type { Table } from "dexie";
 
 export interface BibleVerse {
   id: number;
@@ -38,7 +39,11 @@ class BibleDB extends Dexie {
   constructor() {
     super("BibleDB");
 
-    this.version(1).stores({ verses: "id, book, [book+chapter]", meta: "key", highlights: "++id, verseId, book, [book+chapter], updatedAt" });
+    this.version(1).stores({
+      highlights: "++id, verseId, book, [book+chapter], updatedAt",
+      meta: "key",
+      verses: "id, book, [book+chapter]",
+    });
     this.version(11).stores({ readingHistory: null });
     this.version(12)
       .stores({ highlightsV12: "verseId, updatedAt" })
@@ -55,15 +60,15 @@ class BibleDB extends Dexie {
 
         await tx.table("highlightsV12").bulkPut(
           [...latestByVerse.values()].map((row) => ({
-            verseId: row.verseId,
             book: row.book,
             chapter: row.chapter,
-            verse: row.verse,
-            text: row.text,
             color: row.color,
             createdAt: row.createdAt,
+            text: row.text,
             updatedAt: row.updatedAt,
-          })),
+            verse: row.verse,
+            verseId: row.verseId,
+          }))
         );
       });
     this.version(13).stores({ highlights: null });

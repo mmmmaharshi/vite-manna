@@ -1,5 +1,5 @@
-import { type FontSize } from "./fontSize";
-import { parsePositiveInteger } from "./parsePositiveInteger";
+import type { FontSize } from "./font-size";
+import { parsePositiveInteger } from "./parse-positive-integer";
 
 const STORAGE_KEY = "manna.reader-location";
 const FONT_SIZE_KEY = "manna.reader-font-size";
@@ -19,7 +19,7 @@ export interface ReaderInitState {
   permalinkVerse: number | null;
 }
 
-function parseChaptersByBook(value: unknown): Record<number, number> {
+const parseChaptersByBook = (value: unknown): Record<number, number> => {
   if (!value || typeof value !== "object") {
     return {};
   }
@@ -36,9 +36,9 @@ function parseChaptersByBook(value: unknown): Record<number, number> {
   }
 
   return result;
-}
+};
 
-function readUrlLocation() {
+const readUrlLocation = () => {
   if (typeof window === "undefined") {
     return null;
   }
@@ -52,18 +52,18 @@ function readUrlLocation() {
   }
 
   return { book, chapter };
-}
+};
 
-function readUrlVerse() {
+const readUrlVerse = () => {
   if (typeof window === "undefined") {
     return null;
   }
 
   const params = new URLSearchParams(window.location.search);
   return parsePositiveInteger(params.get("verse"));
-}
+};
 
-export function loadInitialState(): ReaderInitState {
+export const loadInitialState = (): ReaderInitState => {
   const fromUrl = readUrlLocation();
   const permalinkVerse = readUrlVerse();
 
@@ -72,13 +72,15 @@ export function loadInitialState(): ReaderInitState {
 
     try {
       const stored = JSON.parse(
-        localStorage.getItem(STORAGE_KEY) ?? "",
+        localStorage.getItem(STORAGE_KEY) ?? ""
       ) as StoredLocation;
 
       if (stored.version === STORAGE_VERSION) {
         chaptersByBook = parseChaptersByBook(stored.chaptersByBook);
       }
-    } catch { /* localStorage read may fail */ }
+    } catch {
+      /* localStorage read may fail */
+    }
 
     return {
       book: fromUrl.book,
@@ -93,7 +95,9 @@ export function loadInitialState(): ReaderInitState {
   let chaptersByBook: Record<number, number> = {};
 
   try {
-    const stored = JSON.parse(localStorage.getItem(STORAGE_KEY) ?? "") as StoredLocation;
+    const stored = JSON.parse(
+      localStorage.getItem(STORAGE_KEY) ?? ""
+    ) as StoredLocation;
 
     if (stored.version === STORAGE_VERSION) {
       const storedBook = parsePositiveInteger(String(stored.book));
@@ -109,29 +113,37 @@ export function loadInitialState(): ReaderInitState {
         };
       }
     }
-  } catch { /* localStorage read may fail */ }
+  } catch {
+    /* localStorage read may fail */
+  }
 
   return { book, chapter, chaptersByBook, permalinkVerse };
-}
+};
 
-export function loadFontSize(): FontSize {
+export const loadFontSize = (): FontSize => {
   const valid: FontSize[] = ["sm", "base", "lg", "xl", "2xl"];
   try {
     const stored = localStorage.getItem(FONT_SIZE_KEY) as FontSize | null;
-    if (stored && valid.includes(stored)) return stored;
-  } catch { /* localStorage read may fail */ }
+    if (stored && valid.includes(stored)) {
+      return stored;
+    }
+  } catch {
+    /* localStorage read may fail */
+  }
   return "sm";
-}
+};
 
-export function setStoredFontSize(fontSize: FontSize) {
-  try { localStorage.setItem(FONT_SIZE_KEY, fontSize); } catch { /* localStorage may be full */ }
-}
+export const setStoredFontSize = (fontSize: FontSize) => {
+  try {
+    localStorage.setItem(FONT_SIZE_KEY, fontSize);
+  } catch {
+    /* localStorage may be full */
+  }
+};
 
-export function rememberChapter(
+export const rememberChapter = (
   chaptersByBook: Record<number, number>,
-  book: number,
-) {
-  return chaptersByBook[book] ?? 1;
-}
+  book: number
+) => chaptersByBook[book] ?? 1;
 
 export const STORAGE_KEY_LOCATION = STORAGE_KEY;

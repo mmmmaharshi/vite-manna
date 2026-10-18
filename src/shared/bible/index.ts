@@ -17,4 +17,4 @@ export {
   removeHighlight,
   getHighlights,
   searchVerses,
-} from "./bibleRepository";
+} from "./bible-repository";

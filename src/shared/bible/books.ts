@@ -67,6 +67,5 @@ export const BIBLE_BOOK_NAMES = [
   "ప్రకటన గ్రంథము",
 ] as const;
 
-export function getBibleBookName(book: number) {
-  return BIBLE_BOOK_NAMES[book - 1] ?? `Book ${book}`;
-}
+export const getBibleBookName = (book: number) =>
+  BIBLE_BOOK_NAMES[book - 1] ?? `Book ${book}`;

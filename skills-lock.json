@@ -49,6 +49,12 @@
       "skillPath": "skills/seo/SKILL.md",
       "computedHash": "3d72168e266b759454b3e16028e7306ec716f21de6878cac7e98a0a3834ab5db"
     },
+    "ultracite": {
+      "source": "haydenbleasel/ultracite",
+      "sourceType": "github",
+      "skillPath": "skills/ultracite/SKILL.md",
+      "computedHash": "bbbcab6a2840d8886de7b30c531cc2ff24d5ab741eb717072f8c87e02ed6bd93"
+    },
     "web-quality-audit": {
       "source": "addyosmani/web-quality-skills",
       "sourceType": "github",
