@@ -26,13 +26,15 @@ bun install && bun run dev
 
 ## Scripts
 
-| Command           | What it does                   |
-| ----------------- | ------------------------------ |
-| `bun run dev`     | Dev server                     |
-| `bun run build`   | Type-check + production build  |
-| `bun run test`    | Tests (Vitest 5)               |
-| `bun run lint`    | Lint + format (Oxlint / Oxfmt) |
-| `bun run preview` | Preview the production build   |
+| Command           | What it does                    |
+| ----------------- | ------------------------------- |
+| `bun run dev`     | Dev server                      |
+| `bun run build`   | Type-check + production build   |
+| `bun run test`    | Tests (Vitest)                  |
+| `bun run lint`    | Lint (Oxlint)                   |
+| `bun run check`   | Lint + format check (Ultracite) |
+| `bun run fix`     | Lint + format fix (Ultracite)   |
+| `bun run preview` | Preview the production build    |
 
 ## Stack
 
