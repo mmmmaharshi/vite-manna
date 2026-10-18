@@ -33,6 +33,7 @@ export const useSwipeAndKeyboard = ({
 
   useEffect(() => {
     const el = elementRef.current;
+
     if (!el) {
       return;
     }
@@ -41,6 +42,7 @@ export const useSwipeAndKeyboard = ({
       if (isSelectionMode || isBookSelectOpen) {
         return;
       }
+
       const [touch] = e.touches;
       touchStart.current = {
         time: Date.now(),
@@ -53,6 +55,7 @@ export const useSwipeAndKeyboard = ({
       if (!touchStart.current) {
         return;
       }
+
       if (isSelectionMode || isBookSelectOpen) {
         return;
       }
@@ -67,19 +70,23 @@ export const useSwipeAndKeyboard = ({
       if (dt > SWIPE_TIME_MAX) {
         return;
       }
+
       if (Math.abs(dx) < SWIPE_THRESHOLD) {
         return;
       }
+
       if (Math.abs(dy) > Math.abs(dx) * 0.5) {
         return;
       }
 
       const dir = dx > 0 ? "prev" : "next";
       const next = navigateChapter(books, book, chapter, dir);
+
       if (next) {
         if (next.book !== book) {
           setBook(next.book);
         }
+
         setChapter(next.chapter);
       }
     };
@@ -108,7 +115,8 @@ export const useSwipeAndKeyboard = ({
         return;
       }
 
-      const tag = (e.target as HTMLElement)?.tagName;
+      const tag = e.target instanceof HTMLElement ? e.target.tagName : "";
+
       if (tag === "INPUT" || tag === "TEXTAREA" || tag === "SELECT") {
         return;
       }
@@ -116,25 +124,30 @@ export const useSwipeAndKeyboard = ({
       if (e.key === "ArrowRight") {
         e.preventDefault();
         const next = navigateChapter(books, book, chapter, "next");
+
         if (next) {
           if (next.book !== book) {
             setBook(next.book);
           }
+
           setChapter(next.chapter);
         }
       } else if (e.key === "ArrowLeft") {
         e.preventDefault();
         const next = navigateChapter(books, book, chapter, "prev");
+
         if (next) {
           if (next.book !== book) {
             setBook(next.book);
           }
+
           setChapter(next.chapter);
         }
       }
     };
 
     window.addEventListener("keydown", onKeyDown);
+
     return () => window.removeEventListener("keydown", onKeyDown);
   }, [
     books,

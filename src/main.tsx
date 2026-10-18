@@ -13,6 +13,7 @@ if (typeof history !== "undefined" && "scrollRestoration" in history) {
 }
 
 const rootElement = document.querySelector("#root");
+
 if (!rootElement) {
   throw new Error("Root element #root not found");
 }

@@ -5,6 +5,7 @@ export const countVerses = () => db.verses.count();
 
 export const getChapterNumbers = async (book: number) => {
   const verses = await db.verses.where("book").equals(book).toArray();
+
   return [...new Set(verses.map((verse) => verse.chapter))];
 };
 
@@ -23,6 +24,7 @@ export const getReaderSnapshot = async (
     chapterCount === undefined
       ? await getChapterNumbers(book)
       : getContiguousChapterNumbers(chapterCount);
+
   const selectedChapter = chapters.includes(chapter) ? chapter : chapters[0];
 
   return {
@@ -50,13 +52,16 @@ export const getReaderBootstrap = async (book: number, chapter: number) => {
     chapterCount: chapterNumbers.size,
     id,
   }));
+
   const selectedBook = books.some((candidate) => candidate.id === book)
     ? book
     : books[0]?.id;
+
   const chapters =
     selectedBook === undefined
       ? []
       : [...(chapterNumbersByBook.get(selectedBook) ?? [])];
+
   const selectedChapter = chapters.includes(chapter) ? chapter : chapters[0];
 
   return {
@@ -88,6 +93,7 @@ export const searchVerses = (query: string) => {
   if (!query.trim()) {
     return Promise.resolve([]);
   }
+
   return db.verses
     .filter((v) => v.text.toLowerCase().includes(query.toLowerCase()))
     .limit(50)
@@ -117,5 +123,6 @@ export const removeHighlight = (verseId: number) =>
 
 export const getHighlights = async () => {
   const highlights = await db.highlights.orderBy("updatedAt").toArray();
+
   return highlights.toReversed();
 };

@@ -1,3 +1,4 @@
+import { isFontSize } from "./font-size";
 import type { FontSize } from "./font-size";
 import { parsePositiveInteger } from "./parse-positive-integer";
 
@@ -19,23 +20,34 @@ export interface ReaderInitState {
   permalinkVerse: number | null;
 }
 
-const parseChaptersByBook = (value: unknown): Record<number, number> => {
-  if (!value || typeof value !== "object") {
-    return {};
+const isStoredLocation = (value: unknown): value is StoredLocation =>
+  typeof value === "object" && value !== null;
+
+const readStoredLocation = (): StoredLocation | null => {
+  try {
+    const parsed: unknown = JSON.parse(localStorage.getItem(STORAGE_KEY) ?? "");
+
+    return isStoredLocation(parsed) ? parsed : null;
+  } catch {
+    /* localStorage read may fail */
   }
 
-  const result: Record<number, number> = {};
+  return null;
+};
 
-  for (const [book, chapter] of Object.entries(value)) {
+const parseChaptersByBook = (value: Record<string, number> | undefined) => {
+  const chapters = new Map<number, number>();
+
+  for (const [book, chapter] of Object.entries(value ?? {})) {
     const parsedBook = parsePositiveInteger(book);
     const parsedChapter = parsePositiveInteger(String(chapter));
 
     if (parsedBook !== null && parsedChapter !== null) {
-      result[parsedBook] = parsedChapter;
+      chapters.set(parsedBook, parsedChapter);
     }
   }
 
-  return result;
+  return chapters;
 };
 
 const readUrlLocation = () => {
@@ -60,28 +72,23 @@ const readUrlVerse = () => {
   }
 
   const params = new URLSearchParams(window.location.search);
+
   return parsePositiveInteger(params.get("verse"));
 };
 
 export const loadInitialState = (): ReaderInitState => {
   const fromUrl = readUrlLocation();
   const permalinkVerse = readUrlVerse();
+  const stored = readStoredLocation();
+
+  const current =
+    stored !== null && stored.version === STORAGE_VERSION ? stored : null;
+
+  const chaptersByBook = Object.fromEntries(
+    parseChaptersByBook(current?.chaptersByBook)
+  );
 
   if (fromUrl !== null) {
-    let chaptersByBook: Record<number, number> = {};
-
-    try {
-      const stored = JSON.parse(
-        localStorage.getItem(STORAGE_KEY) ?? ""
-      ) as StoredLocation;
-
-      if (stored.version === STORAGE_VERSION) {
-        chaptersByBook = parseChaptersByBook(stored.chaptersByBook);
-      }
-    } catch {
-      /* localStorage read may fail */
-    }
-
     return {
       book: fromUrl.book,
       chapter: fromUrl.chapter,
@@ -90,46 +97,32 @@ export const loadInitialState = (): ReaderInitState => {
     };
   }
 
-  let book = 1;
-  let chapter = 1;
-  let chaptersByBook: Record<number, number> = {};
+  const book = parsePositiveInteger(String(current?.book));
+  const chapter = parsePositiveInteger(String(current?.chapter));
 
-  try {
-    const stored = JSON.parse(
-      localStorage.getItem(STORAGE_KEY) ?? ""
-    ) as StoredLocation;
-
-    if (stored.version === STORAGE_VERSION) {
-      const storedBook = parsePositiveInteger(String(stored.book));
-      const storedChapter = parsePositiveInteger(String(stored.chapter));
-      const storedChaptersByBook = parseChaptersByBook(stored.chaptersByBook);
-
-      if (storedBook !== null && storedChapter !== null) {
-        book = storedBook;
-        chapter = storedChapter;
-        chaptersByBook = {
-          ...storedChaptersByBook,
-          [storedBook]: storedChapter,
-        };
-      }
-    }
-  } catch {
-    /* localStorage read may fail */
+  if (book === null || chapter === null) {
+    return { book: 1, chapter: 1, chaptersByBook: {}, permalinkVerse };
   }
 
-  return { book, chapter, chaptersByBook, permalinkVerse };
+  return {
+    book,
+    chapter,
+    chaptersByBook: { ...chaptersByBook, [book]: chapter },
+    permalinkVerse,
+  };
 };
 
 export const loadFontSize = (): FontSize => {
-  const valid: FontSize[] = ["sm", "base", "lg", "xl", "2xl"];
   try {
-    const stored = localStorage.getItem(FONT_SIZE_KEY) as FontSize | null;
-    if (stored && valid.includes(stored)) {
+    const stored = localStorage.getItem(FONT_SIZE_KEY);
+
+    if (stored !== null && isFontSize(stored)) {
       return stored;
     }
   } catch {
     /* localStorage read may fail */
   }
+
   return "sm";
 };
 

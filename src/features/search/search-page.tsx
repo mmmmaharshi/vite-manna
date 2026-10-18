@@ -30,6 +30,7 @@ const SearchPage = ({ onNavigateToReader }: SearchPageProps) => {
   const handleQueryChange = (value: string) => {
     setQuery(value);
     setError(null);
+
     if (!value.trim()) {
       setResults([]);
       setSearched(false);
@@ -39,6 +40,7 @@ const SearchPage = ({ onNavigateToReader }: SearchPageProps) => {
   const executeSearch = useCallback(async (q: string) => {
     setSearching(true);
     setError(null);
+
     try {
       const verses = await searchVerses(q);
       setResults(verses);
@@ -48,6 +50,7 @@ const SearchPage = ({ onNavigateToReader }: SearchPageProps) => {
       setResults([]);
       setSearched(true);
     }
+
     setSearching(false);
   }, []);
 
@@ -55,10 +58,13 @@ const SearchPage = ({ onNavigateToReader }: SearchPageProps) => {
     if (timerRef.current) {
       clearTimeout(timerRef.current);
     }
+
     if (!query.trim()) {
       return;
     }
+
     timerRef.current = setTimeout(() => executeSearch(query.trim()), 300);
+
     return () => {
       if (timerRef.current) {
         clearTimeout(timerRef.current);

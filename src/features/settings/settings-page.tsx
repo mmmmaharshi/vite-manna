@@ -12,6 +12,7 @@ import { useMemo } from "react";
 
 import { version } from "../../../package.json";
 import { cn } from "../../shared/lib/cn";
+import { isFontSize } from "../../shared/lib/font-size";
 import type { FontSize } from "../../shared/lib/font-size";
 import { useReaderStore } from "../reader/store/reader-store";
 
@@ -66,8 +67,9 @@ const SettingsPage = () => {
               className="mb-3"
               selectedKeys={useMemo(() => new Set([fontSize]), [fontSize])}
               onSelectionChange={(keys) => {
-                const value = [...keys][0] as FontSize;
-                if (value) {
+                const [value] = [...keys];
+
+                if (value !== undefined && isFontSize(value)) {
                   setFontSize(value);
                 }
               }}
@@ -89,7 +91,7 @@ const SettingsPage = () => {
                   "leading-relaxed"
                 )}
               >
-                <sup className="text-muted me-1 text-[0.65em]">1</sup>
+                <sup className="text-muted text-superscript me-1">1</sup>
                 {PREVIEW_TEXT}
               </span>
             </div>

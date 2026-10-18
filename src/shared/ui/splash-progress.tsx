@@ -1,5 +1,6 @@
 import { clamp } from "es-toolkit";
 import { memo } from "react";
+import type { CSSProperties } from "react";
 
 import { cn } from "../lib/cn";
 
@@ -19,13 +20,19 @@ const getInitialAnimationDelay = () => {
 // Computed once at module load so every mount shares the same animation phase.
 const INITIAL_ANIMATION_DELAY = getInitialAnimationDelay();
 
+// The phase rides in a custom property so no inline style carries a raw value.
+const INDETERMINATE_STYLE: CSSProperties & { "--splash-delay": string } = {
+  "--splash-delay": INITIAL_ANIMATION_DELAY,
+};
+
 interface SplashProgressProps {
   value?: number | null;
 }
 
 const SplashProgress = ({ value }: SplashProgressProps) => {
   const normalizedValue =
-    typeof value === "number" ? clamp(value, 0, 100) : null;
+    value === null || value === undefined ? null : clamp(value, 0, 100);
+
   const progressWidth =
     normalizedValue === null
       ? INDETERMINATE_WIDTH
@@ -58,11 +65,7 @@ const SplashProgress = ({ value }: SplashProgressProps) => {
             "splash-progress__bar",
             normalizedValue !== null && "splash-progress__bar--determinate"
           )}
-          style={
-            normalizedValue === null
-              ? { animationDelay: INITIAL_ANIMATION_DELAY }
-              : { transition: "width 180ms ease-out" }
-          }
+          style={INDETERMINATE_STYLE}
           x={0}
           width={progressWidth}
           height={TRACK_HEIGHT}

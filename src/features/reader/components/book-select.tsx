@@ -66,6 +66,7 @@ const BookSelectComponent = ({
       variant="secondary"
       onOpenChange={(open) => {
         setBookSelectOpen(open);
+
         if (open) {
           scrollSelectedBookIntoView();
         }
@@ -74,6 +75,7 @@ const BookSelectComponent = ({
         if (bookId === null) {
           return;
         }
+
         selectBook(Number(bookId));
       }}
     >

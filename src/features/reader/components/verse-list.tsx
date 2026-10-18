@@ -13,9 +13,11 @@ interface VerseListProps {
 
 const VerseListComponent = ({ verses }: VerseListProps) => {
   const selectedVerseIds = useReaderStore((state) => state.selectedVerseIds);
+
   const toggleVerseSelection = useReaderStore(
     (state) => state.toggleVerseSelection
   );
+
   const permalinkVerse = useReaderStore((state) => state.permalinkVerse);
 
   const permalinkRef = useRef<HTMLLIElement | null>(null);
@@ -29,6 +31,7 @@ const VerseListComponent = ({ verses }: VerseListProps) => {
   useLayoutEffect(() => {
     if (permalinkVerse === null) {
       lastScrolledVerseRef.current = null;
+
       return;
     }
 
@@ -61,11 +64,7 @@ const VerseListComponent = ({ verses }: VerseListProps) => {
           <li
             key={verse.id}
             ref={isPermalink ? permalinkRef : null}
-            className="relative"
-            style={{
-              containIntrinsicSize: "auto 2.5rem",
-              contentVisibility: "auto",
-            }}
+            className="verse-row relative"
           >
             {highlightColor && (
               <div
@@ -81,7 +80,7 @@ const VerseListComponent = ({ verses }: VerseListProps) => {
                 isSelected
                   ? "bg-accent/15 hover:bg-accent/20"
                   : "hover:bg-surface-secondary",
-                isPermalink && "animate-permalink-flash"
+                isPermalink && "motion-safe:animate-permalink-flash"
               )}
               onClick={() => toggleVerseSelection(verse.id)}
             >
@@ -95,7 +94,7 @@ const VerseListComponent = ({ verses }: VerseListProps) => {
                   "leading-relaxed"
                 )}
               >
-                <sup className="text-muted me-1 text-[0.65em]">
+                <sup className="text-muted text-superscript me-1">
                   {verse.verse}
                 </sup>
                 {verse.text}

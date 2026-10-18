@@ -1,4 +1,5 @@
 export { getBibleBookName, BIBLE_BOOK_NAMES } from "./books";
+
 export {
   db,
   DEFAULT_HIGHLIGHT_COLOR,
@@ -6,6 +7,7 @@ export {
   type Highlight,
   type HighlightColor,
 } from "./db";
+
 export {
   countVerses,
   getChapterNumbers,

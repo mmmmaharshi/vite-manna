@@ -37,6 +37,7 @@ export const useHighlightStore = create<HighlightStore>((set) => ({
     set((state) => {
       const next = new Map(state.highlightedMap);
       next.delete(verseId);
+
       return {
         highlightedMap: next,
         highlights: state.highlights.filter((h) => h.verseId !== verseId),
@@ -48,10 +49,12 @@ export const useHighlightStore = create<HighlightStore>((set) => ({
       const filtered = state.highlights.filter(
         (h) => h.verseId !== highlight.verseId
       );
+
       const entries: [number, HighlightColor][] = [
         ...state.highlightedMap,
         [highlight.verseId, highlight.color],
       ];
+
       return {
         highlightedMap: new Map(entries),
         highlights: [highlight, ...filtered],

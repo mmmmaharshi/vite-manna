@@ -21,7 +21,16 @@ import { useReaderStore } from "./store/reader-store";
 import type { BibleBook, ReaderSnapshot } from "./types";
 import { useUrlSync } from "./use-url-sync";
 
-const SKELETON_WIDTHS = [75, 85, 65, 90, 70, 80, 60, 95];
+const SKELETON_LINES = [
+  "w-3/4",
+  "w-17/20",
+  "w-13/20",
+  "w-9/10",
+  "w-7/10",
+  "w-4/5",
+  "w-3/5",
+  "w-19/20",
+];
 
 const buildChapterNumbers = (chapterCount: number) =>
   Array.from({ length: chapterCount }, (_, index) => index + 1);
@@ -66,6 +75,7 @@ const ReaderScreen = () => {
   const prevBookChapter = useRef({ book, chapter });
   useEffect(() => {
     const prev = prevBookChapter.current;
+
     if (prev.book !== book || prev.chapter !== chapter) {
       scrollRef.current?.scrollTo(0, 0);
       prevBookChapter.current = { book, chapter };
@@ -90,8 +100,10 @@ const ReaderScreen = () => {
     const name = selectedBookSummary
       ? getBibleBookName(selectedBookSummary.id)
       : "";
+
     document.title = name ? `మన్నా - ${name} ${chapter}` : "మన్నా - తెలుగు బైబిల్";
   }, [selectedBookSummary, chapter]);
+
   const snapshot = useReaderSnapshot(
     book,
     chapter,
@@ -99,15 +111,19 @@ const ReaderScreen = () => {
   );
 
   const visibleBook = pendingBook ?? snapshot?.book ?? book;
+
   const visibleBookSummary = books.find(
     (candidate) => candidate.id === visibleBook
   );
+
   const isReaderTransitioning = snapshot !== null && snapshot.book !== book;
+
   const visibleChapters = resolveVisibleChapters(
     isReaderTransitioning,
     visibleBookSummary,
     snapshot
   );
+
   const visibleChapter = isReaderTransitioning ? 1 : chapter;
 
   const bookIndex = books.findIndex((candidate) => candidate.id === book);
@@ -116,6 +132,7 @@ const ReaderScreen = () => {
 
   const handlePrevBook = () => {
     const next = books[bookIndex - 1];
+
     if (next) {
       selectBook(next.id);
     }
@@ -123,6 +140,7 @@ const ReaderScreen = () => {
 
   const handleNextBook = () => {
     const next = books[bookIndex + 1];
+
     if (next) {
       selectBook(next.id);
     }
@@ -204,12 +222,8 @@ const ReaderScreen = () => {
           {snapshot && <VerseList verses={snapshot.verses} />}
           {!snapshot && hasLoadedBooks && (
             <div className="flex flex-col gap-3" aria-busy="true">
-              {SKELETON_WIDTHS.map((w, i) => (
-                <Skeleton
-                  key={i}
-                  className="h-5 rounded-lg"
-                  style={{ width: `${w}%` }}
-                />
+              {SKELETON_LINES.map((width) => (
+                <Skeleton key={width} className={cn("h-5 rounded-lg", width)} />
               ))}
             </div>
           )}

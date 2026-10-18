@@ -19,8 +19,10 @@ export const useReaderSnapshot = (
     if (preloadedSnapshot !== null && preloadedSnapshot.book === book) {
       const stored = preloadedSnapshot;
       preloadedSnapshot = null;
+
       return stored;
     }
+
     return null;
   });
 
@@ -50,9 +52,11 @@ export const useReaderSnapshot = (
         if (!mounted) {
           return;
         }
+
         if (import.meta.env.DEV) {
           console.error("[Bible] Unable to load reader snapshot", error);
         }
+
         setSnapshot(null);
         useReaderStore.getState().clearPendingBook();
       }

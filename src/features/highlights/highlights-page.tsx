@@ -35,6 +35,7 @@ const COLOR_STYLES: Record<HighlightColor, string> = {
 
 const HighlightsPage = ({ onNavigateToReader }: HighlightsPageProps) => {
   const { highlights, remove, loaded } = useHighlights();
+
   const [pendingRemove, setPendingRemove] = useState<HighlightEntry | null>(
     null
   );
@@ -224,6 +225,7 @@ const HighlightsPage = ({ onNavigateToReader }: HighlightsPageProps) => {
                       if (pendingRemove) {
                         handleRemove(pendingRemove);
                       }
+
                       close();
                     }}
                   >

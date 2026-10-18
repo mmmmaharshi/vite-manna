@@ -13,6 +13,7 @@ import type { TabId } from "./bottom-nav";
 const HighlightsPage = lazy(
   () => import("../features/highlights/highlights-page")
 );
+
 const SearchPage = lazy(() => import("../features/search/search-page"));
 const SettingsPage = lazy(() => import("../features/settings/settings-page"));
 

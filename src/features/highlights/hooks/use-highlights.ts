@@ -26,6 +26,7 @@ export const useHighlights = () => {
 
     const load = async () => {
       const hlList = await getHighlights();
+
       if (mounted) {
         hydrate(hlList);
       }

@@ -24,6 +24,7 @@ const PROGRESS_CAP = 95;
 // that appear inside a component.
 const loadInitializeBible = async () => {
   const setup = await import("../features/setup");
+
   return setup.initializeBible;
 };
 
@@ -42,9 +43,11 @@ const progressMessage = (progress: number) => {
   if (progress < 75) {
     return `${PROGRESS_MESSAGE_DOWNLOADING} ${progress}%`;
   }
+
   if (progress < 90) {
     return PROGRESS_MESSAGE_PREPARING;
   }
+
   return PROGRESS_MESSAGE_SAVING;
 };
 
@@ -64,6 +67,7 @@ export const useAppShell = (): ShellStatus => {
 
     const prepare = async () => {
       await waitForFonts();
+
       if (mounted) {
         setAreFontsReady(true);
       }
@@ -96,6 +100,7 @@ export const useAppShell = (): ShellStatus => {
           if (!mounted) {
             return;
           }
+
           setDownloadProgress(Math.min(Math.round(nextProgress), PROGRESS_CAP));
         });
 
@@ -107,6 +112,7 @@ export const useAppShell = (): ShellStatus => {
         if (import.meta.env.DEV) {
           console.error("[Bible] Failed to initialize database", error);
         }
+
         if (mounted) {
           setDownloadError(DOWNLOAD_ERROR_MESSAGE);
         }

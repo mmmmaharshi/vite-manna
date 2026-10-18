@@ -53,6 +53,7 @@ class BibleDB extends Dexie {
 
         for (const row of rows) {
           const prev = latestByVerse.get(row.verseId);
+
           if (prev === undefined || row.updatedAt > prev.updatedAt) {
             latestByVerse.set(row.verseId, row);
           }

@@ -1,6 +1,54 @@
 @import "tailwindcss";
 @import "@heroui/styles";
 
+@theme {
+  /* Safe-area insets and the verse superscript size, as tokens so no utility
+     needs an arbitrary value. */
+  --spacing-nav-safe: max(0.25rem, env(safe-area-inset-bottom));
+  --spacing-bar-safe: max(0.75rem, env(safe-area-inset-bottom));
+  --text-superscript: 0.65em;
+}
+
+/*
+ * Classes the app styles by hand, declared as utilities so Tailwind generates
+ * them and the class rules can see them. Color variants stay in verseList.css.
+ */
+@keyframes manna-permalink-flash {
+  from {
+    box-shadow: inset 0 0 0 2px var(--accent);
+  }
+
+  to {
+    box-shadow: inset 0 0 0 2px transparent;
+  }
+}
+
+@utility animate-permalink-flash {
+  animation: manna-permalink-flash 1.2s ease-out;
+}
+
+@utility highlight-strip {
+  position: absolute;
+  inset: 0;
+  pointer-events: none;
+  border-radius: inherit;
+}
+
+@utility hl-dot {
+  display: inline-block;
+  width: var(--hl-dot-size);
+  height: var(--hl-dot-size);
+  border-radius: 9999px;
+  margin-left: 2px;
+  vertical-align: super;
+  flex-shrink: 0;
+}
+
+@utility verse-row {
+  content-visibility: auto;
+  contain-intrinsic-size: auto 2.5rem;
+}
+
 html {
   overflow: hidden;
   touch-action: manipulation;
@@ -23,6 +71,7 @@ html {
 @media (prefers-reduced-motion: no-preference) {
   .splash-progress__bar {
     animation: splash-progress-slide 1150ms ease-in-out infinite;
+    animation-delay: var(--splash-delay, 0ms);
     transform-box: fill-box;
     will-change: transform;
   }
@@ -31,6 +80,7 @@ html {
 .splash-progress__bar--determinate {
   animation: none;
   transform: none;
+  transition: width 180ms ease-out;
   will-change: width;
 }
 

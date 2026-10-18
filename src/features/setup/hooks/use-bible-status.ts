@@ -13,6 +13,7 @@ export const useBibleStatus = (): BibleStatus => {
     const check = async () => {
       try {
         const count = await countVerses();
+
         if (mounted) {
           setStatus(count > 0 ? "ready" : "missing");
         }

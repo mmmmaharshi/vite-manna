@@ -10,3 +10,6 @@ export const SIZE_PROPS: Record<
   sm: { type: "body-sm" },
   xl: { type: "h4", weight: "normal" },
 };
+
+export const isFontSize = (value: string | number): value is FontSize =>
+  Object.hasOwn(SIZE_PROPS, value);

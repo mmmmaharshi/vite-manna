@@ -1,6 +1,7 @@
 import { delay } from "es-toolkit";
 
 const FONT_WAIT_TIMEOUT_MS = 3000;
+
 const APP_FONT_FACES = [
   '400 1em "Google Sans Variable"',
   '900 1em "Google Sans Variable"',

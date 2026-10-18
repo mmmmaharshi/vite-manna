@@ -18,13 +18,14 @@ const TABS: { id: TabId; label: string; Icon: typeof Book }[] = [
 ];
 
 const BottomNav = ({ activeTab, onTabChange }: BottomNavProps) => (
-  <Surface className="fixed inset-x-0 bottom-0 z-20 mx-auto max-w-md border border-t pb-[max(0.25rem,env(safe-area-inset-bottom))] sm:max-w-lg md:max-w-xl lg:max-w-2xl xl:max-w-3xl">
+  <Surface className="pb-nav-safe fixed inset-x-0 bottom-0 z-20 mx-auto max-w-md border border-t sm:max-w-lg md:max-w-xl lg:max-w-2xl xl:max-w-3xl">
     <nav
       aria-label="Main navigation"
       className="flex items-center justify-around"
     >
       {TABS.map(({ id, label, Icon }) => {
         const isActive = id === activeTab;
+
         return (
           <Button
             key={id}

@@ -15,6 +15,19 @@ interface BibleResponse {
   }[];
 }
 
+const isBibleResponse = (value: unknown): value is BibleResponse =>
+  typeof value === "object" && value !== null && "Book" in value;
+
+const parseBibleResponse = (json: string): BibleResponse => {
+  const parsed: unknown = JSON.parse(json);
+
+  if (!isBibleResponse(parsed)) {
+    throw new Error("Bible data has an unexpected shape");
+  }
+
+  return parsed;
+};
+
 export const initializeBible = async (
   onProgress?: (progress: number) => void
 ) => {
@@ -22,6 +35,7 @@ export const initializeBible = async (
 
   if (count > 0) {
     onProgress?.(100);
+
     return true;
   }
 
@@ -73,7 +87,7 @@ export const initializeBible = async (
 
   onProgress?.(75);
 
-  const bible = JSON.parse(new TextDecoder().decode(bytes)) as BibleResponse;
+  const bible = parseBibleResponse(new TextDecoder().decode(bytes));
 
   const verses: BibleVerse[] = [];
 

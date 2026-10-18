@@ -1,9 +1,9 @@
-export const canNativeShare = () =>
-  typeof navigator !== "undefined" && typeof navigator.share === "function";
+export const canNativeShare = () => navigator.share !== undefined;
 
 export const copyToClipboard = async (text: string) => {
   if (navigator.clipboard?.writeText) {
     await navigator.clipboard.writeText(text);
+
     return;
   }
 

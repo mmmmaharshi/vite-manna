@@ -27,6 +27,7 @@ const buildShareText = (
   chapter: number
 ) => {
   const reference = formatReference(book, chapter);
+
   return verses
     .map((verse) => `${reference}:${verse.verse} ${verse.text}`)
     .join("\n");
@@ -38,6 +39,7 @@ const buildPermalinkUrl = (book: number, chapter: number, verse: number) => {
   url.searchParams.set("chapter", String(chapter));
   url.searchParams.set("verse", String(verse));
   url.hash = "";
+
   return url.toString();
 };
 
@@ -54,9 +56,11 @@ const getSelectionGridCols = (
 
 const VerseActionBarInnerComponent = ({ verses }: VerseActionBarProps) => {
   const selectedVerseIds = useReaderStore((state) => state.selectedVerseIds);
+
   const clearVerseSelection = useReaderStore(
     (state) => state.clearVerseSelection
   );
+
   const setPermalinkVerse = useReaderStore((state) => state.setPermalinkVerse);
   const book = useReaderStore((state) => state.book);
   const chapter = useReaderStore((state) => state.chapter);
@@ -66,13 +70,18 @@ const VerseActionBarInnerComponent = ({ verses }: VerseActionBarProps) => {
     remove: removeHighlight,
     highlightedMap,
   } = useHighlights();
+
   const selectedSet = new Set(selectedVerseIds);
+
   const selectedVerses = verses
     .filter((verse) => selectedSet.has(verse.id))
     .toSorted((a, b) => a.verse - b.verse);
+
   const text = buildShareText(selectedVerses, book, chapter);
+
   const singleSelectedVerse =
     selectedVerses.length === 1 ? selectedVerses[0] : null;
+
   const allSelectedHighlighted =
     selectedVerses.length > 0 &&
     selectedVerses.every((verse) => highlightedMap.has(verse.id));
@@ -84,6 +93,7 @@ const VerseActionBarInnerComponent = ({ verses }: VerseActionBarProps) => {
 
     if (!canNativeShare()) {
       toast("Sharing isn't supported on this device", { variant: "warning" });
+
       return;
     }
 
@@ -93,6 +103,7 @@ const VerseActionBarInnerComponent = ({ verses }: VerseActionBarProps) => {
       if (error instanceof DOMException && error.name === "AbortError") {
         return;
       }
+
       toast("Failed to share verses", { variant: "danger" });
     }
   };
@@ -119,6 +130,7 @@ const VerseActionBarInnerComponent = ({ verses }: VerseActionBarProps) => {
         void addHighlight(verse);
       }
     }
+
     clearVerseSelection();
   };
 
@@ -126,6 +138,7 @@ const VerseActionBarInnerComponent = ({ verses }: VerseActionBarProps) => {
     for (const verse of selectedVerses) {
       void removeHighlight(verse.id);
     }
+
     toast("Highlight removed", { variant: "success" });
     clearVerseSelection();
   };
@@ -136,10 +149,7 @@ const VerseActionBarInnerComponent = ({ verses }: VerseActionBarProps) => {
   );
 
   return (
-    <div
-      className="pointer-events-none fixed inset-x-0 bottom-[3.5rem] z-40 px-3 pt-3 pb-[max(0.75rem,env(safe-area-inset-bottom))]"
-      style={{ overscrollBehavior: "contain" }}
-    >
+    <div className="pb-bar-safe pointer-events-none fixed inset-x-0 bottom-[3.5rem] z-40 overscroll-contain px-3 pt-3">
       <Surface className="pointer-events-auto mx-auto w-full border px-4 py-3 shadow-lg">
         <div className="mb-3 flex items-center justify-between">
           <span className="text-sm font-medium tabular-nums">

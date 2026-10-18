@@ -27,6 +27,7 @@ export const useUrlSync = () => {
         isExternalUpdate.current = true;
         state.setBook(Number(bookParam));
         state.setChapter(Number(chapterParam));
+
         if (verseParam !== null) {
           state.setPermalinkVerse(Number(verseParam));
         }
@@ -34,12 +35,14 @@ export const useUrlSync = () => {
     };
 
     window.addEventListener("popstate", onPopState);
+
     return () => window.removeEventListener("popstate", onPopState);
   }, []);
 
   useEffect(() => {
     if (isExternalUpdate.current) {
       isExternalUpdate.current = false;
+
       return;
     }
 
@@ -47,6 +50,7 @@ export const useUrlSync = () => {
 
     next.set(URL_PARAM_BOOK, String(book));
     next.set(URL_PARAM_CHAPTER, String(chapter));
+
     if (permalinkVerse === null) {
       next.delete(URL_PARAM_VERSE);
     } else {

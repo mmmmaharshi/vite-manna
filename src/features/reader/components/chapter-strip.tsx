@@ -48,6 +48,7 @@ const useChapterStripScroll = ({
     lastScrollRestoreKeyRef.current = scrollRestoreKey;
 
     const savedScrollLeft = scrollByBookRef.current.get(currentBook);
+
     const targetScrollLeft =
       savedScrollLeft ??
       activeChapter.offsetLeft -
@@ -84,9 +85,11 @@ const useChapterStripScroll = ({
   return {
     rememberChapterStripScroll: () => {
       const chapterStrip = chapterStripRef.current;
+
       if (!chapterStrip) {
         return;
       }
+
       scrollByBookRef.current.set(currentBook, chapterStrip.scrollLeft);
     },
   };

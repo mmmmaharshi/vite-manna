@@ -82,6 +82,7 @@ export const useReaderStore = create<ReaderState>((set, get) => ({
 
     setTimeout(() => {
       const { pendingBook } = get();
+
       if (pendingBook === bookId) {
         set({ isBookSelectOpen: false, pendingBook: null });
       }
@@ -102,6 +103,7 @@ export const useReaderStore = create<ReaderState>((set, get) => ({
   setBookSelectOpen: (open) => {
     if (get().pendingBook !== null) {
       set({ isBookSelectOpen: true });
+
       return;
     }
 
@@ -139,6 +141,7 @@ export const useReaderStore = create<ReaderState>((set, get) => ({
 
     if (!isSelectionMode) {
       set({ isSelectionMode: true, selectedVerseIds: [verseId] });
+
       return;
     }
 
