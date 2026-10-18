@@ -32,8 +32,6 @@ export interface Highlight {
   updatedAt: number;
 }
 
-export const DB_NAME = "BibleDB";
-
 class BibleDB extends Dexie {
   verses!: Table<BibleVerse, number>;
   meta!: Table<MetaEntry, string>;

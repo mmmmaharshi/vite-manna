@@ -11,11 +11,9 @@ export {
 
 export {
   clearBibleSeed,
-  getChapterNumbers,
   getHighlights,
   getReaderBootstrap,
   getReaderSnapshot,
-  getVerses,
   isBibleSeeded,
   markBibleSeeded,
   putVerses,
