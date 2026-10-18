@@ -10,7 +10,6 @@ import {
 } from "@heroui/react";
 import { useMemo } from "react";
 
-import { version } from "../../../package.json";
 import { cn } from "../../shared/lib/cn";
 import {
   fontSizeClass,
@@ -94,9 +93,7 @@ const SettingsPage = () => {
 
           <Surface className="p-3">
             <Typography className="mb-2 text-sm font-medium">About</Typography>
-            <Typography className="text-muted text-xs">
-              మన్నా · Manna v{version}
-            </Typography>
+            <Typography className="text-muted text-xs">మన్నా · Manna</Typography>
             <Typography className="text-muted mt-0.5 text-xs">
               Offline Telugu Bible reader
             </Typography>
