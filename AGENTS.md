@@ -21,6 +21,10 @@ Bible reading app (manna) built with Vite+ and React 19.
 - `bun run preview` — Preview production build
 - `vp check` — Lint, format check, and typecheck in one pass
 
+## Branching
+
+- Commit and push directly to `main`. No `dev` branch and no PR flow.
+
 ## Testing
 
 - Vitest 5 (run via `vp test`) for unit/integration tests
