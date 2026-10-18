@@ -19,9 +19,7 @@ export const useInstallPrompt = () => {
 
   const [dismissed, setDismissed] = useLocalStorage(DISMISS_KEY, false);
 
-  const isStandalone =
-    typeof window !== "undefined" &&
-    window.matchMedia("(display-mode: standalone)").matches;
+  const isStandalone = window.matchMedia("(display-mode: standalone)").matches;
 
   useEffect(() => {
     const handler = (event: Event) => {
