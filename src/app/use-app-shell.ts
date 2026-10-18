@@ -17,7 +17,12 @@ const PROGRESS_MESSAGE_PREPARING = "Preparing Bible data...";
 const PROGRESS_MESSAGE_SAVING = "Saving Bible for offline use...";
 const DOWNLOAD_ERROR_MESSAGE = "Unable to load Bible data. Please try again.";
 
+const READ_ERROR_MESSAGE =
+  "Unable to read your Bible data on this device. Please try again.";
+
 const PROGRESS_CAP = 95;
+
+const BOOT_SPLASH_SELECTOR = "#boot-splash";
 
 // Kept at module scope: the React Compiler cannot lower `import()` expressions
 // that appear inside a component.
@@ -58,7 +63,7 @@ export const useAppShell = (): ShellStatus => {
   const [areFontsReady, setAreFontsReady] = useState(false);
   const [isMinSplashElapsed, setIsMinSplashElapsed] = useState(false);
   const [downloadProgress, setDownloadProgress] = useState<number | null>(0);
-  const [downloadError, setDownloadError] = useState<string | null>(null);
+  const [loadError, setLoadError] = useState<string | null>(null);
   const [isBibleComplete, setIsBibleComplete] = useState(false);
   const [areBooksReady, setAreBooksReady] = useState(false);
   const [isSnapshotReady, setIsSnapshotReady] = useState(false);
@@ -84,7 +89,7 @@ export const useAppShell = (): ShellStatus => {
   }, []);
 
   useEffect(() => {
-    if (bibleStatus !== "missing" || downloadError !== null) {
+    if (bibleStatus !== "missing" || loadError !== null) {
       return;
     }
 
@@ -112,7 +117,6 @@ export const useAppShell = (): ShellStatus => {
         });
 
         if (mounted) {
-          setDownloadProgress(0);
           setIsBibleComplete(true);
         }
       } catch (error) {
@@ -121,7 +125,7 @@ export const useAppShell = (): ShellStatus => {
         }
 
         if (mounted) {
-          setDownloadError(DOWNLOAD_ERROR_MESSAGE);
+          setLoadError(DOWNLOAD_ERROR_MESSAGE);
         }
       }
     };
@@ -131,9 +135,13 @@ export const useAppShell = (): ShellStatus => {
     return () => {
       mounted = false;
     };
-  }, [bibleStatus, downloadError]);
+  }, [bibleStatus, loadError]);
 
   useEffect(() => {
+    if (loadError !== null) {
+      return;
+    }
+
     if (bibleStatus !== "ready" && !isBibleComplete) {
       return;
     }
@@ -159,9 +167,14 @@ export const useAppShell = (): ShellStatus => {
 
         setBooksCache(mapped);
         setAreBooksReady(true);
-      } catch {
+      } catch (error) {
+        // Without surfacing this the reader would sit on an empty state forever.
+        if (import.meta.env.DEV) {
+          console.error("[Bible] Failed to load the book list", error);
+        }
+
         if (mounted) {
-          setAreBooksReady(true);
+          setLoadError(READ_ERROR_MESSAGE);
         }
       }
     };
@@ -171,9 +184,13 @@ export const useAppShell = (): ShellStatus => {
     return () => {
       mounted = false;
     };
-  }, [bibleStatus, isBibleComplete, areBooksReady]);
+  }, [bibleStatus, isBibleComplete, areBooksReady, loadError]);
 
   useEffect(() => {
+    if (loadError !== null) {
+      return;
+    }
+
     if (!areBooksReady) {
       return;
     }
@@ -195,9 +212,14 @@ export const useAppShell = (): ShellStatus => {
 
         setPreloadedSnapshot(snapshot);
         setIsSnapshotReady(true);
-      } catch {
+      } catch (error) {
+        // Without surfacing this the reader would show its skeleton forever.
+        if (import.meta.env.DEV) {
+          console.error("[Bible] Failed to load the reader snapshot", error);
+        }
+
         if (mounted) {
-          setIsSnapshotReady(true);
+          setLoadError(READ_ERROR_MESSAGE);
         }
       }
     };
@@ -207,7 +229,7 @@ export const useAppShell = (): ShellStatus => {
     return () => {
       mounted = false;
     };
-  }, [areBooksReady, isSnapshotReady]);
+  }, [areBooksReady, isSnapshotReady, loadError]);
 
   const isShellReady =
     (bibleStatus === "ready" || isBibleComplete) &&
@@ -216,11 +238,7 @@ export const useAppShell = (): ShellStatus => {
     isSnapshotReady;
 
   useEffect(() => {
-    if (!isShellReady || downloadError !== null) {
-      return;
-    }
-
-    if (downloadProgress !== 0) {
+    if (!isShellReady || loadError !== null) {
       return;
     }
 
@@ -234,29 +252,42 @@ export const useAppShell = (): ShellStatus => {
     );
 
     return () => clearTimeout(timeoutId);
-  }, [downloadError, downloadProgress, isMinSplashElapsed, isShellReady]);
+  }, [loadError, isMinSplashElapsed, isShellReady]);
 
   const handleRetry = () => {
-    setDownloadError(null);
+    setLoadError(null);
     setDownloadProgress(0);
   };
 
-  if (downloadError !== null) {
-    return { handleRetry, kind: "error", message: downloadError };
-  }
+  const isDownloading = bibleStatus === "missing" && !isBibleComplete;
+  const isPreparing = !isShellReady || !isMinSplashElapsed;
 
-  if (bibleStatus === "missing" && !isBibleComplete) {
-    return {
+  let status: ShellStatus = { kind: "ready" };
+
+  if (loadError !== null) {
+    status = { handleRetry, kind: "error", message: loadError };
+  } else if (bibleStatus === "missing" && isPreparing) {
+    // The bar holds its last value once the download is done, so it never drops
+    // back to the indeterminate slide while the books and snapshot load.
+    status = {
       handleRetry,
       kind: "progress",
-      message: progressMessage(downloadProgress),
-      progress: downloadProgress,
+      message: isDownloading
+        ? progressMessage(downloadProgress)
+        : PROGRESS_MESSAGE_SAVING,
+      progress: isDownloading ? downloadProgress : PROGRESS_CAP,
     };
+  } else if (isPreparing) {
+    status = { kind: "splash" };
   }
 
-  if (!isShellReady || !isMinSplashElapsed) {
-    return { kind: "splash" };
-  }
+  const isBootSplashVisible = status.kind === "splash";
 
-  return { kind: "ready" };
+  useEffect(() => {
+    if (!isBootSplashVisible) {
+      document.querySelector(BOOT_SPLASH_SELECTOR)?.remove();
+    }
+  }, [isBootSplashVisible]);
+
+  return status;
 };
