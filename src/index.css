@@ -49,6 +49,27 @@
   contain-intrinsic-size: auto 2.5rem;
 }
 
+/* The shared page width: `max-w-md sm:max-w-lg md:max-w-xl lg:max-w-2xl xl:max-w-3xl`. */
+@utility page-shell {
+  max-width: var(--container-md);
+
+  @media (width >= 40rem) {
+    max-width: var(--container-lg);
+  }
+
+  @media (width >= 48rem) {
+    max-width: var(--container-xl);
+  }
+
+  @media (width >= 64rem) {
+    max-width: var(--container-2xl);
+  }
+
+  @media (width >= 80rem) {
+    max-width: var(--container-3xl);
+  }
+}
+
 html {
   overflow: hidden;
   touch-action: manipulation;

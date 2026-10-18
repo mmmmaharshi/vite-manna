@@ -3,11 +3,12 @@ import { useSearchParams } from "react-router";
 
 import { parsePositiveInteger } from "../../shared/lib/parse-positive-integer";
 import { saveReaderLocation } from "../../shared/lib/persistence";
+import {
+  URL_PARAM_BOOK,
+  URL_PARAM_CHAPTER,
+  URL_PARAM_VERSE,
+} from "../../shared/lib/reference";
 import { useReaderStore } from "./store/reader-store";
-
-const URL_PARAM_BOOK = "book";
-const URL_PARAM_CHAPTER = "chapter";
-const URL_PARAM_VERSE = "verse";
 
 export const useUrlSync = () => {
   const [searchParams, setSearchParams] = useSearchParams();

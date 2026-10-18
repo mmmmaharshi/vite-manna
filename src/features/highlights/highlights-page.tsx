@@ -10,19 +10,16 @@ import {
 } from "@heroui/react";
 import { useState } from "react";
 
-import { getBibleBookName } from "../../shared/bible";
 import type { Highlight, HighlightColor } from "../../shared/bible";
 import { copyToClipboard } from "../../shared/lib/browser";
 import { cn } from "../../shared/lib/cn";
+import { formatReference } from "../../shared/lib/reference";
 import { useHighlights } from "../highlights/hooks/use-highlights";
 import { useReaderStore } from "../reader/store/reader-store";
 
 interface HighlightsPageProps {
   onNavigateToReader: () => void;
 }
-
-const formatRef = (book: number, chapter: number, verse: number) =>
-  `${getBibleBookName(book)} ${chapter}:${verse}`;
 
 const COLOR_STYLES: Record<HighlightColor, string> = {
   blue: "bg-blue-200/60 border-blue-400/40",
@@ -57,7 +54,7 @@ const HighlightsPage = ({ onNavigateToReader }: HighlightsPageProps) => {
   return (
     <main id="main-content" className="flex h-dvh flex-col">
       <Surface className="bg-surface sticky top-0 z-30 border border-b py-3">
-        <div className="mx-auto flex w-full max-w-md flex-col gap-2 px-2 sm:max-w-lg md:max-w-xl lg:max-w-2xl xl:max-w-3xl">
+        <div className="page-shell mx-auto flex w-full flex-col gap-2 px-2">
           <Typography.Heading level={1} className="text-xl">
             Highlights
           </Typography.Heading>
@@ -67,7 +64,7 @@ const HighlightsPage = ({ onNavigateToReader }: HighlightsPageProps) => {
       <ScrollShadow hideScrollBar className="flex-1">
         {error !== null && (
           <section
-            className="mx-auto flex w-full max-w-md flex-col items-center gap-2 px-2 py-24 text-center sm:max-w-lg md:max-w-xl lg:max-w-2xl xl:max-w-3xl"
+            className="page-shell mx-auto flex w-full flex-col items-center gap-2 px-2 py-24 text-center"
             role="alert"
           >
             <Typography className="text-danger text-base font-medium">
@@ -80,7 +77,7 @@ const HighlightsPage = ({ onNavigateToReader }: HighlightsPageProps) => {
         )}
 
         {loaded && highlights.length === 0 && (
-          <section className="mx-auto flex w-full max-w-md flex-col items-center gap-4 px-2 py-24 text-center sm:max-w-lg md:max-w-xl lg:max-w-2xl xl:max-w-3xl">
+          <section className="page-shell mx-auto flex w-full flex-col items-center gap-4 px-2 py-24 text-center">
             <PencilToSquare
               aria-hidden="true"
               className="text-muted h-10 w-10 sm:h-12 sm:w-12"
@@ -96,7 +93,7 @@ const HighlightsPage = ({ onNavigateToReader }: HighlightsPageProps) => {
 
         {loaded && highlights.length > 0 && (
           <section
-            className="mx-auto flex w-full max-w-md flex-col gap-2 px-2 py-4 sm:max-w-lg md:max-w-xl lg:max-w-2xl xl:max-w-3xl"
+            className="page-shell mx-auto flex w-full flex-col gap-2 px-2 py-4"
             aria-live="polite"
             aria-atomic="true"
           >
@@ -117,7 +114,7 @@ const HighlightsPage = ({ onNavigateToReader }: HighlightsPageProps) => {
                     }
                   >
                     <Typography className="text-accent text-sm font-medium">
-                      {formatRef(hl.book, hl.chapter, hl.verse)}
+                      {formatReference(hl.book, hl.chapter, hl.verse)}
                     </Typography>
                   </button>
                   <div className="flex shrink-0 gap-0.5">
@@ -130,7 +127,7 @@ const HighlightsPage = ({ onNavigateToReader }: HighlightsPageProps) => {
                         onPress={async () => {
                           try {
                             await copyToClipboard(
-                              `${formatRef(hl.book, hl.chapter, hl.verse)} ${hl.text}`
+                              `${formatReference(hl.book, hl.chapter, hl.verse)} ${hl.text}`
                             );
                             toast("Verse copied to clipboard", {
                               variant: "success",
@@ -185,7 +182,7 @@ const HighlightsPage = ({ onNavigateToReader }: HighlightsPageProps) => {
 
         {!loaded && error === null && (
           <section
-            className="mx-auto flex w-full max-w-md flex-col items-center gap-3 px-2 py-24 sm:max-w-lg md:max-w-xl lg:max-w-2xl xl:max-w-3xl"
+            className="page-shell mx-auto flex w-full flex-col items-center gap-3 px-2 py-24"
             aria-live="polite"
             aria-busy="true"
           >
@@ -220,7 +217,7 @@ const HighlightsPage = ({ onNavigateToReader }: HighlightsPageProps) => {
                     Remove highlight for{" "}
                     <strong>
                       {pendingRemove
-                        ? formatRef(
+                        ? formatReference(
                             pendingRemove.book,
                             pendingRemove.chapter,
                             pendingRemove.verse

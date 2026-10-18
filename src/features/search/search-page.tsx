@@ -8,16 +8,14 @@ import {
 } from "@heroui/react";
 import { useCallback, useEffect, useRef, useState } from "react";
 
-import { getBibleBookName, searchVerses } from "../../shared/bible";
+import { searchVerses } from "../../shared/bible";
 import type { BibleVerse } from "../../shared/bible";
+import { formatReference } from "../../shared/lib/reference";
 import { useReaderStore } from "../reader/store/reader-store";
 
 interface SearchPageProps {
   onNavigateToReader: () => void;
 }
-
-const formatRef = (verse: BibleVerse) =>
-  `${getBibleBookName(verse.book)} ${verse.chapter}:${verse.verse}`;
 
 const SearchPage = ({ onNavigateToReader }: SearchPageProps) => {
   const [query, setQuery] = useState("");
@@ -99,7 +97,7 @@ const SearchPage = ({ onNavigateToReader }: SearchPageProps) => {
   return (
     <main id="main-content" className="flex h-dvh flex-col">
       <Surface className="sticky top-0 z-30 border border-b py-3">
-        <div className="mx-auto w-full max-w-md px-2 sm:max-w-lg md:max-w-xl lg:max-w-2xl xl:max-w-3xl">
+        <div className="page-shell mx-auto w-full px-2">
           <Typography.Heading level={1} className="text-xl">
             Search
           </Typography.Heading>
@@ -107,7 +105,7 @@ const SearchPage = ({ onNavigateToReader }: SearchPageProps) => {
       </Surface>
 
       <ScrollShadow hideScrollBar className="flex-1">
-        <div className="mx-auto w-full max-w-md px-2 pt-2 sm:max-w-lg md:max-w-xl lg:max-w-2xl xl:max-w-3xl">
+        <div className="page-shell mx-auto w-full px-2 pt-2">
           <SearchField
             value={query}
             onChange={handleQueryChange}
@@ -135,7 +133,7 @@ const SearchPage = ({ onNavigateToReader }: SearchPageProps) => {
 
         <div aria-live="polite" aria-atomic="true">
           {!searched && !searching && (
-            <section className="mx-auto flex w-full max-w-md flex-col items-center gap-2 px-2 py-24 text-center sm:max-w-lg md:max-w-xl lg:max-w-2xl xl:max-w-3xl">
+            <section className="page-shell mx-auto flex w-full flex-col items-center gap-2 px-2 py-24 text-center">
               <Magnifier
                 aria-hidden="true"
                 className="text-muted h-10 w-10 sm:h-12 sm:w-12"
@@ -151,7 +149,7 @@ const SearchPage = ({ onNavigateToReader }: SearchPageProps) => {
 
           {searched && error !== null && (
             <section
-              className="mx-auto flex w-full max-w-md flex-col items-center gap-2 px-2 py-24 text-center sm:max-w-lg md:max-w-xl lg:max-w-2xl xl:max-w-3xl"
+              className="page-shell mx-auto flex w-full flex-col items-center gap-2 px-2 py-24 text-center"
               role="alert"
             >
               <Typography className="text-danger text-base font-medium">
@@ -161,7 +159,7 @@ const SearchPage = ({ onNavigateToReader }: SearchPageProps) => {
           )}
 
           {searched && error === null && results.length === 0 && !searching && (
-            <section className="mx-auto flex w-full max-w-md flex-col items-center gap-2 px-2 py-24 text-center sm:max-w-lg md:max-w-xl lg:max-w-2xl xl:max-w-3xl">
+            <section className="page-shell mx-auto flex w-full flex-col items-center gap-2 px-2 py-24 text-center">
               <Typography className="text-base font-medium">
                 No results
               </Typography>
@@ -172,7 +170,7 @@ const SearchPage = ({ onNavigateToReader }: SearchPageProps) => {
           )}
 
           {results.length > 0 && (
-            <section className="mx-auto flex w-full max-w-md flex-col gap-2 px-2 py-4 sm:max-w-lg md:max-w-xl lg:max-w-2xl xl:max-w-3xl">
+            <section className="page-shell mx-auto flex w-full flex-col gap-2 px-2 py-4">
               <Typography.Paragraph size="sm" color="muted" className="px-1">
                 {results.length} result{results.length === 1 ? "" : "s"}
               </Typography.Paragraph>
@@ -184,7 +182,7 @@ const SearchPage = ({ onNavigateToReader }: SearchPageProps) => {
                     onClick={() => handleNavigate(verse)}
                   >
                     <Typography className="text-accent text-sm font-medium">
-                      {formatRef(verse)}
+                      {formatReference(verse.book, verse.chapter, verse.verse)}
                     </Typography>
                     <Typography.Paragraph
                       size="sm"

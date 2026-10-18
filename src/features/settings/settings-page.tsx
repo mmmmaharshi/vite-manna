@@ -8,7 +8,6 @@ import {
   Tooltip,
   Typography,
 } from "@heroui/react";
-import { useMemo } from "react";
 
 import { cn } from "../../shared/lib/cn";
 import {
@@ -37,7 +36,7 @@ const SettingsPage = () => {
   return (
     <main id="main-content" className="flex h-dvh flex-col">
       <Surface className="bg-surface sticky top-0 z-30 border border-b py-3">
-        <div className="mx-auto w-full max-w-md px-2 sm:max-w-lg md:max-w-xl lg:max-w-2xl xl:max-w-3xl">
+        <div className="page-shell mx-auto w-full px-2">
           <Typography.Heading level={1} className="text-xl">
             Settings
           </Typography.Heading>
@@ -45,7 +44,7 @@ const SettingsPage = () => {
       </Surface>
 
       <ScrollShadow hideScrollBar className="flex-1">
-        <section className="mx-auto flex w-full max-w-md flex-col gap-2 px-2 py-4 sm:max-w-lg md:max-w-xl lg:max-w-2xl xl:max-w-3xl">
+        <section className="page-shell mx-auto flex w-full flex-col gap-2 px-2 py-4">
           <Surface className="p-3">
             <div className="mb-2 flex items-center justify-between">
               <Typography className="text-sm font-medium">Font Size</Typography>
@@ -68,7 +67,7 @@ const SettingsPage = () => {
               fullWidth
               selectionMode="single"
               className="mb-3"
-              selectedKeys={useMemo(() => new Set([fontSize]), [fontSize])}
+              selectedKeys={new Set([fontSize])}
               onSelectionChange={(keys) => {
                 const [value] = [...keys];
 

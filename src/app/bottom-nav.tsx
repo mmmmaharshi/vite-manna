@@ -18,7 +18,7 @@ const TABS: { id: TabId; label: string; Icon: typeof Book }[] = [
 ];
 
 const BottomNav = ({ activeTab, onTabChange }: BottomNavProps) => (
-  <Surface className="pb-nav-safe fixed inset-x-0 bottom-0 z-20 mx-auto max-w-md border border-t sm:max-w-lg md:max-w-xl lg:max-w-2xl xl:max-w-3xl">
+  <Surface className="pb-nav-safe page-shell fixed inset-x-0 bottom-0 z-20 mx-auto border border-t">
     <nav
       aria-label="Main navigation"
       className="flex items-center justify-around"

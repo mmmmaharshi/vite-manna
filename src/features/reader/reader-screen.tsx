@@ -8,8 +8,8 @@ import {
 } from "@heroui/react";
 import { useEffect, useRef } from "react";
 
-import { getBibleBookName } from "../../shared/bible";
 import { cn } from "../../shared/lib/cn";
+import { formatReference } from "../../shared/lib/reference";
 import BookSelect from "./components/book-select";
 import ChapterStrip from "./components/chapter-strip";
 import VerseActionBar from "./components/verse-action-bar";
@@ -97,11 +97,9 @@ const ReaderScreen = () => {
   const selectedBookSummary = books.find((candidate) => candidate.id === book);
 
   useEffect(() => {
-    const name = selectedBookSummary
-      ? getBibleBookName(selectedBookSummary.id)
-      : "";
-
-    document.title = name ? `మన్నా - ${name} ${chapter}` : "మన్నా - తెలుగు బైబిల్";
+    document.title = selectedBookSummary
+      ? `మన్నా - ${formatReference(selectedBookSummary.id, chapter)}`
+      : "మన్నా - తెలుగు బైబిల్";
   }, [selectedBookSummary, chapter]);
 
   const snapshot = useReaderSnapshot(
@@ -162,7 +160,7 @@ const ReaderScreen = () => {
   return (
     <main id="main-content" className="flex h-dvh flex-col">
       <Surface className="sticky top-0 z-30 border border-b py-2.5 pt-3.5">
-        <div className="mx-auto flex w-full max-w-md flex-col gap-2 px-2 sm:max-w-lg md:max-w-xl lg:max-w-2xl">
+        <div className="page-shell mx-auto flex w-full flex-col gap-2 px-2">
           <div className="flex items-stretch gap-1">
             <Button
               variant="tertiary"
@@ -204,18 +202,18 @@ const ReaderScreen = () => {
       <ScrollShadow ref={scrollRef} hideScrollBar className="flex-1">
         <Typography.Heading level={1} className="sr-only">
           {selectedBookSummary
-            ? `${getBibleBookName(selectedBookSummary.id)} ${chapter}`
+            ? formatReference(selectedBookSummary.id, chapter)
             : "Bible Reader"}
         </Typography.Heading>
         <section
           ref={verseSectionRef}
           className={cn(
-            "mx-auto w-full max-w-md px-2 py-4 sm:max-w-lg md:max-w-xl lg:max-w-2xl",
+            "page-shell mx-auto w-full px-2 py-4",
             isSelectionMode && "pb-24"
           )}
           aria-label={
             selectedBookSummary
-              ? `${getBibleBookName(selectedBookSummary.id)} ${chapter}`
+              ? formatReference(selectedBookSummary.id, chapter)
               : "Bible reader"
           }
         >

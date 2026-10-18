@@ -7,19 +7,19 @@ import {
 import { Button, Surface, toast, Tooltip } from "@heroui/react";
 import { memo } from "react";
 
-import { getBibleBookName } from "../../../shared/bible";
 import type { BibleVerse } from "../../../shared/bible";
 import { canNativeShare, copyToClipboard } from "../../../shared/lib/browser";
 import { cn } from "../../../shared/lib/cn";
+import {
+  buildPermalinkUrl,
+  formatReference,
+} from "../../../shared/lib/reference";
 import { useHighlights } from "../../highlights/hooks/use-highlights";
 import { useReaderStore } from "../store/reader-store";
 
 interface VerseActionBarProps {
   verses: BibleVerse[];
 }
-
-const formatReference = (book: number, chapter: number) =>
-  `${getBibleBookName(book)} ${chapter}`;
 
 const buildShareText = (
   verses: BibleVerse[],
@@ -31,16 +31,6 @@ const buildShareText = (
   return verses
     .map((verse) => `${reference}:${verse.verse} ${verse.text}`)
     .join("\n");
-};
-
-const buildPermalinkUrl = (book: number, chapter: number, verse: number) => {
-  const url = new URL(window.location.href);
-  url.searchParams.set("book", String(book));
-  url.searchParams.set("chapter", String(chapter));
-  url.searchParams.set("verse", String(verse));
-  url.hash = "";
-
-  return url.toString();
 };
 
 const getSelectionGridCols = (
