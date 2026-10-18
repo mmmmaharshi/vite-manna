@@ -9,7 +9,6 @@ import {
   getReaderBootstrap,
   getReaderSnapshot,
 } from "../shared/bible";
-import { waitForOfflineReadiness } from "../shared/lib/offline-readiness";
 import { waitForFonts } from "../shared/lib/wait-for-fonts";
 
 const MINIMUM_SPLASH_DURATION_MS = 500;
@@ -33,13 +32,17 @@ export type ShellStatus =
   | {
       kind: "progress";
       message: string;
-      progress: number;
+      progress: number | null;
       handleRetry: () => void;
     }
   | { kind: "error"; message: string; handleRetry: () => void }
   | { kind: "ready" };
 
-const progressMessage = (progress: number) => {
+const progressMessage = (progress: number | null) => {
+  if (progress === null) {
+    return PROGRESS_MESSAGE_DOWNLOADING;
+  }
+
   if (progress < 75) {
     return `${PROGRESS_MESSAGE_DOWNLOADING} ${progress}%`;
   }
@@ -54,7 +57,7 @@ const progressMessage = (progress: number) => {
 export const useAppShell = (): ShellStatus => {
   const [areFontsReady, setAreFontsReady] = useState(false);
   const [isMinSplashElapsed, setIsMinSplashElapsed] = useState(false);
-  const [downloadProgress, setDownloadProgress] = useState(0);
+  const [downloadProgress, setDownloadProgress] = useState<number | null>(0);
   const [downloadError, setDownloadError] = useState<string | null>(null);
   const [isBibleComplete, setIsBibleComplete] = useState(false);
   const [areBooksReady, setAreBooksReady] = useState(false);
@@ -74,7 +77,6 @@ export const useAppShell = (): ShellStatus => {
     };
 
     void prepare();
-    void waitForOfflineReadiness();
 
     return () => {
       mounted = false;
@@ -101,7 +103,12 @@ export const useAppShell = (): ShellStatus => {
             return;
           }
 
-          setDownloadProgress(Math.min(Math.round(nextProgress), PROGRESS_CAP));
+          // `null` means the response had no content-length, so the bar runs indeterminate.
+          setDownloadProgress(
+            nextProgress === null
+              ? null
+              : Math.min(Math.round(nextProgress), PROGRESS_CAP)
+          );
         });
 
         if (mounted) {

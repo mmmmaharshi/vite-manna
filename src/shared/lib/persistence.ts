@@ -23,13 +23,13 @@ export interface ReaderInitState {
 const isStoredLocation = (value: unknown): value is StoredLocation =>
   typeof value === "object" && value !== null;
 
-const readStoredLocation = (): StoredLocation | null => {
+const parseStoredLocation = (raw: string | null): StoredLocation | null => {
   try {
-    const parsed: unknown = JSON.parse(localStorage.getItem(STORAGE_KEY) ?? "");
+    const parsed: unknown = JSON.parse(raw ?? "");
 
     return isStoredLocation(parsed) ? parsed : null;
   } catch {
-    /* localStorage read may fail */
+    /* the stored value may be corrupt */
   }
 
   return null;
@@ -50,12 +50,8 @@ const parseChaptersByBook = (value: Record<string, number> | undefined) => {
   return chapters;
 };
 
-const readUrlLocation = () => {
-  if (typeof window === "undefined") {
-    return null;
-  }
-
-  const params = new URLSearchParams(window.location.search);
+const readUrlLocation = (search: string) => {
+  const params = new URLSearchParams(search);
   const book = parsePositiveInteger(params.get("book"));
   const chapter = parsePositiveInteger(params.get("chapter"));
 
@@ -66,20 +62,20 @@ const readUrlLocation = () => {
   return { book, chapter };
 };
 
-const readUrlVerse = () => {
-  if (typeof window === "undefined") {
-    return null;
-  }
+const readUrlVerse = (search: string) =>
+  parsePositiveInteger(new URLSearchParams(search).get("verse"));
 
-  const params = new URLSearchParams(window.location.search);
-
-  return parsePositiveInteger(params.get("verse"));
-};
-
-export const loadInitialState = (): ReaderInitState => {
-  const fromUrl = readUrlLocation();
-  const permalinkVerse = readUrlVerse();
-  const stored = readStoredLocation();
+/**
+ * Pure so it can be tested without a browser: `search` is `location.search`
+ * (with or without the leading `?`) and `storedRaw` is the raw localStorage value.
+ */
+export const resolveReaderLocation = (
+  search: string,
+  storedRaw: string | null
+): ReaderInitState => {
+  const fromUrl = readUrlLocation(search);
+  const permalinkVerse = readUrlVerse(search);
+  const stored = parseStoredLocation(storedRaw);
 
   const current =
     stored !== null && stored.version === STORAGE_VERSION ? stored : null;
@@ -112,6 +108,48 @@ export const loadInitialState = (): ReaderInitState => {
   };
 };
 
+export const loadInitialState = (): ReaderInitState => {
+  if (typeof window === "undefined") {
+    return resolveReaderLocation("", null);
+  }
+
+  let stored: string | null = null;
+
+  try {
+    stored = localStorage.getItem(STORAGE_KEY);
+  } catch {
+    /* localStorage read may fail */
+  }
+
+  return resolveReaderLocation(window.location.search, stored);
+};
+
+export interface StoredReaderLocation {
+  book: number;
+  chapter: number;
+  chaptersByBook: Record<number, number>;
+}
+
+export const saveReaderLocation = ({
+  book,
+  chapter,
+  chaptersByBook,
+}: StoredReaderLocation) => {
+  try {
+    localStorage.setItem(
+      STORAGE_KEY,
+      JSON.stringify({
+        book,
+        chapter,
+        chaptersByBook,
+        version: STORAGE_VERSION,
+      })
+    );
+  } catch {
+    /* localStorage write may fail */
+  }
+};
+
 export const loadFontSize = (): FontSize => {
   try {
     const stored = localStorage.getItem(FONT_SIZE_KEY);
@@ -138,5 +176,3 @@ export const rememberChapter = (
   chaptersByBook: Record<number, number>,
   book: number
 ) => chaptersByBook[book] ?? 1;
-
-export const STORAGE_KEY_LOCATION = STORAGE_KEY;

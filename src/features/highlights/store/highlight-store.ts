@@ -1,32 +1,25 @@
 import { create } from "zustand";
 
-import type { HighlightColor } from "../../../shared/bible";
-
-export interface HighlightEntry {
-  verseId: number;
-  book: number;
-  chapter: number;
-  verse: number;
-  text: string;
-  color: HighlightColor;
-  createdAt: number;
-  updatedAt: number;
-}
+import type { Highlight, HighlightColor } from "../../../shared/bible";
 
 export interface HighlightStore {
-  highlights: HighlightEntry[];
+  highlights: Highlight[];
   highlightedMap: Map<number, HighlightColor>;
   loaded: boolean;
-  hydrate: (highlights: HighlightEntry[]) => void;
-  upsertLocal: (highlight: HighlightEntry) => void;
+  error: string | null;
+  hydrate: (highlights: Highlight[]) => void;
+  setError: (message: string | null) => void;
+  upsertLocal: (highlight: Highlight) => void;
   removeLocal: (verseId: number) => void;
 }
 
 export const useHighlightStore = create<HighlightStore>((set) => ({
+  error: null,
   highlightedMap: new Map(),
   highlights: [],
   hydrate: (highlights) => {
     set({
+      error: null,
       highlightedMap: new Map(highlights.map((h) => [h.verseId, h.color])),
       highlights,
       loaded: true,
@@ -43,6 +36,9 @@ export const useHighlightStore = create<HighlightStore>((set) => ({
         highlights: state.highlights.filter((h) => h.verseId !== verseId),
       };
     });
+  },
+  setError: (message) => {
+    set({ error: message });
   },
   upsertLocal: (highlight) => {
     set((state) => {

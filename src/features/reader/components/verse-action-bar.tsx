@@ -124,23 +124,40 @@ const VerseActionBarInnerComponent = ({ verses }: VerseActionBarProps) => {
     }
   };
 
-  const handleHighlight = () => {
-    for (const verse of selectedVerses) {
-      if (!highlightedMap.has(verse.id)) {
-        void addHighlight(verse);
-      }
+  const saveHighlights = async (verseList: BibleVerse[]) => {
+    const results = await Promise.all(
+      verseList.map((verse) => addHighlight(verse))
+    );
+
+    if (results.includes(false)) {
+      toast("Failed to save highlight", { variant: "danger" });
     }
+  };
+
+  const handleHighlight = () => {
+    const toHighlight = selectedVerses.filter(
+      (verse) => !highlightedMap.has(verse.id)
+    );
 
     clearVerseSelection();
+    void saveHighlights(toHighlight);
+  };
+
+  const deleteHighlights = async (verseList: BibleVerse[]) => {
+    const results = await Promise.all(
+      verseList.map((verse) => removeHighlight(verse.id))
+    );
+
+    const failed = results.includes(false);
+
+    toast(failed ? "Failed to remove highlight" : "Highlight removed", {
+      variant: failed ? "danger" : "success",
+    });
   };
 
   const handleRemoveHighlight = () => {
-    for (const verse of selectedVerses) {
-      void removeHighlight(verse.id);
-    }
-
-    toast("Highlight removed", { variant: "success" });
     clearVerseSelection();
+    void deleteHighlights(selectedVerses);
   };
 
   const cols = getSelectionGridCols(

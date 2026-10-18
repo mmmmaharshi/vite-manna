@@ -1,19 +1,53 @@
 import { db, DEFAULT_HIGHLIGHT_COLOR } from "./db";
-import type { BibleVerse } from "./db";
+import type { BibleVerse, ChapterCounts } from "./db";
 
-export const countVerses = () => db.verses.count();
+const META_CHAPTER_COUNTS = "chapterCounts";
+const META_SEEDED = "bibleSeeded";
+
+const isChapterCount = (value: unknown): value is [number, number] =>
+  Array.isArray(value) &&
+  value.length === 2 &&
+  typeof value[0] === "number" &&
+  typeof value[1] === "number";
+
+const isChapterCounts = (value: unknown): value is ChapterCounts =>
+  Array.isArray(value) && value.every(isChapterCount);
+
+const readChapterCounts = async () => {
+  const entry = await db.meta.get(META_CHAPTER_COUNTS);
+
+  return isChapterCounts(entry?.value) ? entry.value : [];
+};
+
+export const isBibleSeeded = async () => {
+  const entry = await db.meta.get(META_SEEDED);
+
+  return entry?.value === true;
+};
+
+export const markBibleSeeded = (chapterCounts: ChapterCounts) =>
+  db.meta.bulkPut([
+    { key: META_CHAPTER_COUNTS, value: chapterCounts },
+    { key: META_SEEDED, value: true },
+  ]);
+
+export const clearBibleSeed = async () => {
+  await db.verses.clear();
+  await db.meta.bulkDelete([META_CHAPTER_COUNTS, META_SEEDED]);
+};
+
+const getContiguousChapterNumbers = (chapterCount: number) =>
+  Array.from({ length: chapterCount }, (_, index) => index + 1);
 
 export const getChapterNumbers = async (book: number) => {
-  const verses = await db.verses.where("book").equals(book).toArray();
+  const counts = await readChapterCounts();
+  const chapterCount = counts.find(([bookId]) => bookId === book)?.[1] ?? 0;
 
-  return [...new Set(verses.map((verse) => verse.chapter))];
+  return getContiguousChapterNumbers(chapterCount);
 };
 
 export const getVerses = (book: number, chapter: number) =>
   db.verses.where("[book+chapter]").equals([book, chapter]).sortBy("verse");
-
-const getContiguousChapterNumbers = (chapterCount: number) =>
-  Array.from({ length: chapterCount }, (_, index) => index + 1);
 
 export const getReaderSnapshot = async (
   book: number,
@@ -39,29 +73,17 @@ export const getReaderSnapshot = async (
 };
 
 export const getReaderBootstrap = async (book: number, chapter: number) => {
-  const verses = await db.verses.orderBy("book").toArray();
-  const chapterNumbersByBook = new Map<number, Set<number>>();
-
-  for (const verse of verses) {
-    const chapterNumbers = chapterNumbersByBook.get(verse.book) ?? new Set();
-    chapterNumbers.add(verse.chapter);
-    chapterNumbersByBook.set(verse.book, chapterNumbers);
-  }
-
-  const books = [...chapterNumbersByBook].map(([id, chapterNumbers]) => ({
-    chapterCount: chapterNumbers.size,
-    id,
-  }));
+  const counts = await readChapterCounts();
+  const books = counts.map(([id, chapterCount]) => ({ chapterCount, id }));
 
   const selectedBook = books.some((candidate) => candidate.id === book)
     ? book
     : books[0]?.id;
 
-  const chapters =
-    selectedBook === undefined
-      ? []
-      : [...(chapterNumbersByBook.get(selectedBook) ?? [])];
+  const selectedChapterCount =
+    books.find((candidate) => candidate.id === selectedBook)?.chapterCount ?? 0;
 
+  const chapters = getContiguousChapterNumbers(selectedChapterCount);
   const selectedChapter = chapters.includes(chapter) ? chapter : chapters[0];
 
   return {
@@ -76,13 +98,7 @@ export const getReaderBootstrap = async (book: number, chapter: number) => {
             verses:
               selectedChapter === undefined
                 ? []
-                : verses
-                    .filter(
-                      (verse) =>
-                        verse.book === selectedBook &&
-                        verse.chapter === selectedChapter
-                    )
-                    .toSorted((first, second) => first.verse - second.verse),
+                : await getVerses(selectedBook, selectedChapter),
           },
   };
 };
@@ -90,12 +106,14 @@ export const getReaderBootstrap = async (book: number, chapter: number) => {
 export const putVerses = (verses: BibleVerse[]) => db.verses.bulkPut(verses);
 
 export const searchVerses = (query: string) => {
-  if (!query.trim()) {
+  const needle = query.trim().toLowerCase();
+
+  if (!needle) {
     return Promise.resolve([]);
   }
 
   return db.verses
-    .filter((v) => v.text.toLowerCase().includes(query.toLowerCase()))
+    .filter((v) => v.text.toLowerCase().includes(needle))
     .limit(50)
     .toArray();
 };

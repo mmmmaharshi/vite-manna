@@ -1,6 +1,8 @@
 import { useEffect, useRef } from "react";
 import { useSearchParams } from "react-router";
 
+import { parsePositiveInteger } from "../../shared/lib/parse-positive-integer";
+import { saveReaderLocation } from "../../shared/lib/persistence";
 import { useReaderStore } from "./store/reader-store";
 
 const URL_PARAM_BOOK = "book";
@@ -18,19 +20,22 @@ export const useUrlSync = () => {
   useEffect(() => {
     const onPopState = () => {
       const params = new URLSearchParams(window.location.search);
-      const bookParam = params.get(URL_PARAM_BOOK);
-      const chapterParam = params.get(URL_PARAM_CHAPTER);
-      const verseParam = params.get(URL_PARAM_VERSE);
+      const nextBook = parsePositiveInteger(params.get(URL_PARAM_BOOK));
+      const nextChapter = parsePositiveInteger(params.get(URL_PARAM_CHAPTER));
 
-      if (bookParam !== null && chapterParam !== null) {
-        const state = useReaderStore.getState();
-        isExternalUpdate.current = true;
-        state.setBook(Number(bookParam));
-        state.setChapter(Number(chapterParam));
+      if (nextBook === null || nextChapter === null) {
+        return;
+      }
 
-        if (verseParam !== null) {
-          state.setPermalinkVerse(Number(verseParam));
-        }
+      const state = useReaderStore.getState();
+      isExternalUpdate.current = true;
+      state.setBook(nextBook);
+      state.setChapter(nextChapter);
+
+      const nextVerse = parsePositiveInteger(params.get(URL_PARAM_VERSE));
+
+      if (nextVerse !== null) {
+        state.setPermalinkVerse(nextVerse);
       }
     };
 
@@ -69,18 +74,6 @@ export const useUrlSync = () => {
   }, [book, chapter, permalinkVerse, searchParams, setSearchParams]);
 
   useEffect(() => {
-    try {
-      localStorage.setItem(
-        "manna.reader-location",
-        JSON.stringify({
-          book,
-          chapter,
-          chaptersByBook,
-          version: 1,
-        })
-      );
-    } catch {
-      /* localStorage write may fail */
-    }
+    saveReaderLocation({ book, chapter, chaptersByBook });
   }, [book, chapter, chaptersByBook]);
 };

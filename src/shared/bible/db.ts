@@ -14,6 +14,9 @@ export interface MetaEntry {
   value: unknown;
 }
 
+/** `[book, chapterCount]` pairs in book order, stored under the `chapterCounts` meta key. */
+export type ChapterCounts = [number, number][];
+
 export type HighlightColor = "yellow" | "green" | "blue" | "pink" | "orange";
 
 export const DEFAULT_HIGHLIGHT_COLOR: HighlightColor = "yellow";

@@ -12,17 +12,21 @@ import { useMemo } from "react";
 
 import { version } from "../../../package.json";
 import { cn } from "../../shared/lib/cn";
-import { isFontSize } from "../../shared/lib/font-size";
+import {
+  fontSizeClass,
+  FONT_SIZES,
+  isFontSize,
+} from "../../shared/lib/font-size";
 import type { FontSize } from "../../shared/lib/font-size";
 import { useReaderStore } from "../reader/store/reader-store";
 
-const FONT_SIZES: { value: FontSize; label: string }[] = [
-  { label: "S", value: "sm" },
-  { label: "M", value: "base" },
-  { label: "L", value: "lg" },
-  { label: "XL", value: "xl" },
-  { label: "2XL", value: "2xl" },
-];
+const FONT_SIZE_LABELS: Record<FontSize, string> = {
+  "2xl": "2XL",
+  base: "M",
+  lg: "L",
+  sm: "S",
+  xl: "XL",
+};
 
 const PREVIEW_TEXT =
   "ఆదియందు దేవుడు ఆకాశమును భూమిని సృష్టించెను. భూమి నిరాకారముగా నిర్జనముగా ఉండెను. అగాధజలముల మీదను అంధకారము కమ్ముకొని యుండెను. దేవుని ఆత్మ జలముల మీద కదలాడుచుండెను. అప్పుడు దేవుడు వెలుగు కలుగునని చెప్పగా వెలుగు కలిగెను.";
@@ -74,23 +78,14 @@ const SettingsPage = () => {
                 }
               }}
             >
-              {FONT_SIZES.map(({ value, label }) => (
+              {FONT_SIZES.map((value) => (
                 <ToggleButton key={value} id={value}>
-                  {label}
+                  {FONT_SIZE_LABELS[value]}
                 </ToggleButton>
               ))}
             </ToggleButtonGroup>
             <div className="bg-field-background rounded-lg border p-3">
-              <span
-                className={cn(
-                  fontSize === "sm" && "text-sm",
-                  fontSize === "base" && "text-base",
-                  fontSize === "lg" && "text-lg",
-                  fontSize === "xl" && "text-xl",
-                  fontSize === "2xl" && "text-2xl",
-                  "leading-relaxed"
-                )}
-              >
+              <span className={cn(fontSizeClass(fontSize), "leading-relaxed")}>
                 <sup className="text-muted text-superscript me-1">1</sup>
                 {PREVIEW_TEXT}
               </span>

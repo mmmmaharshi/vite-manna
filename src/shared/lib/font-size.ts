@@ -1,15 +1,17 @@
-export type FontSize = "sm" | "base" | "lg" | "xl" | "2xl";
+export const FONT_SIZES = ["sm", "base", "lg", "xl", "2xl"] as const;
 
-export const SIZE_PROPS: Record<
-  FontSize,
-  { type: "body-sm" | "body" | "h5" | "h4" | "h3"; weight?: "normal" }
-> = {
-  "2xl": { type: "h3", weight: "normal" },
-  base: { type: "body" },
-  lg: { type: "h5", weight: "normal" },
-  sm: { type: "body-sm" },
-  xl: { type: "h4", weight: "normal" },
+export type FontSize = (typeof FONT_SIZES)[number];
+
+const FONT_SIZE_CLASSES: Record<FontSize, string> = {
+  "2xl": "text-2xl",
+  base: "text-base",
+  lg: "text-lg",
+  sm: "text-sm",
+  xl: "text-xl",
 };
 
+export const fontSizeClass = (fontSize: FontSize) =>
+  FONT_SIZE_CLASSES[fontSize];
+
 export const isFontSize = (value: string | number): value is FontSize =>
-  Object.hasOwn(SIZE_PROPS, value);
+  FONT_SIZES.some((fontSize) => fontSize === value);

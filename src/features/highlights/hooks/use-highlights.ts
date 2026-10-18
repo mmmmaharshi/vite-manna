@@ -9,11 +9,15 @@ import {
 import type { BibleVerse } from "../../../shared/bible";
 import { useHighlightStore } from "../store/highlight-store";
 
+export const HIGHLIGHTS_LOAD_ERROR = "Unable to load highlights.";
+
 export const useHighlights = () => {
   const highlights = useHighlightStore((s) => s.highlights);
   const highlightedMap = useHighlightStore((s) => s.highlightedMap);
   const loaded = useHighlightStore((s) => s.loaded);
+  const error = useHighlightStore((s) => s.error);
   const hydrate = useHighlightStore((s) => s.hydrate);
+  const setError = useHighlightStore((s) => s.setError);
   const upsertLocal = useHighlightStore((s) => s.upsertLocal);
   const removeLocal = useHighlightStore((s) => s.removeLocal);
 
@@ -25,10 +29,17 @@ export const useHighlights = () => {
     let mounted = true;
 
     const load = async () => {
-      const hlList = await getHighlights();
+      try {
+        const hlList = await getHighlights();
 
-      if (mounted) {
-        hydrate(hlList);
+        if (mounted) {
+          hydrate(hlList);
+        }
+      } catch {
+        // Without this the Highlights tab would sit on its loading placeholder forever.
+        if (mounted) {
+          setError(HIGHLIGHTS_LOAD_ERROR);
+        }
       }
     };
 
@@ -37,41 +48,54 @@ export const useHighlights = () => {
     return () => {
       mounted = false;
     };
-  }, [loaded, hydrate]);
+  }, [loaded, hydrate, setError]);
 
   const add = useCallback(
     async (verse: BibleVerse) => {
-      await upsertHl(
-        verse.id,
-        verse.book,
-        verse.chapter,
-        verse.verse,
-        verse.text
-      );
-      upsertLocal({
-        book: verse.book,
-        chapter: verse.chapter,
-        color: DEFAULT_HIGHLIGHT_COLOR,
-        createdAt: Date.now(),
-        text: verse.text,
-        updatedAt: Date.now(),
-        verse: verse.verse,
-        verseId: verse.id,
-      });
+      try {
+        await upsertHl(
+          verse.id,
+          verse.book,
+          verse.chapter,
+          verse.verse,
+          verse.text
+        );
+        upsertLocal({
+          book: verse.book,
+          chapter: verse.chapter,
+          color: DEFAULT_HIGHLIGHT_COLOR,
+          createdAt: Date.now(),
+          text: verse.text,
+          updatedAt: Date.now(),
+          verse: verse.verse,
+          verseId: verse.id,
+        });
+
+        return true;
+      } catch {
+        return false;
+      }
     },
     [upsertLocal]
   );
 
   const remove = useCallback(
     async (verseId: number) => {
-      await removeHl(verseId);
-      removeLocal(verseId);
+      try {
+        await removeHl(verseId);
+        removeLocal(verseId);
+
+        return true;
+      } catch {
+        return false;
+      }
     },
     [removeLocal]
   );
 
   return {
     add,
+    error,
     highlightedMap,
     highlights,
     loaded,

@@ -11,11 +11,10 @@ import {
 import { useState } from "react";
 
 import { getBibleBookName } from "../../shared/bible";
-import type { HighlightColor } from "../../shared/bible";
+import type { Highlight, HighlightColor } from "../../shared/bible";
 import { copyToClipboard } from "../../shared/lib/browser";
 import { cn } from "../../shared/lib/cn";
 import { useHighlights } from "../highlights/hooks/use-highlights";
-import type { HighlightEntry } from "../highlights/store/highlight-store";
 import { useReaderStore } from "../reader/store/reader-store";
 
 interface HighlightsPageProps {
@@ -34,11 +33,9 @@ const COLOR_STYLES: Record<HighlightColor, string> = {
 };
 
 const HighlightsPage = ({ onNavigateToReader }: HighlightsPageProps) => {
-  const { highlights, remove, loaded } = useHighlights();
+  const { error, highlights, remove, loaded } = useHighlights();
 
-  const [pendingRemove, setPendingRemove] = useState<HighlightEntry | null>(
-    null
-  );
+  const [pendingRemove, setPendingRemove] = useState<Highlight | null>(null);
 
   const navigateToVerse = (book: number, chapter: number, verse: number) => {
     const store = useReaderStore.getState();
@@ -48,9 +45,13 @@ const HighlightsPage = ({ onNavigateToReader }: HighlightsPageProps) => {
     onNavigateToReader();
   };
 
-  const handleRemove = (hl: HighlightEntry) => {
-    void remove(hl.verseId);
-    toast("Highlight removed", { variant: "success" });
+  const handleRemove = async (hl: Highlight) => {
+    const removed = await remove(hl.verseId);
+
+    toast(
+      removed ? "Highlight removed" : "Failed to remove highlight",
+      removed ? { variant: "success" } : { variant: "danger" }
+    );
   };
 
   return (
@@ -64,6 +65,20 @@ const HighlightsPage = ({ onNavigateToReader }: HighlightsPageProps) => {
       </Surface>
 
       <ScrollShadow hideScrollBar className="flex-1">
+        {error !== null && (
+          <section
+            className="mx-auto flex w-full max-w-md flex-col items-center gap-2 px-2 py-24 text-center sm:max-w-lg md:max-w-xl lg:max-w-2xl xl:max-w-3xl"
+            role="alert"
+          >
+            <Typography className="text-danger text-base font-medium">
+              {error}
+            </Typography>
+            <Typography.Paragraph size="sm" color="muted">
+              Reopen this tab to try again
+            </Typography.Paragraph>
+          </section>
+        )}
+
         {loaded && highlights.length === 0 && (
           <section className="mx-auto flex w-full max-w-md flex-col items-center gap-4 px-2 py-24 text-center sm:max-w-lg md:max-w-xl lg:max-w-2xl xl:max-w-3xl">
             <PencilToSquare
@@ -168,7 +183,7 @@ const HighlightsPage = ({ onNavigateToReader }: HighlightsPageProps) => {
           </section>
         )}
 
-        {!loaded && (
+        {!loaded && error === null && (
           <section
             className="mx-auto flex w-full max-w-md flex-col items-center gap-3 px-2 py-24 sm:max-w-lg md:max-w-xl lg:max-w-2xl xl:max-w-3xl"
             aria-live="polite"
@@ -223,7 +238,7 @@ const HighlightsPage = ({ onNavigateToReader }: HighlightsPageProps) => {
                     variant="danger"
                     onPress={() => {
                       if (pendingRemove) {
-                        handleRemove(pendingRemove);
+                        void handleRemove(pendingRemove);
                       }
 
                       close();

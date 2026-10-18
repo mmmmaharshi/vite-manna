@@ -2,6 +2,7 @@ import { memo, useLayoutEffect, useRef } from "react";
 
 import type { BibleVerse } from "../../../shared/bible";
 import { cn } from "../../../shared/lib/cn";
+import { fontSizeClass } from "../../../shared/lib/font-size";
 import { useHighlights } from "../../highlights/hooks/use-highlights";
 import { useReaderStore } from "../store/reader-store";
 
@@ -84,16 +85,7 @@ const VerseListComponent = ({ verses }: VerseListProps) => {
               )}
               onClick={() => toggleVerseSelection(verse.id)}
             >
-              <span
-                className={cn(
-                  fontSize === "sm" && "text-sm",
-                  fontSize === "base" && "text-base",
-                  fontSize === "lg" && "text-lg",
-                  fontSize === "xl" && "text-xl",
-                  fontSize === "2xl" && "text-2xl",
-                  "leading-relaxed"
-                )}
-              >
+              <span className={cn(fontSizeClass(fontSize), "leading-relaxed")}>
                 <sup className="text-muted text-superscript me-1">
                   {verse.verse}
                 </sup>

@@ -1,39 +1,18 @@
-import { countVerses, putVerses } from "../../shared/bible";
-import type { BibleVerse } from "../../shared/bible";
+import {
+  clearBibleSeed,
+  isBibleSeeded,
+  markBibleSeeded,
+  putVerses,
+} from "../../shared/bible";
+import { parseBibleResponse, readBible } from "./bible-parser";
 
 const BIBLE_URL = "/bible.json";
 const BATCH_SIZE = 1000;
 
-interface BibleResponse {
-  Book: {
-    Chapter: {
-      Verse: {
-        Verse: string;
-        Verseid: number;
-      }[];
-    }[];
-  }[];
-}
-
-const isBibleResponse = (value: unknown): value is BibleResponse =>
-  typeof value === "object" && value !== null && "Book" in value;
-
-const parseBibleResponse = (json: string): BibleResponse => {
-  const parsed: unknown = JSON.parse(json);
-
-  if (!isBibleResponse(parsed)) {
-    throw new Error("Bible data has an unexpected shape");
-  }
-
-  return parsed;
-};
-
 export const initializeBible = async (
-  onProgress?: (progress: number) => void
+  onProgress?: (progress: number | null) => void
 ) => {
-  const count = await countVerses();
-
-  if (count > 0) {
+  if (await isBibleSeeded()) {
     onProgress?.(100);
 
     return true;
@@ -74,6 +53,8 @@ export const initializeBible = async (
     await readStream();
   };
 
+  // Compressed responses carry no content-length, so the bar stays indeterminate.
+  onProgress?.(total > 0 ? 0 : null);
   await readStream();
 
   const bytes = new Uint8Array(received);
@@ -87,43 +68,9 @@ export const initializeBible = async (
 
   onProgress?.(75);
 
-  const bible = parseBibleResponse(new TextDecoder().decode(bytes));
-
-  const verses: BibleVerse[] = [];
-
-  const totalBooks = bible.Book.length;
-
-  for (let bookIndex = 0; bookIndex < totalBooks; bookIndex += 1) {
-    const book = bible.Book[bookIndex];
-
-    for (
-      let chapterIndex = 0;
-      chapterIndex < book.Chapter.length;
-      chapterIndex += 1
-    ) {
-      const chapter = book.Chapter[chapterIndex];
-
-      for (
-        let verseIndex = 0;
-        verseIndex < chapter.Verse.length;
-        verseIndex += 1
-      ) {
-        const verse = chapter.Verse[verseIndex];
-
-        verses.push({
-          book: bookIndex + 1,
-          chapter: chapterIndex + 1,
-          id: verse.Verseid,
-          text: verse.Verse,
-          verse: verseIndex + 1,
-        });
-      }
-    }
-
-    const processingProgress = 75 + ((bookIndex + 1) / totalBooks) * 15;
-
-    onProgress?.(processingProgress);
-  }
+  const { chapterCounts, verses } = readBible(
+    parseBibleResponse(new TextDecoder().decode(bytes))
+  );
 
   const saveBatch = async (start: number): Promise<void> => {
     if (start >= verses.length) {
@@ -139,7 +86,11 @@ export const initializeBible = async (
     await saveBatch(start + BATCH_SIZE);
   };
 
+  // Only after a good download and parse, so a failure never destroys the old data.
+  await clearBibleSeed();
+  onProgress?.(90);
   await saveBatch(0);
+  await markBibleSeeded(chapterCounts);
 
   onProgress?.(100);
 

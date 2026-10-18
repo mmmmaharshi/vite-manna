@@ -26,6 +26,7 @@ const SearchPage = ({ onNavigateToReader }: SearchPageProps) => {
   const [searching, setSearching] = useState(false);
   const [error, setError] = useState<string | null>(null);
   const timerRef = useRef<ReturnType<typeof setTimeout> | null>(null);
+  const requestIdRef = useRef(0);
 
   const handleQueryChange = (value: string) => {
     setQuery(value);
@@ -38,20 +39,35 @@ const SearchPage = ({ onNavigateToReader }: SearchPageProps) => {
   };
 
   const executeSearch = useCallback(async (q: string) => {
+    // Answers that arrive after a newer search started are dropped.
+    const requestId = requestIdRef.current + 1;
+
+    requestIdRef.current = requestId;
     setSearching(true);
     setError(null);
 
     try {
       const verses = await searchVerses(q);
+
+      if (requestIdRef.current !== requestId) {
+        return;
+      }
+
       setResults(verses);
       setSearched(true);
     } catch {
+      if (requestIdRef.current !== requestId) {
+        return;
+      }
+
       setError("Search failed. Please try again.");
       setResults([]);
       setSearched(true);
     }
 
-    setSearching(false);
+    if (requestIdRef.current === requestId) {
+      setSearching(false);
+    }
   }, []);
 
   useEffect(() => {
@@ -117,7 +133,7 @@ const SearchPage = ({ onNavigateToReader }: SearchPageProps) => {
           </output>
         )}
 
-        <div ref={null} aria-live="polite" aria-atomic="true">
+        <div aria-live="polite" aria-atomic="true">
           {!searched && !searching && (
             <section className="mx-auto flex w-full max-w-md flex-col items-center gap-2 px-2 py-24 text-center sm:max-w-lg md:max-w-xl lg:max-w-2xl xl:max-w-3xl">
               <Magnifier

@@ -1,6 +1,6 @@
 import { useEffect, useState } from "react";
 
-import { countVerses } from "../../../shared/bible";
+import { isBibleSeeded } from "../../../shared/bible";
 
 export type BibleStatus = "checking" | "ready" | "missing";
 
@@ -12,10 +12,10 @@ export const useBibleStatus = (): BibleStatus => {
 
     const check = async () => {
       try {
-        const count = await countVerses();
+        const seeded = await isBibleSeeded();
 
         if (mounted) {
-          setStatus(count > 0 ? "ready" : "missing");
+          setStatus(seeded ? "ready" : "missing");
         }
       } catch (error) {
         if (import.meta.env.DEV) {

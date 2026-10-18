@@ -1,11 +1,14 @@
 import { ExpirationPlugin } from "workbox-expiration";
-import { precacheAndRoute } from "workbox-precaching";
+import { cleanupOutdatedCaches, precacheAndRoute } from "workbox-precaching";
 import { registerRoute } from "workbox-routing";
 import { CacheFirst } from "workbox-strategies";
 
 declare let self: ServiceWorkerGlobalScope;
 
 precacheAndRoute(self.__WB_MANIFEST);
+
+// Otherwise every release keeps its own hashed files in the precache forever.
+cleanupOutdatedCaches();
 
 self.addEventListener("activate", () => {
   void self.clients.claim();

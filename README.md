@@ -2,7 +2,7 @@
 
 Offline-first Telugu Bible reader. All 66 books, works with no internet. React 19 + HeroUI v3 + Tailwind v4.
 
-[![Live Demo](https://img.shields.io/badge/demo-holymanna.vercel.app-000?style=flat&logo=vercel)](https://holymanna.vercel.app) [![GitHub](https://img.shields.io/badge/github-mmmmaharshi/vite--manna-181717?style=flat&logo=github)](https://github.com/mmmmaharshi/vite-manna)
+[![Live Demo](https://img.shields.io/badge/demo-holymanna.maharshi.work-000?style=flat&logo=vercel)](https://holymanna.maharshi.work) [![GitHub](https://img.shields.io/badge/github-mmmmaharshi/vite--manna-181717?style=flat&logo=github)](https://github.com/mmmmaharshi/vite-manna)
 
 ## Run it in 3 minutes
 
@@ -13,7 +13,7 @@ bun install && bun run dev
 ```
 
 1. Open http://localhost:5173
-2. First visit downloads the Bible (~6 MB) into IndexedDB — once.
+2. First visit downloads the Bible (~12 MB, compressed in transit) into IndexedDB — once.
 3. After that, everything loads offline.
 
 ## What you can do
@@ -36,7 +36,7 @@ bun install && bun run dev
 
 ## Stack
 
-React 19 · TypeScript 6 · Vite+ 1.3 (Vite 8) · HeroUI v3 · Tailwind v4 · Zustand · Dexie · React Router 7 · Workbox PWA · Google Sans
+React 19 · TypeScript 6 · Vite+ 1.3 (Vite 8) · HeroUI v3 · Tailwind v4 · Zustand · Dexie · React Router 8 · Workbox PWA · Google Sans
 
 ## Deploy
 
