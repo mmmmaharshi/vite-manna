@@ -14,6 +14,10 @@ dev-dist
 dist-ssr
 *.local
 
+# Tooling state
+.opencode/
+.vite-hooks/
+
 # Editor directories and files
 .vscode/*
 !.vscode/extensions.json

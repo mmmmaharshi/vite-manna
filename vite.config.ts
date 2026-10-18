@@ -37,6 +37,15 @@ export default defineConfig({
       "src/assets/fonts",
     ],
   },
+  /*
+   * A deliberate subset of the Oxlint presets in `oxlint.config.ts`.
+   * shortcut: `vp check` lints type-aware, and extending the presets here
+   * (`extends: [core, react, vitest, antiSlop, shadcn, gdp]`, which this schema
+   * does support) surfaces ~40 type-aware violations — strict-boolean-expressions,
+   * no-misused-promises, promise-function-async, no-confusing-void-expression —
+   * that the app does not satisfy yet. Replace this list with the presets once
+   * they are fixed.
+   */
   lint: {
     categories: {
       correctness: "warn",
