@@ -4,8 +4,9 @@
   "mcp": {
     "heroui-react": {
       "type": "local",
-      "command": ["npx", "-y", "@heroui/react-mcp@1.1.2"],
-      "enabled": true
+      "command": ["bun", "x", "@heroui/react-mcp@1.1.2"],
+      "enabled": true,
+      "timeout": 30000
     }
   }
 }
