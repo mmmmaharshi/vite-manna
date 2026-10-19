@@ -1,33 +1,27 @@
 import type { SVGProps } from "react";
 
+// Open book and a manna drop. Single colour (currentColor) so it follows the theme.
 const IconSVG = (props: SVGProps<SVGSVGElement>) => (
-  <svg
-    xmlns="http://www.w3.org/2000/svg"
-    viewBox="0 0 241.16 170.09"
-    {...props}
-  >
-    <g transform="translate(-106.42 -552.93)">
-      <path
-        fill="var(--foreground)"
-        fillRule="evenodd"
-        stroke="var(--foreground)"
-        strokeWidth={5}
-        d="m108.92 624.83 63.11 95.69c20.36-28.5 67.18-46.83 93.65-40.72 32.57-22.39 69.22-18.32 79.4-10.18l-73.29-95.68s-50.9-14.25-71.26 16.28c-36.64-16.28-81.43 10.18-91.61 34.61z"
-      />
-      <path
-        fill="var(--background)"
-        fillRule="evenodd"
-        stroke="var(--foreground)"
-        strokeWidth={5}
-        d="m116.72 612.21 54.97 83.47c22.39-40.72 67.18-59.04 89.58-32.57 34.61-48.87 75.32 0 79.39 0l-73.29-99.76s-48.86-22.4-69.22 8.14c-20.35-16.29-69.21 4.07-81.43 40.72z"
-      />
-      <path
-        fill="none"
-        stroke="var(--foreground)"
-        strokeWidth={5}
-        d="m199.51 571.9 63.12 85.51c8.14 12.21-8.15 34.61 26.46 48.86"
-      />
-    </g>
+  <svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 64 64" {...props}>
+    <path
+      d="M32 53.5C26 49 19.5 47.5 12.5 48.5V24c7-1 13.5.5 19.5 4.5 6-4 12.5-5.5 19.5-4.5v24.5c-7-1-13.5.5-19.5 5Z"
+      fill="none"
+      stroke="currentColor"
+      strokeLinecap="round"
+      strokeLinejoin="round"
+      strokeWidth={4}
+    />
+    <path
+      d="M32 28.5v25"
+      fill="none"
+      stroke="currentColor"
+      strokeLinecap="round"
+      strokeWidth={4}
+    />
+    <path
+      d="M32 10c2.1 2.9 3.4 4.7 3.4 6.4a3.4 3.4 0 1 1-6.8 0c0-1.7 1.3-3.5 3.4-6.4Z"
+      fill="currentColor"
+    />
   </svg>
 );
 
