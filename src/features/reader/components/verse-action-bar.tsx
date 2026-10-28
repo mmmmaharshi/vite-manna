@@ -1,11 +1,11 @@
 import {
   ArrowUpFromSquare,
   Link as LinkIcon,
-  PencilToSquare,
+  Star,
   TrashBin,
 } from "@gravity-ui/icons";
 import { Button, Surface, toast, Tooltip } from "@heroui/react";
-import { memo } from "react";
+import { memo, useMemo } from "react";
 
 import type { BibleVerse } from "../../../shared/bible";
 import { canNativeShare, copyToClipboard } from "../../../shared/lib/browser";
@@ -61,7 +61,10 @@ const VerseActionBarInnerComponent = ({ verses }: VerseActionBarProps) => {
     highlightedMap,
   } = useHighlights();
 
-  const selectedSet = new Set(selectedVerseIds);
+  const selectedSet = useMemo(
+    () => new Set(selectedVerseIds),
+    [selectedVerseIds]
+  );
 
   const selectedVerses = verses
     .filter((verse) => selectedSet.has(verse.id))
@@ -202,7 +205,7 @@ const VerseActionBarInnerComponent = ({ verses }: VerseActionBarProps) => {
               className="h-12 w-full rounded-xl"
               onPress={handleHighlight}
             >
-              <PencilToSquare aria-hidden="true" className="h-5 w-5" />
+              <Star aria-hidden="true" className="h-5 w-5" />
             </Button>
             <Tooltip.Content placement="top">Highlight</Tooltip.Content>
           </Tooltip>

@@ -95,6 +95,38 @@ const useChapterStripScroll = ({
   };
 };
 
+interface ChapterButtonProps {
+  activeChapterRef: RefObject<HTMLButtonElement | null>;
+  chapterNumber: number;
+  onSelectChapter: (chapter: number) => void;
+  visibleChapter: number;
+}
+
+const ChapterButton = memo(
+  ({
+    activeChapterRef,
+    chapterNumber,
+    onSelectChapter,
+    visibleChapter,
+  }: ChapterButtonProps) => {
+    const isActive = visibleChapter === chapterNumber;
+
+    return (
+      <Button
+        ref={isActive ? activeChapterRef : null}
+        aria-label={`${chapterNumber}వ అధ్యాయం`}
+        size="sm"
+        variant={isActive ? "primary" : "secondary"}
+        onPress={() => onSelectChapter(chapterNumber)}
+      >
+        {chapterNumber}
+      </Button>
+    );
+  }
+);
+
+ChapterButton.displayName = "ChapterButton";
+
 const ChapterStripComponent = ({
   chapters,
   currentBook,
@@ -126,18 +158,13 @@ const ChapterStripComponent = ({
       >
         <div className="flex gap-2 py-1">
           {chapters.map((chapterNumber) => (
-            <Button
-              ref={visibleChapter === chapterNumber ? activeChapterRef : null}
+            <ChapterButton
               key={chapterNumber}
-              aria-label={`${chapterNumber}వ అధ్యాయం`}
-              size="sm"
-              variant={
-                visibleChapter === chapterNumber ? "primary" : "secondary"
-              }
-              onPress={() => onSelectChapter(chapterNumber)}
-            >
-              {chapterNumber}
-            </Button>
+              activeChapterRef={activeChapterRef}
+              chapterNumber={chapterNumber}
+              onSelectChapter={onSelectChapter}
+              visibleChapter={visibleChapter}
+            />
           ))}
         </div>
       </ScrollShadow>

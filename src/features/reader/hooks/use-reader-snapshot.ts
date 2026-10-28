@@ -6,8 +6,31 @@ import type { ReaderSnapshot } from "../types";
 
 let preloadedSnapshot: ReaderSnapshot | null = null;
 
+const snapshotCache = new Map<string, ReaderSnapshot>();
+
+const cacheKey = (book: number, chapter: number) => `${book}:${chapter}`;
+
 export const setPreloadedSnapshot = (snapshot: ReaderSnapshot) => {
   preloadedSnapshot = snapshot;
+};
+
+export const getCachedSnapshot = (book: number, chapter: number) =>
+  snapshotCache.get(cacheKey(book, chapter)) ?? null;
+
+export const prefetchReaderSnapshot = (
+  book: number,
+  chapter: number,
+  chapterCount?: number
+) => {
+  const key = cacheKey(book, chapter);
+
+  if (snapshotCache.has(key)) {
+    return;
+  }
+
+  void getReaderSnapshot(book, chapter, chapterCount).then((next) => {
+    snapshotCache.set(key, next);
+  });
 };
 
 export const useReaderSnapshot = (
@@ -21,6 +44,12 @@ export const useReaderSnapshot = (
       preloadedSnapshot = null;
 
       return stored;
+    }
+
+    const cached = getCachedSnapshot(book, chapter);
+
+    if (cached !== null) {
+      return cached;
     }
 
     return null;
@@ -37,6 +66,7 @@ export const useReaderSnapshot = (
           return;
         }
 
+        snapshotCache.set(cacheKey(book, chapter), next);
         setSnapshot(next);
 
         const { setChapter, clearPendingBook } = useReaderStore.getState();

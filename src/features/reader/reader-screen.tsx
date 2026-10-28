@@ -6,7 +6,7 @@ import {
   Surface,
   Typography,
 } from "@heroui/react";
-import { useEffect, useRef } from "react";
+import { useEffect, useMemo, useRef } from "react";
 
 import { cn } from "../../shared/lib/cn";
 import { formatReference } from "../../shared/lib/reference";
@@ -15,7 +15,10 @@ import ChapterStrip from "./components/chapter-strip";
 import VerseActionBar from "./components/verse-action-bar";
 import VerseList from "./components/verse-list";
 import { useBooks } from "./hooks/use-books";
-import { useReaderSnapshot } from "./hooks/use-reader-snapshot";
+import {
+  prefetchReaderSnapshot,
+  useReaderSnapshot,
+} from "./hooks/use-reader-snapshot";
 import { useSwipeAndKeyboard } from "./hooks/use-swipe-and-keyboard";
 import { useReaderStore } from "./store/reader-store";
 import type { BibleBook, ReaderSnapshot } from "./types";
@@ -108,6 +111,30 @@ const ReaderScreen = () => {
     selectedBookSummary?.chapterCount
   );
 
+  useEffect(() => {
+    if (!selectedBookSummary) {
+      return;
+    }
+
+    const chapterCount = selectedBookSummary.chapterCount;
+    const chapters = snapshot?.chapters ?? [];
+
+    const currentIndex = chapters.indexOf(chapter);
+    const prevChapter = currentIndex > 0 ? chapters[currentIndex - 1] : null;
+    const nextChapter =
+      currentIndex >= 0 && currentIndex < chapters.length - 1
+        ? chapters[currentIndex + 1]
+        : null;
+
+    if (prevChapter !== null) {
+      prefetchReaderSnapshot(book, prevChapter, chapterCount);
+    }
+
+    if (nextChapter !== null) {
+      prefetchReaderSnapshot(book, nextChapter, chapterCount);
+    }
+  }, [book, chapter, selectedBookSummary, snapshot]);
+
   const visibleBook = pendingBook ?? snapshot?.book ?? book;
 
   const visibleBookSummary = books.find(
@@ -116,10 +143,14 @@ const ReaderScreen = () => {
 
   const isReaderTransitioning = snapshot !== null && snapshot.book !== book;
 
-  const visibleChapters = resolveVisibleChapters(
-    isReaderTransitioning,
-    visibleBookSummary,
-    snapshot
+  const visibleChapters = useMemo(
+    () =>
+      resolveVisibleChapters(
+        isReaderTransitioning,
+        visibleBookSummary,
+        snapshot
+      ),
+    [isReaderTransitioning, visibleBookSummary, snapshot]
   );
 
   const visibleChapter = isReaderTransitioning ? 1 : chapter;

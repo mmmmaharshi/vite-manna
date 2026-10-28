@@ -1,4 +1,4 @@
-import { Copy, PencilToSquare, TrashBin } from "@gravity-ui/icons";
+import { Copy, Star, TrashBin } from "@gravity-ui/icons";
 import {
   AlertDialog,
   Button,
@@ -78,7 +78,7 @@ const HighlightsPage = ({ onNavigateToReader }: HighlightsPageProps) => {
 
         {loaded && highlights.length === 0 && (
           <section className="page-shell mx-auto flex w-full flex-col items-center gap-4 px-2 py-24 text-center">
-            <PencilToSquare
+            <Star
               aria-hidden="true"
               className="text-muted h-10 w-10 sm:h-12 sm:w-12"
             />

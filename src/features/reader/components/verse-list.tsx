@@ -1,4 +1,4 @@
-import { memo, useLayoutEffect, useRef } from "react";
+import { memo, useMemo, useLayoutEffect, useRef } from "react";
 
 import type { BibleVerse } from "../../../shared/bible";
 import { cn } from "../../../shared/lib/cn";
@@ -25,7 +25,10 @@ const VerseListComponent = ({ verses }: VerseListProps) => {
   const lastScrolledVerseRef = useRef<number | null>(null);
 
   const fontSize = useReaderStore((state) => state.fontSize);
-  const selectedSet = new Set(selectedVerseIds);
+  const selectedSet = useMemo(
+    () => new Set(selectedVerseIds),
+    [selectedVerseIds]
+  );
 
   const { highlightedMap } = useHighlights();
 
