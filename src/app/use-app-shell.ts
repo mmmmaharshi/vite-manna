@@ -3,6 +3,7 @@ import { useEffect, useState } from "react";
 import { setBooksCache } from "../features/reader/hooks/use-books";
 import { setPreloadedSnapshot } from "../features/reader/hooks/use-reader-snapshot";
 import { useReaderStore } from "../features/reader/store/reader-store";
+import type { BibleStatus } from "../features/setup/hooks/use-bible-status";
 import { useBibleStatus } from "../features/setup/hooks/use-bible-status";
 import {
   attachBookNames,
@@ -57,6 +58,74 @@ const progressMessage = (progress: number | null) => {
   }
 
   return PROGRESS_MESSAGE_SAVING;
+};
+
+export interface ShellReadiness {
+  bibleStatus: BibleStatus;
+  loadError: string | null;
+  isBibleComplete: boolean;
+  areFontsReady: boolean;
+  areBooksReady: boolean;
+  isSnapshotReady: boolean;
+  isMinSplashElapsed: boolean;
+  downloadProgress: number | null;
+}
+
+type BootInputs = Pick<
+  ShellReadiness,
+  | "bibleStatus"
+  | "isBibleComplete"
+  | "areFontsReady"
+  | "areBooksReady"
+  | "isSnapshotReady"
+>;
+
+export const isBootReady = (inputs: BootInputs): boolean =>
+  (inputs.bibleStatus === "ready" || inputs.isBibleComplete) &&
+  inputs.areFontsReady &&
+  inputs.areBooksReady &&
+  inputs.isSnapshotReady;
+
+/** Pure so the boot routing (error paths included) is unit-testable. */
+export const resolveShellStatus = (
+  readiness: ShellReadiness,
+  handleRetry: () => void
+): ShellStatus => {
+  const {
+    bibleStatus,
+    loadError,
+    isBibleComplete,
+    isMinSplashElapsed,
+    downloadProgress,
+  } = readiness;
+
+  const isShellReady = isBootReady(readiness);
+
+  const isDownloading = bibleStatus === "missing" && !isBibleComplete;
+  const isPreparing = !isShellReady || !isMinSplashElapsed;
+
+  if (loadError !== null) {
+    return { handleRetry, kind: "error", message: loadError };
+  }
+
+  if (bibleStatus === "missing" && isPreparing) {
+    // The bar holds its last value once the download is done, so it never drops
+    // back to the indeterminate slide while the books and snapshot load.
+    return {
+      handleRetry,
+      kind: "progress",
+      message: isDownloading
+        ? progressMessage(downloadProgress)
+        : PROGRESS_MESSAGE_SAVING,
+      progress: isDownloading ? downloadProgress : PROGRESS_CAP,
+    };
+  }
+
+  if (isPreparing) {
+    return { kind: "splash" };
+  }
+
+  return { kind: "ready" };
 };
 
 export const useAppShell = (): ShellStatus => {
@@ -228,14 +297,25 @@ export const useAppShell = (): ShellStatus => {
     };
   }, [areBooksReady, isSnapshotReady, loadError]);
 
-  const isShellReady =
-    (bibleStatus === "ready" || isBibleComplete) &&
-    areFontsReady &&
-    areBooksReady &&
-    isSnapshotReady;
+  const handleRetry = () => {
+    setLoadError(null);
+    setDownloadProgress(0);
+  };
+
+  const readiness: ShellReadiness = {
+    areBooksReady,
+    areFontsReady,
+    bibleStatus,
+    downloadProgress,
+    isBibleComplete,
+    isMinSplashElapsed,
+    isSnapshotReady,
+    loadError,
+  };
+  const bootReady = isBootReady(readiness);
 
   useEffect(() => {
-    if (!isShellReady || loadError !== null) {
+    if (!bootReady || loadError !== null) {
       return;
     }
 
@@ -249,34 +329,9 @@ export const useAppShell = (): ShellStatus => {
     );
 
     return () => clearTimeout(timeoutId);
-  }, [loadError, isMinSplashElapsed, isShellReady]);
+  }, [bootReady, loadError, isMinSplashElapsed]);
 
-  const handleRetry = () => {
-    setLoadError(null);
-    setDownloadProgress(0);
-  };
-
-  const isDownloading = bibleStatus === "missing" && !isBibleComplete;
-  const isPreparing = !isShellReady || !isMinSplashElapsed;
-
-  let status: ShellStatus = { kind: "ready" };
-
-  if (loadError !== null) {
-    status = { handleRetry, kind: "error", message: loadError };
-  } else if (bibleStatus === "missing" && isPreparing) {
-    // The bar holds its last value once the download is done, so it never drops
-    // back to the indeterminate slide while the books and snapshot load.
-    status = {
-      handleRetry,
-      kind: "progress",
-      message: isDownloading
-        ? progressMessage(downloadProgress)
-        : PROGRESS_MESSAGE_SAVING,
-      progress: isDownloading ? downloadProgress : PROGRESS_CAP,
-    };
-  } else if (isPreparing) {
-    status = { kind: "splash" };
-  }
+  const status = resolveShellStatus(readiness, handleRetry);
 
   const isBootSplashVisible = status.kind === "splash";
 
