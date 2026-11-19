@@ -13,13 +13,12 @@ export default defineConfig({
             return "heroui";
           }
 
-          if (
+          const isVendor =
             id.includes("node_modules/react") ||
             id.includes("node_modules/react-dom") ||
-            id.includes("node_modules/react-router")
-          ) {
-            return "vendor";
-          }
+            id.includes("node_modules/react-router");
+
+          return isVendor ? "vendor" : null;
         },
       },
     },

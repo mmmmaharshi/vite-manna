@@ -21,8 +21,8 @@ const versesFor = (book: number, chapter: number, texts: string[]) =>
   texts.map((text, index) => ({
     book,
     chapter,
-    id: book * 1_000_000 + chapter * 1000 + index + 1,
     text,
+    id: book * 1_000_000 + chapter * 1000 + index + 1,
     verse: index + 1,
   }));
 

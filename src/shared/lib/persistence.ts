@@ -152,8 +152,8 @@ export const resolveReaderLocation = (
   return {
     book,
     chapter,
-    chaptersByBook: { ...chaptersByBook, [book]: chapter },
     permalinkVerse,
+    chaptersByBook: { ...chaptersByBook, [book]: chapter },
   };
 };
 
@@ -229,16 +229,25 @@ export interface LastCrash {
   time: number;
 }
 
-const isLastCrash = (value: unknown): value is LastCrash =>
-  typeof value === "object" &&
-  value !== null &&
-  "message" in value &&
-  "time" in value &&
-  typeof value.message === "string" &&
-  typeof value.time === "number" &&
-  (!("detail" in value) ||
+const isLastCrash = (value: unknown): value is LastCrash => {
+  if (typeof value !== "object" || value === null) {
+    return false;
+  }
+
+  if (!("message" in value) || !("time" in value)) {
+    return false;
+  }
+
+  if (typeof value.message !== "string" || typeof value.time !== "number") {
+    return false;
+  }
+
+  return (
+    !("detail" in value) ||
     value.detail === undefined ||
-    typeof value.detail === "string");
+    typeof value.detail === "string"
+  );
+};
 
 /** Crash telemetry for an offline app with no backend: the boundary writes,
  * Settings reads, the user reports.

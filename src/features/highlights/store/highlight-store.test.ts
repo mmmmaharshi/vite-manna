@@ -5,11 +5,11 @@ import { useHighlightStore } from "./highlight-store";
 const highlight = (verseId: number, color = "yellow") => ({
   book: 1,
   chapter: 1,
-  color,
   createdAt: verseId,
   text: `verse ${verseId}`,
   updatedAt: verseId,
   verse: verseId,
+  color,
   verseId,
 });
 

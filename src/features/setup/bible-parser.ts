@@ -17,34 +17,41 @@ interface BibleResponse {
   Book: BibleBookJson[];
 }
 
-const isVerseRow = (value: unknown): value is BibleVerseRow =>
-  typeof value === "object" &&
-  value !== null &&
-  "Verse" in value &&
-  "Verseid" in value &&
-  typeof value.Verse === "string" &&
-  typeof value.Verseid === "number";
+const isVerseRow = (value: unknown): value is BibleVerseRow => {
+  if (typeof value !== "object" || value === null) {
+    return false;
+  }
 
-const isChapter = (value: unknown): value is BibleChapter =>
-  typeof value === "object" &&
-  value !== null &&
-  "Verse" in value &&
-  Array.isArray(value.Verse) &&
-  value.Verse.every(isVerseRow);
+  if (!("Verse" in value) || !("Verseid" in value)) {
+    return false;
+  }
 
-const isBook = (value: unknown): value is BibleBookJson =>
-  typeof value === "object" &&
-  value !== null &&
-  "Chapter" in value &&
-  Array.isArray(value.Chapter) &&
-  value.Chapter.every(isChapter);
+  return typeof value.Verse === "string" && typeof value.Verseid === "number";
+};
 
-const isBibleResponse = (value: unknown): value is BibleResponse =>
-  typeof value === "object" &&
-  value !== null &&
-  "Book" in value &&
-  Array.isArray(value.Book) &&
-  value.Book.every(isBook);
+const isChapter = (value: unknown): value is BibleChapter => {
+  if (typeof value !== "object" || value === null || !("Verse" in value)) {
+    return false;
+  }
+
+  return Array.isArray(value.Verse) && value.Verse.every(isVerseRow);
+};
+
+const isBook = (value: unknown): value is BibleBookJson => {
+  if (typeof value !== "object" || value === null || !("Chapter" in value)) {
+    return false;
+  }
+
+  return Array.isArray(value.Chapter) && value.Chapter.every(isChapter);
+};
+
+const isBibleResponse = (value: unknown): value is BibleResponse => {
+  if (typeof value !== "object" || value === null || !("Book" in value)) {
+    return false;
+  }
+
+  return Array.isArray(value.Book) && value.Book.every(isBook);
+};
 
 /**
  * Parses and validates the downloaded Bible JSON.

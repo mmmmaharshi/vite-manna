@@ -91,11 +91,13 @@ type BootInputs = Pick<
  * @param inputs - The boot inputs.
  * @returns True when the reader can mount.
  */
-export const isBootReady = (inputs: BootInputs) =>
-  (inputs.bibleStatus === "ready" || inputs.isBibleComplete) &&
-  inputs.areFontsReady &&
-  inputs.areBooksReady &&
-  inputs.isSnapshotReady;
+export const isBootReady = (inputs: BootInputs) => {
+  if (inputs.bibleStatus !== "ready" && !inputs.isBibleComplete) {
+    return false;
+  }
+
+  return inputs.areFontsReady && inputs.areBooksReady && inputs.isSnapshotReady;
+};
 
 /**
  * Maps boot inputs to the screen the shell should show.
@@ -180,13 +182,13 @@ export const useAppShell = () => {
   }, []);
 
   useEffect(() => {
-    if (bibleStatus !== "missing" || loadError !== null) {
-      return;
-    }
-
     let mounted = true;
 
     const initialize = async () => {
+      if (bibleStatus !== "missing" || loadError !== null) {
+        return;
+      }
+
       try {
         const initializeBible = await loadInitializeBible();
 
@@ -228,21 +230,21 @@ export const useAppShell = () => {
   }, [bibleStatus, loadError]);
 
   useEffect(() => {
-    if (loadError !== null) {
-      return;
-    }
-
-    if (bibleStatus !== "ready" && !isBibleComplete) {
-      return;
-    }
-
-    if (areBooksReady) {
-      return;
-    }
-
     let mounted = true;
 
     const loadBooks = async () => {
+      if (loadError !== null) {
+        return;
+      }
+
+      if (bibleStatus !== "ready" && !isBibleComplete) {
+        return;
+      }
+
+      if (areBooksReady) {
+        return;
+      }
+
       try {
         const { books: bookSummaries } = await getReaderBootstrap(1, 1);
 
@@ -273,21 +275,21 @@ export const useAppShell = () => {
   }, [bibleStatus, isBibleComplete, areBooksReady, loadError]);
 
   useEffect(() => {
-    if (loadError !== null) {
-      return;
-    }
-
-    if (!areBooksReady) {
-      return;
-    }
-
-    if (isSnapshotReady) {
-      return;
-    }
-
     let mounted = true;
 
     const loadSnapshot = async () => {
+      if (loadError !== null) {
+        return;
+      }
+
+      if (!areBooksReady) {
+        return;
+      }
+
+      if (isSnapshotReady) {
+        return;
+      }
+
       try {
         const { book, chapter } = useReaderStore.getState();
         const snapshot = await getReaderSnapshot(book, chapter);
@@ -335,20 +337,18 @@ export const useAppShell = () => {
   const bootReady = isBootReady(readiness);
 
   useEffect(() => {
-    if (!bootReady || loadError !== null) {
-      return;
+    let timeoutId = 0;
+
+    if (bootReady && loadError === null && !isMinSplashElapsed) {
+      timeoutId = setTimeout(
+        () => setIsMinSplashElapsed(true),
+        MINIMUM_SPLASH_DURATION_MS
+      );
     }
 
-    if (isMinSplashElapsed) {
-      return;
-    }
-
-    const timeoutId = setTimeout(
-      () => setIsMinSplashElapsed(true),
-      MINIMUM_SPLASH_DURATION_MS
-    );
-
-    return () => clearTimeout(timeoutId);
+    return () => {
+      clearTimeout(timeoutId);
+    };
   }, [bootReady, loadError, isMinSplashElapsed]);
 
   const status = resolveShellStatus(readiness, handleRetry);

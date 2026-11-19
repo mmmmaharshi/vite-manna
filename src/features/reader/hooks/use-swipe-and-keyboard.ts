@@ -40,10 +40,6 @@ export const useSwipeAndKeyboard = ({
   useEffect(() => {
     const el = elementRef.current;
 
-    if (!el) {
-      return;
-    }
-
     const onTouchStart = (e: TouchEvent) => {
       if (isSelectionMode || isBookSelectOpen) {
         return;
@@ -97,12 +93,14 @@ export const useSwipeAndKeyboard = ({
       }
     };
 
-    el.addEventListener("touchstart", onTouchStart, { passive: true });
-    el.addEventListener("touchend", onTouchEnd, { passive: true });
+    if (el) {
+      el.addEventListener("touchstart", onTouchStart, { passive: true });
+      el.addEventListener("touchend", onTouchEnd, { passive: true });
+    }
 
     return () => {
-      el.removeEventListener("touchstart", onTouchStart);
-      el.removeEventListener("touchend", onTouchEnd);
+      el?.removeEventListener("touchstart", onTouchStart);
+      el?.removeEventListener("touchend", onTouchEnd);
     };
   }, [
     elementRef,

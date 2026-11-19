@@ -106,8 +106,8 @@ export const getReaderSnapshot = async (
 
   return {
     book,
-    chapter: selectedChapter,
     chapters,
+    chapter: selectedChapter,
     verses:
       selectedChapter === undefined
         ? []
@@ -142,9 +142,9 @@ export const getReaderBootstrap = async (book: number, chapter: number) => {
       selectedBook === undefined
         ? null
         : {
+            chapters,
             book: selectedBook,
             chapter: selectedChapter,
-            chapters,
             verses:
               selectedChapter === undefined
                 ? []
@@ -206,12 +206,12 @@ export const upsertHighlight = ({
   db.highlights.put({
     book,
     chapter,
-    color: DEFAULT_HIGHLIGHT_COLOR,
-    createdAt: Date.now(),
     text,
-    updatedAt: Date.now(),
     verse,
     verseId,
+    color: DEFAULT_HIGHLIGHT_COLOR,
+    createdAt: Date.now(),
+    updatedAt: Date.now(),
   });
 
 /**

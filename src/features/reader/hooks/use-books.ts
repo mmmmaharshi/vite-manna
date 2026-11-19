@@ -35,13 +35,13 @@ export const useBooks = () => {
   const [hasLoadedBooks, setHasLoadedBooks] = useState(cachedLoaded);
 
   useEffect(() => {
-    if (cachedLoaded) {
-      return;
-    }
-
     let mounted = true;
 
     const load = async () => {
+      if (cachedLoaded) {
+        return;
+      }
+
       try {
         const { books: bookSummaries } = await getReaderBootstrap(1, 1);
 

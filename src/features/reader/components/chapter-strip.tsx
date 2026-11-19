@@ -65,21 +65,21 @@ const useChapterStripScroll = ({
   }, [activeChapterRef, chapterStripRef, currentBook, isReaderTransitioning]);
 
   useLayoutEffect(() => {
-    if (isReaderTransitioning) {
-      return;
+    let frameId = 0;
+
+    if (!isReaderTransitioning) {
+      const { pendingBook } = useReaderStore.getState();
+
+      if (pendingBook !== null && pendingBook === currentBook) {
+        frameId = requestAnimationFrame(() => {
+          clearPendingBook();
+        });
+      }
     }
 
-    const { pendingBook } = useReaderStore.getState();
-
-    if (pendingBook === null || pendingBook !== currentBook) {
-      return;
-    }
-
-    const frameId = requestAnimationFrame(() => {
-      clearPendingBook();
-    });
-
-    return () => cancelAnimationFrame(frameId);
+    return () => {
+      cancelAnimationFrame(frameId);
+    };
   }, [clearPendingBook, currentBook, isReaderTransitioning]);
 
   return {

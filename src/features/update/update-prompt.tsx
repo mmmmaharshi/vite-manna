@@ -16,12 +16,8 @@ const UpdatePrompt = () => {
   });
 
   useEffect(() => {
-    if (registration === null) {
-      return;
-    }
-
     const checkForUpdate = () => {
-      if (document.visibilityState === "visible") {
+      if (registration !== null && document.visibilityState === "visible") {
         void registration.update();
       }
     };

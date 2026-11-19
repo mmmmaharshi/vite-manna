@@ -90,11 +90,11 @@ const ReaderScreen = () => {
     book,
     books,
     chapter,
-    elementRef: verseSectionRef,
-    isBookSelectOpen: useReaderStore((state) => state.isBookSelectOpen),
     isSelectionMode,
     setBook,
     setChapter,
+    elementRef: verseSectionRef,
+    isBookSelectOpen: useReaderStore((state) => state.isBookSelectOpen),
   });
 
   const selectedBookSummary = books.find((candidate) => candidate.id === book);

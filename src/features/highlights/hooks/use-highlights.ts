@@ -27,13 +27,13 @@ export const useHighlights = () => {
   const removeLocal = useHighlightStore((s) => s.removeLocal);
 
   useEffect(() => {
-    if (loaded) {
-      return;
-    }
-
     let mounted = true;
 
     const load = async () => {
+      if (loaded) {
+        return;
+      }
+
       try {
         const hlList = await getHighlights();
 

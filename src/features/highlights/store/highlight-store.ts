@@ -25,9 +25,9 @@ export const useHighlightStore = create<HighlightStore>((set) => ({
   highlights: [],
   hydrate: (highlights) => {
     set({
+      highlights,
       error: null,
       highlightedIds: new Set(highlights.map((h) => h.verseId)),
-      highlights,
       loaded: true,
     });
   },

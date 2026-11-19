@@ -77,11 +77,9 @@ const SearchPage = ({ onNavigateToReader }: SearchPageProps) => {
       clearTimeout(timerRef.current);
     }
 
-    if (!query.trim()) {
-      return;
+    if (query.trim()) {
+      timerRef.current = setTimeout(() => executeSearch(query.trim()), 300);
     }
-
-    timerRef.current = setTimeout(() => executeSearch(query.trim()), 300);
 
     return () => {
       if (timerRef.current) {

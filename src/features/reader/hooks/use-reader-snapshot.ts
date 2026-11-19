@@ -180,6 +180,7 @@ export const useReaderSnapshot = (
 
   return {
     loadError,
+    snapshot,
     retrySnapshot: () => {
       setLoadError(null);
 
@@ -199,6 +200,5 @@ export const useReaderSnapshot = (
 
       void retry();
     },
-    snapshot,
   };
 };
