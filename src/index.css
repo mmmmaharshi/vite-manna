@@ -42,6 +42,7 @@
   margin-left: 2px;
   vertical-align: super;
   flex-shrink: 0;
+  background-color: oklch(85% 0.12 95);
 }
 
 @utility verse-row {
@@ -118,10 +119,6 @@ html {
 [data-theme="default"] {
   /* Highlight Colors (Light Mode) */
   --highlight-yellow: oklch(92% 0.12 95 / 0.45);
-  --highlight-green: oklch(80% 0.18 145 / 0.35);
-  --highlight-blue: oklch(75% 0.14 225 / 0.35);
-  --highlight-pink: oklch(78% 0.16 345 / 0.3);
-  --highlight-orange: oklch(80% 0.16 65 / 0.4);
 
   /* Theme Colors (Light Mode) */
   --accent: oklch(43% 0.22 262.87);

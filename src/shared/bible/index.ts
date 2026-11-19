@@ -6,7 +6,6 @@ export {
   type BibleVerse,
   type ChapterCounts,
   type Highlight,
-  type HighlightColor,
 } from "./db";
 
 export {

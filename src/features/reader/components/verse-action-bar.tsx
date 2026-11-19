@@ -33,15 +33,16 @@ const buildShareText = (
     .join("\n");
 };
 
-const getSelectionGridCols = (
-  hasSingleVerse: boolean,
-  allHighlighted: boolean
-) => {
-  if (allHighlighted) {
-    return hasSingleVerse ? "grid-cols-4" : "grid-cols-3";
+const selectionGridCols = (buttonCount: number) => {
+  if (buttonCount >= 4) {
+    return "grid-cols-4";
   }
 
-  return hasSingleVerse ? "grid-cols-3" : "grid-cols-2";
+  if (buttonCount === 3) {
+    return "grid-cols-3";
+  }
+
+  return "grid-cols-2";
 };
 
 const VerseActionBarInnerComponent = ({ verses }: VerseActionBarProps) => {
@@ -58,7 +59,7 @@ const VerseActionBarInnerComponent = ({ verses }: VerseActionBarProps) => {
   const {
     add: addHighlight,
     remove: removeHighlight,
-    highlightedMap,
+    highlightedIds,
   } = useHighlights();
 
   const selectedSet = useMemo(
@@ -77,7 +78,7 @@ const VerseActionBarInnerComponent = ({ verses }: VerseActionBarProps) => {
 
   const allSelectedHighlighted =
     selectedVerses.length > 0 &&
-    selectedVerses.every((verse) => highlightedMap.has(verse.id));
+    selectedVerses.every((verse) => highlightedIds.has(verse.id));
 
   const handleShare = async () => {
     if (selectedVerses.length === 0) {
@@ -153,10 +154,14 @@ const VerseActionBarInnerComponent = ({ verses }: VerseActionBarProps) => {
     void deleteHighlights(selectedVerses);
   };
 
-  const cols = getSelectionGridCols(
-    singleSelectedVerse !== null,
-    allSelectedHighlighted
-  );
+  // Share + highlight always render; copy-link needs a single verse and remove
+  // needs every selected verse highlighted.
+  const visibleButtonCount =
+    (singleSelectedVerse === null ? 0 : 1) +
+    2 +
+    (allSelectedHighlighted ? 1 : 0);
+
+  const cols = selectionGridCols(visibleButtonCount);
 
   return (
     <div className="pb-bar-safe pointer-events-none fixed inset-x-0 bottom-[3.5rem] z-40 overscroll-contain px-3 pt-3">

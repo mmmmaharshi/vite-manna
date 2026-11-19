@@ -25,12 +25,13 @@ const VerseListComponent = ({ verses }: VerseListProps) => {
   const lastScrolledVerseRef = useRef<number | null>(null);
 
   const fontSize = useReaderStore((state) => state.fontSize);
+
   const selectedSet = useMemo(
     () => new Set(selectedVerseIds),
     [selectedVerseIds]
   );
 
-  const { highlightedMap } = useHighlights();
+  const { highlightedIds } = useHighlights();
 
   useLayoutEffect(() => {
     if (permalinkVerse === null) {
@@ -62,7 +63,7 @@ const VerseListComponent = ({ verses }: VerseListProps) => {
       {verses.map((verse) => {
         const isSelected = selectedSet.has(verse.id);
         const isPermalink = verse.verse === permalinkVerse;
-        const highlightColor = highlightedMap.get(verse.id);
+        const isHighlighted = highlightedIds.has(verse.id);
 
         return (
           <li
@@ -70,11 +71,8 @@ const VerseListComponent = ({ verses }: VerseListProps) => {
             ref={isPermalink ? permalinkRef : null}
             className="verse-row relative"
           >
-            {highlightColor && (
-              <div
-                aria-hidden="true"
-                className={cn("highlight-strip", `highlight-${highlightColor}`)}
-              />
+            {isHighlighted && (
+              <div aria-hidden="true" className="highlight-strip highlight" />
             )}
             <button
               type="button"
@@ -93,11 +91,8 @@ const VerseListComponent = ({ verses }: VerseListProps) => {
                   {verse.verse}
                 </sup>
                 {verse.text}
-                {highlightColor && (
-                  <span
-                    aria-hidden="true"
-                    className={cn("hl-dot", `hl-dot-${highlightColor}`)}
-                  />
+                {isHighlighted && (
+                  <span aria-hidden="true" className="hl-dot" />
                 )}
               </span>
             </button>

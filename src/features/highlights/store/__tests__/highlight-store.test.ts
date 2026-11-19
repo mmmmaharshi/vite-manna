@@ -2,7 +2,7 @@ import { beforeEach, describe, expect, it } from "vite-plus/test";
 
 import { useHighlightStore } from "../highlight-store";
 
-const highlight = (verseId: number, color: "yellow" | "blue" = "yellow") => ({
+const highlight = (verseId: number, color = "yellow") => ({
   book: 1,
   chapter: 1,
   color,
@@ -17,41 +17,39 @@ describe("highlight store", () => {
   beforeEach(() => {
     useHighlightStore.setState({
       error: null,
-      highlightedMap: new Map(),
+      highlightedIds: new Set(),
       highlights: [],
       loaded: false,
     });
   });
 
   describe("hydrate", () => {
-    it("loads the highlights and their colors", () => {
-      useHighlightStore
-        .getState()
-        .hydrate([highlight(1), highlight(2, "blue")]);
+    it("loads the highlights and their ids", () => {
+      useHighlightStore.getState().hydrate([highlight(1), highlight(2)]);
 
       const state = useHighlightStore.getState();
 
       expect(state.loaded).toBeTruthy();
       expect(state.highlights).toHaveLength(2);
-      expect(state.highlightedMap.get(2)).toBe("blue");
+      expect(state.highlightedIds.has(2)).toBeTruthy();
     });
   });
 
   describe("upsertLocal", () => {
     it("prepends the highlight and replaces one for the same verse", () => {
       useHighlightStore.getState().hydrate([highlight(1)]);
-      useHighlightStore.getState().upsertLocal(highlight(2, "blue"));
-      useHighlightStore.getState().upsertLocal(highlight(1, "blue"));
+      useHighlightStore.getState().upsertLocal(highlight(2));
+      useHighlightStore.getState().upsertLocal(highlight(1));
 
       const state = useHighlightStore.getState();
 
       expect(state.highlights.map((h) => h.verseId)).toStrictEqual([1, 2]);
-      expect(state.highlightedMap.get(1)).toBe("blue");
+      expect(state.highlightedIds.has(1)).toBeTruthy();
     });
   });
 
   describe("removeLocal", () => {
-    it("drops the highlight and its color", () => {
+    it("drops the highlight and its id", () => {
       useHighlightStore.getState().hydrate([highlight(1), highlight(2)]);
 
       useHighlightStore.getState().removeLocal(1);
@@ -59,7 +57,7 @@ describe("highlight store", () => {
       const state = useHighlightStore.getState();
 
       expect(state.highlights.map((h) => h.verseId)).toStrictEqual([2]);
-      expect(state.highlightedMap.has(1)).toBeFalsy();
+      expect(state.highlightedIds.has(1)).toBeFalsy();
     });
   });
 

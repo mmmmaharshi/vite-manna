@@ -1,10 +1,10 @@
 import { create } from "zustand";
 
-import type { Highlight, HighlightColor } from "../../../shared/bible";
+import type { Highlight } from "../../../shared/bible";
 
 export interface HighlightStore {
   highlights: Highlight[];
-  highlightedMap: Map<number, HighlightColor>;
+  highlightedIds: Set<number>;
   loaded: boolean;
   error: string | null;
   hydrate: (highlights: Highlight[]) => void;
@@ -15,12 +15,12 @@ export interface HighlightStore {
 
 export const useHighlightStore = create<HighlightStore>((set) => ({
   error: null,
-  highlightedMap: new Map(),
+  highlightedIds: new Set(),
   highlights: [],
   hydrate: (highlights) => {
     set({
       error: null,
-      highlightedMap: new Map(highlights.map((h) => [h.verseId, h.color])),
+      highlightedIds: new Set(highlights.map((h) => h.verseId)),
       highlights,
       loaded: true,
     });
@@ -28,11 +28,11 @@ export const useHighlightStore = create<HighlightStore>((set) => ({
   loaded: false,
   removeLocal: (verseId) => {
     set((state) => {
-      const next = new Map(state.highlightedMap);
+      const next = new Set(state.highlightedIds);
       next.delete(verseId);
 
       return {
-        highlightedMap: next,
+        highlightedIds: next,
         highlights: state.highlights.filter((h) => h.verseId !== verseId),
       };
     });
@@ -45,14 +45,11 @@ export const useHighlightStore = create<HighlightStore>((set) => ({
       const filtered = state.highlights.filter(
         (h) => h.verseId !== highlight.verseId
       );
-
-      const entries: [number, HighlightColor][] = [
-        ...state.highlightedMap,
-        [highlight.verseId, highlight.color],
-      ];
+      const next = new Set(state.highlightedIds);
+      next.add(highlight.verseId);
 
       return {
-        highlightedMap: new Map(entries),
+        highlightedIds: next,
         highlights: [highlight, ...filtered],
       };
     });

@@ -13,7 +13,7 @@ export const HIGHLIGHTS_LOAD_ERROR = "Unable to load highlights.";
 
 export const useHighlights = () => {
   const highlights = useHighlightStore((s) => s.highlights);
-  const highlightedMap = useHighlightStore((s) => s.highlightedMap);
+  const highlightedIds = useHighlightStore((s) => s.highlightedIds);
   const loaded = useHighlightStore((s) => s.loaded);
   const error = useHighlightStore((s) => s.error);
   const hydrate = useHighlightStore((s) => s.hydrate);
@@ -96,7 +96,7 @@ export const useHighlights = () => {
   return {
     add,
     error,
-    highlightedMap,
+    highlightedIds,
     highlights,
     loaded,
     remove,

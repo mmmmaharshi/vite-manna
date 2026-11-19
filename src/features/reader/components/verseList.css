@@ -2,34 +2,8 @@
   --hl-dot-size: 6px;
 }
 
-.highlight-yellow {
+/* Single highlight color (see DEFAULT_HIGHLIGHT_COLOR): the strip washes the
+   verse row, the dot marks it in compact contexts. */
+.highlight {
   background-color: var(--highlight-yellow);
-}
-.highlight-green {
-  background-color: var(--highlight-green);
-}
-.highlight-blue {
-  background-color: var(--highlight-blue);
-}
-.highlight-pink {
-  background-color: var(--highlight-pink);
-}
-.highlight-orange {
-  background-color: var(--highlight-orange);
-}
-
-.hl-dot-yellow {
-  background-color: oklch(85% 0.12 95);
-}
-.hl-dot-green {
-  background-color: oklch(75% 0.18 145);
-}
-.hl-dot-blue {
-  background-color: oklch(70% 0.14 225);
-}
-.hl-dot-pink {
-  background-color: oklch(72% 0.16 345);
-}
-.hl-dot-orange {
-  background-color: oklch(75% 0.16 65);
 }

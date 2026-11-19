@@ -17,20 +17,14 @@ export interface MetaEntry {
 /** `[book, chapterCount]` pairs in book order, stored under the `chapterCounts` meta key. */
 export type ChapterCounts = [number, number][];
 
-export type HighlightColor = "yellow" | "green" | "blue" | "pink" | "orange";
-
-export const DEFAULT_HIGHLIGHT_COLOR: HighlightColor = "yellow";
+/** The product highlights in one color; rows carry the value so older installs
+ * keep working with no migration. */
+export const DEFAULT_HIGHLIGHT_COLOR = "yellow";
 
 /** Pre-v12 rows were written by older app versions, so verify the fields the
  * migration reads instead of crashing mid-upgrade on a corrupt row. */
-const asHighlightColor = (value: unknown): HighlightColor =>
-  value === "green" ||
-  value === "blue" ||
-  value === "pink" ||
-  value === "orange" ||
-  value === "yellow"
-    ? value
-    : DEFAULT_HIGHLIGHT_COLOR;
+const asStringOr = (value: unknown, fallback: string) =>
+  typeof value === "string" ? value : fallback;
 
 const numberOr = (value: unknown, fallback: number) =>
   typeof value === "number" ? value : fallback;
@@ -52,7 +46,7 @@ const asMigratableHighlight = (row: unknown): Highlight | null => {
   return {
     book: numberOr(row.book, 0),
     chapter: numberOr(row.chapter, 0),
-    color: asHighlightColor(row.color),
+    color: asStringOr(row.color, DEFAULT_HIGHLIGHT_COLOR),
     createdAt: numberOr(row.createdAt, updatedAt),
     text: typeof row.text === "string" ? row.text : "",
     updatedAt,
@@ -67,7 +61,7 @@ export interface Highlight {
   chapter: number;
   verse: number;
   text: string;
-  color: HighlightColor;
+  color: string;
   createdAt: number;
   updatedAt: number;
 }

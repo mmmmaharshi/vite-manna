@@ -10,9 +10,8 @@ import {
 } from "@heroui/react";
 import { useState } from "react";
 
-import type { Highlight, HighlightColor } from "../../shared/bible";
+import type { Highlight } from "../../shared/bible";
 import { copyToClipboard } from "../../shared/lib/browser";
-import { cn } from "../../shared/lib/cn";
 import { formatReference } from "../../shared/lib/reference";
 import { useHighlights } from "../highlights/hooks/use-highlights";
 import { useReaderStore } from "../reader/store/reader-store";
@@ -21,13 +20,8 @@ interface HighlightsPageProps {
   onNavigateToReader: () => void;
 }
 
-const COLOR_STYLES: Record<HighlightColor, string> = {
-  blue: "bg-blue-200/60 border-blue-400/40",
-  green: "bg-green-200/60 border-green-400/40",
-  orange: "bg-orange-200/60 border-orange-400/40",
-  pink: "bg-pink-200/50 border-pink-400/40",
-  yellow: "bg-yellow-200/70 border-yellow-400/40",
-};
+const HIGHLIGHT_CARD_CLASSES =
+  "flex flex-col gap-2 border-l-4 border-yellow-400/40 bg-yellow-200/70 p-3";
 
 const HighlightsPage = ({ onNavigateToReader }: HighlightsPageProps) => {
   const { error, highlights, remove, loaded } = useHighlights();
@@ -98,13 +92,7 @@ const HighlightsPage = ({ onNavigateToReader }: HighlightsPageProps) => {
             aria-atomic="true"
           >
             {highlights.map((hl) => (
-              <Surface
-                key={hl.verseId}
-                className={cn(
-                  "flex flex-col gap-2 border-l-4 p-3",
-                  COLOR_STYLES[hl.color]
-                )}
-              >
+              <Surface key={hl.verseId} className={HIGHLIGHT_CARD_CLASSES}>
                 <div className="flex items-center gap-2">
                   <button
                     type="button"
