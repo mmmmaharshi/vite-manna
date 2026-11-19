@@ -79,13 +79,24 @@ export const getBibleBookName = (book: number) =>
 /** The Protestant canon lists the 39 Old Testament books first. */
 export const OLD_TESTAMENT_BOOK_COUNT = 39;
 
+/** A book summary from the database, before names are attached. */
+export interface BookSummary {
+  id: number;
+  chapterCount: number;
+}
+
+/** A book summary with its display name. */
+export interface NamedBook extends BookSummary {
+  name: string;
+}
+
 /**
  * Attaches Telugu names to book summaries.
  *
  * @param summaries - The summaries to name.
  * @returns The summaries with their names.
  */
-export const attachBookNames = <T extends { id: number }>(summaries: T[]) =>
+export const attachBookNames = (summaries: BookSummary[]): NamedBook[] =>
   summaries.map((summary) => ({
     ...summary,
     name: getBibleBookName(summary.id),

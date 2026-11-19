@@ -17,9 +17,9 @@ import {
   isFontSize,
 } from "../../shared/lib/font-size";
 import type { FontSize } from "../../shared/lib/font-size";
+import { useFontSizeStore } from "../../shared/lib/font-size-store";
 import { clearLastCrash, readLastCrash } from "../../shared/lib/persistence";
 import { BottomSpacer, Page, PageHeader, PageSection } from "../../shared/ui";
-import { useReaderStore } from "../reader/store/reader-store";
 
 const FONT_SIZE_LABELS: Record<FontSize, string> = {
   "2xl": "2XL",
@@ -33,8 +33,8 @@ const PREVIEW_TEXT =
   "ఆదియందు దేవుడు ఆకాశమును భూమిని సృష్టించెను. భూమి నిరాకారముగా నిర్జనముగా ఉండెను. అగాధజలముల మీదను అంధకారము కమ్ముకొని యుండెను. దేవుని ఆత్మ జలముల మీద కదలాడుచుండెను. అప్పుడు దేవుడు వెలుగు కలుగునని చెప్పగా వెలుగు కలిగెను.";
 
 const SettingsPage = () => {
-  const fontSize = useReaderStore((state) => state.fontSize);
-  const setFontSize = useReaderStore((state) => state.setFontSize);
+  const fontSize = useFontSizeStore((state) => state.fontSize);
+  const setFontSize = useFontSizeStore((state) => state.setFontSize);
   const [lastCrash, setLastCrash] = useState(readLastCrash);
 
   return (

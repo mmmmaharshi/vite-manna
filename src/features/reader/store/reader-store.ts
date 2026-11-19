@@ -1,10 +1,7 @@
 import { create } from "zustand";
 
-import type { FontSize } from "../../../shared/lib/font-size";
 import {
   loadInitialState,
-  loadFontSize,
-  setStoredFontSize,
   rememberChapter,
 } from "../../../shared/lib/persistence";
 import type { VerseRef } from "../../../shared/lib/reference";
@@ -20,11 +17,11 @@ export interface ReaderState {
   chaptersByBook: Record<number, number>;
   selectedVerseIds: number[];
   permalinkVerse: number | null;
-  fontSize: FontSize;
 
   setBook: (book: number) => void;
   setChapter: (chapter: number) => void;
   goToVerse: (ref: VerseRef) => void;
+  goToChapter: (book: number, chapter: number) => void;
   selectBook: (bookId: number) => void;
   openBookSelect: () => void;
   closeBookSelect: () => void;
@@ -32,7 +29,6 @@ export interface ReaderState {
   toggleVerseSelection: (verseId: number) => void;
   clearVerseSelection: () => void;
   setPermalinkVerse: (verse: number | null) => void;
-  setFontSize: (fontSize: FontSize) => void;
   reset: () => void;
 }
 
@@ -76,11 +72,14 @@ export const useReaderStore = create<ReaderState>((set, get) => ({
 
     set({ isBookSelectOpen: false });
   },
-  fontSize: loadFontSize(),
   goToVerse: (ref) => {
     get().setBook(ref.book);
     get().setChapter(ref.chapter);
     get().setPermalinkVerse(ref.verse);
+  },
+  goToChapter: (book, chapter) => {
+    get().setBook(book);
+    get().setChapter(chapter);
   },
   isBookSelectOpen: false,
   openBookSelect: () => {
@@ -94,7 +93,6 @@ export const useReaderStore = create<ReaderState>((set, get) => ({
       book: fresh.book,
       chapter: fresh.chapter,
       chaptersByBook: fresh.chaptersByBook,
-      fontSize: loadFontSize(),
       isBookSelectOpen: false,
       pendingBook: null,
       permalinkVerse: fresh.permalinkVerse,
@@ -134,10 +132,6 @@ export const useReaderStore = create<ReaderState>((set, get) => ({
     }
 
     set(next);
-  },
-  setFontSize: (fontSize) => {
-    setStoredFontSize(fontSize);
-    set({ fontSize });
   },
   setPermalinkVerse: (verse) => {
     if (get().permalinkVerse === verse) {

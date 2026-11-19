@@ -23,7 +23,7 @@ import {
 } from "./hooks/use-reader-snapshot";
 import { useSwipeAndKeyboard } from "./hooks/use-swipe-and-keyboard";
 import { selectIsSelectionMode, useReaderStore } from "./store/reader-store";
-import type { BibleBook, ReaderSnapshot } from "./types";
+import type { NamedBook } from "../../shared/bible"; import type { ReaderSnapshot } from "./types";
 import { useUrlSync } from "./use-url-sync";
 
 const SKELETON_LINES = [
@@ -39,7 +39,7 @@ const SKELETON_LINES = [
 
 const resolveVisibleChapters = (
   isReaderTransitioning: boolean,
-  visibleBookSummary: BibleBook | undefined,
+  visibleBookSummary: NamedBook | undefined,
   snapshot: ReaderSnapshot | null
 ) => {
   if (!visibleBookSummary) {
@@ -86,16 +86,8 @@ const ReaderScreen = () => {
   }, [book, chapter]);
 
   const verseSectionRef = useRef<HTMLElement>(null);
-  useSwipeAndKeyboard({
-    book,
-    books,
-    chapter,
-    isSelectionMode,
-    setBook,
-    setChapter,
-    elementRef: verseSectionRef,
-    isBookSelectOpen: useReaderStore((state) => state.isBookSelectOpen),
-  });
+
+  useSwipeAndKeyboard({ elementRef: verseSectionRef });
 
   const selectedBookSummary = books.find((candidate) => candidate.id === book);
 

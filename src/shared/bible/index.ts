@@ -3,6 +3,8 @@ export {
   BIBLE_BOOK_NAMES,
   OLD_TESTAMENT_BOOK_COUNT,
   attachBookNames,
+  type BookSummary,
+  type NamedBook,
 } from "./books";
 
 export {

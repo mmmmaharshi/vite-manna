@@ -36,12 +36,16 @@ const SearchPage = ({ onNavigateToReader }: SearchPageProps) => {
   const timerRef = useRef<ReturnType<typeof setTimeout> | null>(null);
   const requestIdRef = useRef(0);
 
+  const clearSearch = () => {
+    setResults([]);
+    setStatus("idle");
+  };
+
   const handleQueryChange = (value: string) => {
     setQuery(value);
 
     if (!value.trim()) {
-      setResults([]);
-      setStatus("idle");
+      clearSearch();
     } else if (status === "error") {
       setStatus(results.length > 0 ? "results" : "empty");
     }
@@ -108,10 +112,7 @@ const SearchPage = ({ onNavigateToReader }: SearchPageProps) => {
           <SearchField
             value={query}
             onChange={handleQueryChange}
-            onClear={() => {
-              setResults([]);
-              setStatus("idle");
-            }}
+            onClear={clearSearch}
             fullWidth
             aria-label="Search verses"
           >

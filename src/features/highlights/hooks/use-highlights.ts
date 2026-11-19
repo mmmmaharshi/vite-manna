@@ -1,4 +1,4 @@
-import { useCallback, useEffect } from "react";
+import { useCallback, useEffect, useMemo } from "react";
 
 import {
   DEFAULT_HIGHLIGHT_COLOR,
@@ -18,7 +18,10 @@ export const HIGHLIGHTS_LOAD_ERROR = "Unable to load highlights.";
  */
 export const useHighlights = () => {
   const highlights = useHighlightStore((s) => s.highlights);
-  const highlightedIds = useHighlightStore((s) => s.highlightedIds);
+  const highlightedIds = useMemo(
+    () => new Set(highlights.map((highlight) => highlight.verseId)),
+    [highlights]
+  );
   const loaded = useHighlightStore((s) => s.loaded);
   const error = useHighlightStore((s) => s.error);
   const hydrate = useHighlightStore((s) => s.hydrate);
@@ -56,6 +59,8 @@ export const useHighlights = () => {
 
   const add = useCallback(
     async (verse: BibleVerse) => {
+      const now = Date.now();
+
       try {
         await upsertHl({
           book: verse.book,
@@ -68,9 +73,9 @@ export const useHighlights = () => {
           book: verse.book,
           chapter: verse.chapter,
           color: DEFAULT_HIGHLIGHT_COLOR,
-          createdAt: Date.now(),
+          createdAt: now,
           text: verse.text,
-          updatedAt: Date.now(),
+          updatedAt: now,
           verse: verse.verse,
           verseId: verse.id,
         });

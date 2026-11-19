@@ -1,5 +1,6 @@
 import { Spinner } from "@heroui/react";
 import { lazy, Suspense, useCallback, useState } from "react";
+import type { ReactNode } from "react";
 import { useSearchParams } from "react-router";
 
 import { ReaderScreen } from "../features/reader";
@@ -23,6 +24,20 @@ const pageFallback = (
     <Spinner size="lg" aria-label="Loading" />
   </div>
 );
+
+const LazyTab = ({
+  active,
+  children,
+}: {
+  active: boolean;
+  children: ReactNode;
+}) => {
+  if (!active) {
+    return null;
+  }
+
+  return <Suspense fallback={pageFallback}>{children}</Suspense>;
+};
 
 const TabLayout = () => {
   const [activeTab, setActiveTab] = useState<TabId>("reader");
@@ -48,21 +63,15 @@ const TabLayout = () => {
       <div className={cn(activeTab !== "reader" && "hidden")}>
         <ReaderScreen />
       </div>
-      {activeTab === "search" && (
-        <Suspense fallback={pageFallback}>
-          <SearchPage onNavigateToReader={() => setActiveTab("reader")} />
-        </Suspense>
-      )}
-      {activeTab === "highlights" && (
-        <Suspense fallback={pageFallback}>
-          <HighlightsPage onNavigateToReader={() => setActiveTab("reader")} />
-        </Suspense>
-      )}
-      {activeTab === "settings" && (
-        <Suspense fallback={pageFallback}>
-          <SettingsPage />
-        </Suspense>
-      )}
+      <LazyTab active={activeTab === "search"}>
+        <SearchPage onNavigateToReader={() => setActiveTab("reader")} />
+      </LazyTab>
+      <LazyTab active={activeTab === "highlights"}>
+        <HighlightsPage onNavigateToReader={() => setActiveTab("reader")} />
+      </LazyTab>
+      <LazyTab active={activeTab === "settings"}>
+        <SettingsPage />
+      </LazyTab>
       <BottomNav activeTab={activeTab} onTabChange={handleTabChange} />
       <div className="pointer-events-none fixed inset-x-0 bottom-0 z-50 flex flex-col gap-2 p-4 pb-20">
         <div className="pointer-events-auto">

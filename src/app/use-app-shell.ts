@@ -18,7 +18,10 @@ const READ_ERROR_MESSAGE =
 
 const PROGRESS_CAP = 95;
 
-const BOOT_SPLASH_SELECTOR = "#boot-splash";
+/** The boot splash node id, mirrored by the static markup in index.html. */
+export const BOOT_SPLASH_ID = "boot-splash";
+
+const BOOT_SPLASH_SELECTOR = `#${BOOT_SPLASH_ID}`;
 
 // WARNING: moving this import into a component breaks the React Compiler build.
 const loadInitializeBible = async () => {

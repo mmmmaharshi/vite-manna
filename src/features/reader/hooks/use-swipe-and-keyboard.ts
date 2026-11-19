@@ -1,38 +1,31 @@
 import { useEffect, useRef } from "react";
 
-import type { BibleBook } from "../types";
+import { selectIsSelectionMode, useReaderStore } from "../store/reader-store";
 import { navigateChapter } from "./navigate-chapter";
+import { useBooks } from "./use-books";
 
 const SWIPE_THRESHOLD = 50;
 const SWIPE_TIME_MAX = 400;
 
 interface UseSwipeAndKeyboardOptions {
   elementRef: React.RefObject<HTMLElement | null>;
-  books: BibleBook[];
-  book: number;
-  chapter: number;
-  setChapter: (chapter: number) => void;
-  setBook: (book: number) => void;
-  isSelectionMode: boolean;
-  isBookSelectOpen: boolean;
 }
 
 /**
  * Drives chapter navigation from touch swipes and arrow keys.
  *
- * @param options - The element, position, and callbacks.
+ * @param options - The element to listen on.
  * @returns Nothing.
  */
 export const useSwipeAndKeyboard = ({
   elementRef,
-  books,
-  book,
-  chapter,
-  setChapter,
-  setBook,
-  isSelectionMode,
-  isBookSelectOpen,
 }: UseSwipeAndKeyboardOptions) => {
+  const { books } = useBooks();
+  const book = useReaderStore((state) => state.book);
+  const chapter = useReaderStore((state) => state.chapter);
+  const isSelectionMode = useReaderStore(selectIsSelectionMode);
+  const isBookSelectOpen = useReaderStore((state) => state.isBookSelectOpen);
+  const goToChapter = useReaderStore((state) => state.goToChapter);
   const touchStart = useRef<{ x: number; y: number; time: number } | null>(
     null
   );
@@ -85,11 +78,7 @@ export const useSwipeAndKeyboard = ({
       const next = navigateChapter(books, book, chapter, dir);
 
       if (next) {
-        if (next.book !== book) {
-          setBook(next.book);
-        }
-
-        setChapter(next.chapter);
+        goToChapter(next.book, next.chapter);
       }
     };
 
@@ -107,8 +96,7 @@ export const useSwipeAndKeyboard = ({
     books,
     book,
     chapter,
-    setChapter,
-    setBook,
+    goToChapter,
     isSelectionMode,
     isBookSelectOpen,
   ]);
@@ -130,22 +118,14 @@ export const useSwipeAndKeyboard = ({
         const next = navigateChapter(books, book, chapter, "next");
 
         if (next) {
-          if (next.book !== book) {
-            setBook(next.book);
-          }
-
-          setChapter(next.chapter);
+          goToChapter(next.book, next.chapter);
         }
       } else if (e.key === "ArrowLeft") {
         e.preventDefault();
         const next = navigateChapter(books, book, chapter, "prev");
 
         if (next) {
-          if (next.book !== book) {
-            setBook(next.book);
-          }
-
-          setChapter(next.chapter);
+          goToChapter(next.book, next.chapter);
         }
       }
     };
@@ -153,13 +133,5 @@ export const useSwipeAndKeyboard = ({
     window.addEventListener("keydown", onKeyDown);
 
     return () => window.removeEventListener("keydown", onKeyDown);
-  }, [
-    books,
-    book,
-    chapter,
-    setChapter,
-    setBook,
-    isSelectionMode,
-    isBookSelectOpen,
-  ]);
+  }, [books, book, chapter, goToChapter, isSelectionMode, isBookSelectOpen]);
 };

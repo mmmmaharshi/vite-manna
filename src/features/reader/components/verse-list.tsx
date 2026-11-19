@@ -3,6 +3,7 @@ import { memo, useMemo, useLayoutEffect, useRef } from "react";
 import type { BibleVerse } from "../../../shared/bible";
 import { cn } from "../../../shared/lib/cn";
 import { fontSizeClass } from "../../../shared/lib/font-size";
+import { useFontSizeStore } from "../../../shared/lib/font-size-store";
 import { useHighlights } from "../../highlights/hooks/use-highlights";
 import { useReaderStore } from "../store/reader-store";
 
@@ -22,7 +23,7 @@ const VerseListComponent = ({ verses }: VerseListProps) => {
   const permalinkRef = useRef<HTMLLIElement | null>(null);
   const lastScrolledVerseRef = useRef<number | null>(null);
 
-  const fontSize = useReaderStore((state) => state.fontSize);
+  const fontSize = useFontSizeStore((state) => state.fontSize);
 
   const selectedSet = useMemo(
     () => new Set(selectedVerseIds),

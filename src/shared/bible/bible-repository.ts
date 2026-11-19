@@ -61,6 +61,26 @@ export const clearBibleSeed = async () => {
 export const getContiguousChapterNumbers = (chapterCount: number) =>
   Array.from({ length: chapterCount }, (_, index) => index + 1);
 
+const clampChapter = (chapters: number[], chapter: number) =>
+  chapters.includes(chapter) ? chapter : chapters[0];
+
+const readChapterSnapshot = async (
+  book: number,
+  chapters: number[],
+  chapter: number
+) => {
+  const selectedChapter = clampChapter(chapters, chapter);
+
+  return {
+    chapter: selectedChapter,
+    chapters,
+    verses:
+      selectedChapter === undefined
+        ? []
+        : await getVerses(book, selectedChapter),
+  };
+};
+
 /**
  * Lists the chapter numbers of a book.
  *
@@ -102,16 +122,9 @@ export const getReaderSnapshot = async (
       ? await getChapterNumbers(book)
       : getContiguousChapterNumbers(chapterCount);
 
-  const selectedChapter = chapters.includes(chapter) ? chapter : chapters[0];
-
   return {
     book,
-    chapters,
-    chapter: selectedChapter,
-    verses:
-      selectedChapter === undefined
-        ? []
-        : await getVerses(book, selectedChapter),
+    ...(await readChapterSnapshot(book, chapters, chapter)),
   };
 };
 
@@ -134,7 +147,6 @@ export const getReaderBootstrap = async (book: number, chapter: number) => {
     books.find((candidate) => candidate.id === selectedBook)?.chapterCount ?? 0;
 
   const chapters = getContiguousChapterNumbers(selectedChapterCount);
-  const selectedChapter = chapters.includes(chapter) ? chapter : chapters[0];
 
   return {
     books,
@@ -142,13 +154,8 @@ export const getReaderBootstrap = async (book: number, chapter: number) => {
       selectedBook === undefined
         ? null
         : {
-            chapters,
             book: selectedBook,
-            chapter: selectedChapter,
-            verses:
-              selectedChapter === undefined
-                ? []
-                : await getVerses(selectedBook, selectedChapter),
+            ...(await readChapterSnapshot(selectedBook, chapters, chapter)),
           },
   };
 };

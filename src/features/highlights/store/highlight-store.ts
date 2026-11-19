@@ -7,7 +7,6 @@ import type { Highlight } from "../../../shared/bible";
  */
 export interface HighlightStore {
   highlights: Highlight[];
-  highlightedIds: Set<number>;
   loaded: boolean;
   error: string | null;
   hydrate: (highlights: Highlight[]) => void;
@@ -17,48 +16,34 @@ export interface HighlightStore {
 }
 
 /**
- * The highlight list store.
+ * The highlight list store. Membership is derived from `highlights`, never
+ * stored twice.
  */
 export const useHighlightStore = create<HighlightStore>((set) => ({
   error: null,
-  highlightedIds: new Set(),
   highlights: [],
   hydrate: (highlights) => {
     set({
-      highlights,
       error: null,
-      highlightedIds: new Set(highlights.map((h) => h.verseId)),
+      highlights,
       loaded: true,
     });
   },
   loaded: false,
   removeLocal: (verseId) => {
-    set((state) => {
-      const next = new Set(state.highlightedIds);
-      next.delete(verseId);
-
-      return {
-        highlightedIds: next,
-        highlights: state.highlights.filter((h) => h.verseId !== verseId),
-      };
-    });
+    set((state) => ({
+      highlights: state.highlights.filter((h) => h.verseId !== verseId),
+    }));
   },
   setError: (message) => {
     set({ error: message });
   },
   upsertLocal: (highlight) => {
-    set((state) => {
-      const filtered = state.highlights.filter(
-        (h) => h.verseId !== highlight.verseId
-      );
-
-      const next = new Set(state.highlightedIds);
-      next.add(highlight.verseId);
-
-      return {
-        highlightedIds: next,
-        highlights: [highlight, ...filtered],
-      };
-    });
+    set((state) => ({
+      highlights: [
+        highlight,
+        ...state.highlights.filter((h) => h.verseId !== highlight.verseId),
+      ],
+    }));
   },
 }));

@@ -8,6 +8,10 @@ import { parseBibleResponse, readBible } from "./bible-parser";
 
 const BIBLE_URL = "/bible.json";
 const BATCH_SIZE = 1000;
+const DOWNLOAD_WEIGHT = 70;
+const PARSED_PERCENT = 75;
+const SAVE_START = 90;
+const SAVE_SPAN = 10;
 
 /**
  * Downloads the Bible JSON once, then stores it in IndexedDB in batches.
@@ -52,7 +56,7 @@ export const initializeBible = async (
     received += value.length;
 
     if (total > 0) {
-      onProgress?.(Math.round((received / total) * 70));
+      onProgress?.(Math.round((received / total) * DOWNLOAD_WEIGHT));
     }
 
     await readStream();
@@ -70,7 +74,7 @@ export const initializeBible = async (
     position += chunk.length;
   }
 
-  onProgress?.(75);
+  onProgress?.(PARSED_PERCENT);
 
   const { chapterCounts, verses } = readBible(
     parseBibleResponse(new TextDecoder().decode(bytes))
@@ -85,7 +89,7 @@ export const initializeBible = async (
 
     const saved = Math.min(start + BATCH_SIZE, verses.length);
 
-    onProgress?.(90 + (saved / verses.length) * 10);
+    onProgress?.(SAVE_START + (saved / verses.length) * SAVE_SPAN);
 
     await saveBatch(start + BATCH_SIZE);
   };

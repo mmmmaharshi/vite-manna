@@ -1,18 +1,18 @@
 import { useEffect, useState } from "react";
 
 import { attachBookNames, getReaderBootstrap } from "../../../shared/bible";
-import type { BibleBook } from "../types";
+import type { NamedBook } from "../../../shared/bible";
 
 /**
  * The book list result.
  */
 export interface UseBooksResult {
-  books: BibleBook[];
+  books: NamedBook[];
   hasLoadedBooks: boolean;
   reloadBooks: () => void;
 }
 
-let cachedBooks: BibleBook[] = [];
+let cachedBooks: NamedBook[] = [];
 let cachedLoaded = false;
 
 /**
@@ -22,7 +22,7 @@ let cachedLoaded = false;
  * @returns The books, their load state, and a retry action.
  */
 export const useBooks = (enabled = true) => {
-  const [books, setBooks] = useState<BibleBook[]>(cachedBooks);
+  const [books, setBooks] = useState<NamedBook[]>(cachedBooks);
   const [hasLoadedBooks, setHasLoadedBooks] = useState(cachedLoaded);
   const [reloadToken, setReloadToken] = useState(0);
 

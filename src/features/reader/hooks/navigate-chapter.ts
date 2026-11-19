@@ -1,4 +1,4 @@
-import type { BibleBook } from "../types";
+import type { NamedBook } from "../../../shared/bible";
 
 /**
  * Steps one chapter forward or back across book boundaries.
@@ -10,7 +10,7 @@ import type { BibleBook } from "../types";
  * @returns The destination, or null past either end.
  */
 export const navigateChapter = (
-  books: BibleBook[],
+  books: NamedBook[],
   book: number,
   chapter: number,
   direction: "prev" | "next"

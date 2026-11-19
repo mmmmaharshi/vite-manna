@@ -17,39 +17,41 @@ describe("highlight store", () => {
   beforeEach(() => {
     useHighlightStore.setState({
       error: null,
-      highlightedIds: new Set(),
       highlights: [],
       loaded: false,
     });
   });
 
   describe("hydrate", () => {
-    it("loads the highlights and their ids", () => {
+    it("loads the highlights and clears any error", () => {
+      useHighlightStore.getState().setError("Unable to load highlights.");
       useHighlightStore.getState().hydrate([highlight(1), highlight(2)]);
 
       const state = useHighlightStore.getState();
 
       expect(state.loaded).toBeTruthy();
+      expect(state.error).toBeNull();
       expect(state.highlights).toHaveLength(2);
-      expect(state.highlightedIds.has(2)).toBeTruthy();
     });
   });
 
   describe("upsertLocal", () => {
-    it("prepends the highlight and replaces one for the same verse", () => {
+    it("prepends the highlight and replaces text for the same verse", () => {
       useHighlightStore.getState().hydrate([highlight(1)]);
       useHighlightStore.getState().upsertLocal(highlight(2));
-      useHighlightStore.getState().upsertLocal(highlight(1));
+      useHighlightStore
+        .getState()
+        .upsertLocal({ ...highlight(1), text: "updated" });
 
       const state = useHighlightStore.getState();
 
       expect(state.highlights.map((h) => h.verseId)).toStrictEqual([1, 2]);
-      expect(state.highlightedIds.has(1)).toBeTruthy();
+      expect(state.highlights[0].text).toBe("updated");
     });
   });
 
   describe("removeLocal", () => {
-    it("drops the highlight and its id", () => {
+    it("drops the highlight", () => {
       useHighlightStore.getState().hydrate([highlight(1), highlight(2)]);
 
       useHighlightStore.getState().removeLocal(1);
@@ -57,7 +59,14 @@ describe("highlight store", () => {
       const state = useHighlightStore.getState();
 
       expect(state.highlights.map((h) => h.verseId)).toStrictEqual([2]);
-      expect(state.highlightedIds.has(1)).toBeFalsy();
+    });
+
+    it("keeps the list when the id is missing", () => {
+      useHighlightStore.getState().hydrate([highlight(1)]);
+
+      useHighlightStore.getState().removeLocal(9);
+
+      expect(useHighlightStore.getState().highlights).toHaveLength(1);
     });
   });
 

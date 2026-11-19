@@ -4,4 +4,4 @@ export { useReaderStore } from "./store/reader-store";
 
 export type { ReaderState } from "./store/reader-store";
 
-export type { BibleBook, ReaderSnapshot } from "./types";
+export type { ReaderSnapshot } from "./types";

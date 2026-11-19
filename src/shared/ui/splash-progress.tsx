@@ -3,17 +3,22 @@ import type { CSSProperties } from "react";
 
 import { cn } from "../lib/cn";
 
-const TRACK_WIDTH = 160;
-const TRACK_HEIGHT = 4;
-const INDETERMINATE_WIDTH = TRACK_WIDTH * 0.35;
-const INDETERMINATE_DURATION_MS = 1150;
+/** Splash bar geometry shared with the static boot markup in index.html. */
+export const SPLASH_TRACK = {
+  barWidth: 56,
+  durationMs: 1150,
+  height: 4,
+  width: 160,
+} as const;
+
+const INDETERMINATE_WIDTH = SPLASH_TRACK.width * 0.35;
 
 const getInitialAnimationDelay = () => {
   if (typeof performance === "undefined") {
     return "0ms";
   }
 
-  return `-${performance.now() % INDETERMINATE_DURATION_MS}ms`;
+  return `-${performance.now() % SPLASH_TRACK.durationMs}ms`;
 };
 
 const INITIAL_ANIMATION_DELAY = getInitialAnimationDelay();
@@ -35,7 +40,7 @@ const SplashProgress = ({ value }: SplashProgressProps) => {
   const progressWidth =
     normalizedValue === null
       ? INDETERMINATE_WIDTH
-      : (TRACK_WIDTH * normalizedValue) / 100;
+      : (SPLASH_TRACK.width * normalizedValue) / 100;
 
   return (
     <>
@@ -47,14 +52,14 @@ const SplashProgress = ({ value }: SplashProgressProps) => {
       />
       <svg
         className="splash-progress mt-4"
-        width={TRACK_WIDTH}
-        height={TRACK_HEIGHT}
-        viewBox={`0 0 ${TRACK_WIDTH} ${TRACK_HEIGHT}`}
+        width={SPLASH_TRACK.width}
+        height={SPLASH_TRACK.height}
+        viewBox={`0 0 ${SPLASH_TRACK.width} ${SPLASH_TRACK.height}`}
         aria-hidden="true"
       >
         <rect
-          width={TRACK_WIDTH}
-          height={TRACK_HEIGHT}
+          width={SPLASH_TRACK.width}
+          height={SPLASH_TRACK.height}
           rx={2}
           fill="currentColor"
           opacity={0.14}
@@ -67,7 +72,7 @@ const SplashProgress = ({ value }: SplashProgressProps) => {
           style={INDETERMINATE_STYLE}
           x={0}
           width={progressWidth}
-          height={TRACK_HEIGHT}
+          height={SPLASH_TRACK.height}
           rx={2}
           fill="currentColor"
         />

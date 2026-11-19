@@ -5,14 +5,14 @@ import {
   OLD_TESTAMENT_BOOK_COUNT,
   getBibleBookName,
 } from "../../../shared/bible";
+import type { NamedBook } from "../../../shared/bible";
 import { cn } from "../../../shared/lib/cn";
 import { useReaderStore } from "../store/reader-store";
-import type { BibleBook } from "../types";
 
 interface BookSelectProps {
-  books: BibleBook[];
+  books: NamedBook[];
   value: number;
-  visibleBookSummary: BibleBook | undefined;
+  visibleBookSummary: NamedBook | undefined;
   className?: string;
 }
 
@@ -26,7 +26,7 @@ const scrollSelectedBookIntoView = () => {
   });
 };
 
-const renderBookItem = (book: BibleBook) => (
+const renderBookItem = (book: NamedBook) => (
   <ListBox.Item
     id={book.id}
     key={book.id}

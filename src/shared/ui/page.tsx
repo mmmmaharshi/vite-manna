@@ -3,13 +3,16 @@ import type { ReactNode, Ref } from "react";
 
 import { cn } from "../lib/cn";
 
+/** The main landmark id, mirrored by the skip link in index.html. */
+export const MAIN_CONTENT_ID = "main-content";
+
 /**
  * Full-screen page frame every tab shares.
  *
  * @returns The page element.
  */
 export const Page = ({ children }: { children: ReactNode }) => (
-  <main id="main-content" className="flex h-dvh flex-col">
+  <main id={MAIN_CONTENT_ID} className="flex h-dvh flex-col">
     {children}
   </main>
 );

@@ -37,7 +37,6 @@ describe("reader store", () => {
       book: 1,
       chapter: 1,
       chaptersByBook: {},
-      fontSize: "sm",
       isBookSelectOpen: false,
       pendingBook: null,
       permalinkVerse: null,
