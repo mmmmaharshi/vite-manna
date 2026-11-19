@@ -14,8 +14,8 @@ import {
   removeHighlight,
   searchVerses,
   upsertHighlight,
-} from "../bible-repository";
-import { db } from "../db";
+} from "./bible-repository";
+import { db } from "./db";
 
 const versesFor = (book: number, chapter: number, texts: string[]) =>
   texts.map((text, index) => ({

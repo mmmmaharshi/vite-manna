@@ -1,6 +1,6 @@
 import { beforeEach, describe, expect, it } from "vite-plus/test";
 
-import { useHighlightStore } from "../highlight-store";
+import { useHighlightStore } from "./highlight-store";
 
 const highlight = (verseId: number, color = "yellow") => ({
   book: 1,

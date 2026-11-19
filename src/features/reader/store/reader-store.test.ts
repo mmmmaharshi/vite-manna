@@ -7,7 +7,7 @@ import {
   vi,
 } from "vite-plus/test";
 
-import type * as ReaderStoreApi from "../reader-store";
+import type * as ReaderStoreApi from "./reader-store";
 
 let useReaderStore: typeof ReaderStoreApi.useReaderStore;
 let selectIsSelectionMode: typeof ReaderStoreApi.selectIsSelectionMode;
@@ -29,7 +29,7 @@ describe("reader store", () => {
     vi.stubGlobal("localStorage", createStorage());
 
     ({ selectIsSelectionMode, useReaderStore } =
-      await import("../reader-store"));
+      await import("./reader-store"));
   });
 
   beforeEach(() => {

@@ -1,6 +1,6 @@
 import { describe, expect, it } from "vite-plus/test";
 
-import { parseBibleResponse, readBible } from "../bible-parser";
+import { parseBibleResponse, readBible } from "./bible-parser";
 
 const FIXTURE = JSON.stringify({
   Book: [

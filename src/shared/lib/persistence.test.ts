@@ -16,7 +16,7 @@ import {
   resolveReaderLocation,
   saveReaderLocation,
   setStoredFontSize,
-} from "../persistence";
+} from "./persistence";
 
 interface StoredFixture {
   book: number;
@@ -174,7 +174,7 @@ describe("storage failures", () => {
 
     // A fresh module instance, so the warn-once flag has not been set yet.
     vi.resetModules();
-    const persistence = await import("../persistence");
+    const persistence = await import("./persistence");
 
     expect(persistence.loadInitialState().book).toBe(1);
     expect(persistence.loadFontSize()).toBe("sm");

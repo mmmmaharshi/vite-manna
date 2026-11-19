@@ -1,6 +1,6 @@
 import { describe, expect, it } from "vite-plus/test";
 
-import { fontSizeClass, isFontSize } from "../font-size";
+import { fontSizeClass, isFontSize } from "./font-size";
 
 describe(isFontSize, () => {
   it("accepts the sizes and rejects anything else", () => {

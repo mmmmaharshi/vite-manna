@@ -1,7 +1,7 @@
 import { describe, expect, it } from "vite-plus/test";
 
-import { BIBLE_BOOK_NAMES } from "../../bible/books";
-import { formatReference } from "../reference";
+import { BIBLE_BOOK_NAMES } from "../bible/books";
+import { formatReference } from "./reference";
 
 describe(formatReference, () => {
   it("names the book and chapter, and appends the verse when given", () => {

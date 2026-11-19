@@ -3,7 +3,7 @@ import { describe, expect, it } from "vite-plus/test";
 import {
   MAX_REASONABLE_ID,
   parsePositiveInteger,
-} from "../parse-positive-integer";
+} from "./parse-positive-integer";
 
 describe(parsePositiveInteger, () => {
   it("parses valid positive integers", () => {

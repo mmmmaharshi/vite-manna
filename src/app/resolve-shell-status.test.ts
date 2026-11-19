@@ -1,6 +1,6 @@
 import { beforeAll, describe, expect, it, vi } from "vite-plus/test";
 
-import type * as AppShellApi from "../use-app-shell";
+import type * as AppShellApi from "./use-app-shell";
 
 let resolveShellStatus: typeof AppShellApi.resolveShellStatus;
 let ready: AppShellApi.ShellReadiness;
@@ -23,7 +23,7 @@ describe("shell status", () => {
     vi.stubGlobal("window", { location: { search: "" } });
     vi.stubGlobal("localStorage", createStorage());
 
-    ({ resolveShellStatus } = await import("../use-app-shell"));
+    ({ resolveShellStatus } = await import("./use-app-shell"));
 
     ready = {
       areBooksReady: true,

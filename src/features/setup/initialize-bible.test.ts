@@ -14,9 +14,9 @@ import {
   isBibleSeeded,
   markBibleSeeded,
   putVerses,
-} from "../../../shared/bible/bible-repository";
-import { db } from "../../../shared/bible/db";
-import { initializeBible } from "../initialize-bible";
+} from "../../shared/bible/bible-repository";
+import { db } from "../../shared/bible/db";
+import { initializeBible } from "./initialize-bible";
 
 const BIBLE_JSON = JSON.stringify({
   Book: [
