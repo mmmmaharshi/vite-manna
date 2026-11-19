@@ -104,7 +104,7 @@ const ReaderScreen = () => {
       : "మన్నా - తెలుగు బైబిల్";
   }, [selectedBookSummary, chapter]);
 
-  const snapshot = useReaderSnapshot(
+  const { snapshot, loadError, retrySnapshot } = useReaderSnapshot(
     book,
     chapter,
     selectedBookSummary?.chapterCount
@@ -115,22 +115,22 @@ const ReaderScreen = () => {
       return;
     }
 
-    const chapterCount = selectedBookSummary.chapterCount;
+    const { chapterCount } = selectedBookSummary;
     const chapters = snapshot?.chapters ?? [];
 
     const currentIndex = chapters.indexOf(chapter);
     const prevChapter = currentIndex > 0 ? chapters[currentIndex - 1] : null;
     const nextChapter =
-      currentIndex >= 0 && currentIndex < chapters.length - 1
+      currentIndex !== -1 && currentIndex < chapters.length - 1
         ? chapters[currentIndex + 1]
         : null;
 
     if (prevChapter !== null) {
-      prefetchReaderSnapshot(book, prevChapter, chapterCount);
+      void prefetchReaderSnapshot(book, prevChapter, chapterCount);
     }
 
     if (nextChapter !== null) {
-      prefetchReaderSnapshot(book, nextChapter, chapterCount);
+      void prefetchReaderSnapshot(book, nextChapter, chapterCount);
     }
   }, [book, chapter, selectedBookSummary, snapshot]);
 
@@ -248,7 +248,20 @@ const ReaderScreen = () => {
           }
         >
           {snapshot && <VerseList verses={snapshot.verses} />}
-          {!snapshot && hasLoadedBooks && (
+          {loadError !== null && snapshot === null && hasLoadedBooks && (
+            <div
+              className="flex flex-col items-center gap-3 py-16 text-center"
+              role="alert"
+            >
+              <Typography className="text-base font-medium">
+                {loadError}
+              </Typography>
+              <Button variant="primary" onPress={retrySnapshot}>
+                Retry
+              </Button>
+            </div>
+          )}
+          {snapshot === null && loadError === null && hasLoadedBooks && (
             <div className="flex flex-col gap-3" aria-busy="true">
               {SKELETON_LINES.map((width) => (
                 <Skeleton key={width} className={cn("h-5 rounded-lg", width)} />

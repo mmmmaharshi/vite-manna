@@ -4,11 +4,30 @@ import { getReaderSnapshot } from "../../../shared/bible";
 import { useReaderStore } from "../store/reader-store";
 import type { ReaderSnapshot } from "../types";
 
+/** The prefetch layer is a best-effort read-ahead, so it stays small and
+ * evicts the oldest entry instead of growing with every chapter visited. */
+const MAX_SNAPSHOT_CACHE_SIZE = 8;
+
 let preloadedSnapshot: ReaderSnapshot | null = null;
 
 const snapshotCache = new Map<string, ReaderSnapshot>();
 
 const cacheKey = (book: number, chapter: number) => `${book}:${chapter}`;
+
+const cacheSnapshot = (key: string, snapshot: ReaderSnapshot) => {
+  if (
+    !snapshotCache.has(key) &&
+    snapshotCache.size >= MAX_SNAPSHOT_CACHE_SIZE
+  ) {
+    const oldest = snapshotCache.keys().next();
+
+    if (!oldest.done) {
+      snapshotCache.delete(oldest.value);
+    }
+  }
+
+  snapshotCache.set(key, snapshot);
+};
 
 export const setPreloadedSnapshot = (snapshot: ReaderSnapshot) => {
   preloadedSnapshot = snapshot;
@@ -17,7 +36,7 @@ export const setPreloadedSnapshot = (snapshot: ReaderSnapshot) => {
 export const getCachedSnapshot = (book: number, chapter: number) =>
   snapshotCache.get(cacheKey(book, chapter)) ?? null;
 
-export const prefetchReaderSnapshot = (
+export const prefetchReaderSnapshot = async (
   book: number,
   chapter: number,
   chapterCount?: number
@@ -28,16 +47,26 @@ export const prefetchReaderSnapshot = (
     return;
   }
 
-  void getReaderSnapshot(book, chapter, chapterCount).then((next) => {
-    snapshotCache.set(key, next);
-  });
+  try {
+    cacheSnapshot(key, await getReaderSnapshot(book, chapter, chapterCount));
+  } catch {
+    // Prefetch is best-effort; the reader hook below surfaces load failures.
+  }
 };
+
+export interface ReaderSnapshotResult {
+  snapshot: ReaderSnapshot | null;
+  loadError: string | null;
+  retrySnapshot: () => void;
+}
+
+const SNAPSHOT_ERROR_MESSAGE = "Unable to load this chapter. Please try again.";
 
 export const useReaderSnapshot = (
   book: number,
   chapter: number,
   chapterCount?: number
-): ReaderSnapshot | null => {
+): ReaderSnapshotResult => {
   const [snapshot, setSnapshot] = useState<ReaderSnapshot | null>(() => {
     if (preloadedSnapshot !== null && preloadedSnapshot.book === book) {
       const stored = preloadedSnapshot;
@@ -54,6 +83,8 @@ export const useReaderSnapshot = (
 
     return null;
   });
+  const [loadError, setLoadError] = useState<string | null>(null);
+  const [retryCount, setRetryCount] = useState(0);
 
   useEffect(() => {
     let mounted = true;
@@ -66,8 +97,9 @@ export const useReaderSnapshot = (
           return;
         }
 
-        snapshotCache.set(cacheKey(book, chapter), next);
+        cacheSnapshot(cacheKey(book, chapter), next);
         setSnapshot(next);
+        setLoadError(null);
 
         const { setChapter, clearPendingBook } = useReaderStore.getState();
 
@@ -88,6 +120,7 @@ export const useReaderSnapshot = (
         }
 
         setSnapshot(null);
+        setLoadError(SNAPSHOT_ERROR_MESSAGE);
         useReaderStore.getState().clearPendingBook();
       }
     };
@@ -97,7 +130,14 @@ export const useReaderSnapshot = (
     return () => {
       mounted = false;
     };
-  }, [book, chapter, chapterCount]);
+  }, [book, chapter, chapterCount, retryCount]);
 
-  return snapshot;
+  return {
+    loadError,
+    retrySnapshot: () => {
+      setLoadError(null);
+      setRetryCount((count) => count + 1);
+    },
+    snapshot,
+  };
 };

@@ -102,30 +102,26 @@ interface ChapterButtonProps {
   visibleChapter: number;
 }
 
-const ChapterButton = memo(
-  ({
-    activeChapterRef,
-    chapterNumber,
-    onSelectChapter,
-    visibleChapter,
-  }: ChapterButtonProps) => {
-    const isActive = visibleChapter === chapterNumber;
+const ChapterButton = memo(function ChapterButton({
+  activeChapterRef,
+  chapterNumber,
+  onSelectChapter,
+  visibleChapter,
+}: ChapterButtonProps) {
+  const isActive = visibleChapter === chapterNumber;
 
-    return (
-      <Button
-        ref={isActive ? activeChapterRef : null}
-        aria-label={`${chapterNumber}వ అధ్యాయం`}
-        size="sm"
-        variant={isActive ? "primary" : "secondary"}
-        onPress={() => onSelectChapter(chapterNumber)}
-      >
-        {chapterNumber}
-      </Button>
-    );
-  }
-);
-
-ChapterButton.displayName = "ChapterButton";
+  return (
+    <Button
+      ref={isActive ? activeChapterRef : null}
+      aria-label={`${chapterNumber}వ అధ్యాయం`}
+      size="sm"
+      variant={isActive ? "primary" : "secondary"}
+      onPress={() => onSelectChapter(chapterNumber)}
+    >
+      {chapterNumber}
+    </Button>
+  );
+});
 
 const ChapterStripComponent = ({
   chapters,
