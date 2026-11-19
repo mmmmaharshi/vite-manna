@@ -1,4 +1,4 @@
-import { useEffect, useRef } from "react";
+import { useEffect } from "react";
 import { useSearchParams } from "react-router";
 
 import { parsePositiveInteger } from "../../shared/lib/parse-positive-integer";
@@ -16,7 +16,6 @@ export const useUrlSync = () => {
   const chapter = useReaderStore((state) => state.chapter);
   const permalinkVerse = useReaderStore((state) => state.permalinkVerse);
   const chaptersByBook = useReaderStore((state) => state.chaptersByBook);
-  const isExternalUpdate = useRef(false);
 
   useEffect(() => {
     const onPopState = () => {
@@ -29,7 +28,6 @@ export const useUrlSync = () => {
       }
 
       const state = useReaderStore.getState();
-      isExternalUpdate.current = true;
       state.setBook(nextBook);
       state.setChapter(nextChapter);
 
@@ -46,12 +44,6 @@ export const useUrlSync = () => {
   }, []);
 
   useEffect(() => {
-    if (isExternalUpdate.current) {
-      isExternalUpdate.current = false;
-
-      return;
-    }
-
     const next = new URLSearchParams(searchParams);
 
     next.set(URL_PARAM_BOOK, String(book));
@@ -63,6 +55,8 @@ export const useUrlSync = () => {
       next.set(URL_PARAM_VERSE, String(permalinkVerse));
     }
 
+    // A popstate navigation already carries these exact params, so writing
+    // them back would loop without this equality check.
     if (
       next.get(URL_PARAM_BOOK) === searchParams.get(URL_PARAM_BOOK) &&
       next.get(URL_PARAM_CHAPTER) === searchParams.get(URL_PARAM_CHAPTER) &&

@@ -51,7 +51,8 @@ const BookSelectComponent = ({
   className,
 }: BookSelectProps) => {
   const isBookSelectOpen = useReaderStore((state) => state.isBookSelectOpen);
-  const setBookSelectOpen = useReaderStore((state) => state.setBookSelectOpen);
+  const openBookSelect = useReaderStore((state) => state.openBookSelect);
+  const closeBookSelect = useReaderStore((state) => state.closeBookSelect);
   const selectBook = useReaderStore((state) => state.selectBook);
 
   const otBooks = books.filter((b) => b.id <= OLD_TESTAMENT_BOOK_COUNT);
@@ -66,7 +67,11 @@ const BookSelectComponent = ({
       value={value}
       variant="secondary"
       onOpenChange={(open) => {
-        setBookSelectOpen(open);
+        if (open) {
+          openBookSelect();
+        } else {
+          closeBookSelect();
+        }
 
         if (open) {
           scrollSelectedBookIntoView();

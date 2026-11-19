@@ -15,7 +15,7 @@ import {
   formatReference,
 } from "../../../shared/lib/reference";
 import { useHighlights } from "../../highlights/hooks/use-highlights";
-import { useReaderStore } from "../store/reader-store";
+import { selectIsSelectionMode, useReaderStore } from "../store/reader-store";
 
 interface VerseActionBarProps {
   verses: BibleVerse[];
@@ -239,7 +239,7 @@ const VerseActionBarInnerComponent = ({ verses }: VerseActionBarProps) => {
 const VerseActionBarInner = memo(VerseActionBarInnerComponent);
 
 const VerseActionBar = ({ verses }: VerseActionBarProps) => {
-  const isSelectionMode = useReaderStore((state) => state.isSelectionMode);
+  const isSelectionMode = useReaderStore(selectIsSelectionMode);
 
   if (!isSelectionMode) {
     return null;

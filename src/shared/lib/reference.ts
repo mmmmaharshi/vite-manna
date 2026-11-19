@@ -15,6 +15,13 @@ export const formatReference = (
     ? `${getBibleBookName(book)} ${chapter}`
     : `${getBibleBookName(book)} ${chapter}:${verse}`;
 
+/** A stable pointer to one verse, passed as a unit instead of three numbers. */
+export interface VerseRef {
+  book: number;
+  chapter: number;
+  verse: number;
+}
+
 /** A link to a verse on the current origin, without any hash or stale params. */
 export const buildPermalinkUrl = (
   book: number,

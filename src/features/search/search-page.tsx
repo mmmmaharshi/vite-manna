@@ -11,6 +11,7 @@ import { useCallback, useEffect, useRef, useState } from "react";
 import { searchVerses } from "../../shared/bible";
 import type { BibleVerse } from "../../shared/bible";
 import { formatReference } from "../../shared/lib/reference";
+import type { VerseRef } from "../../shared/lib/reference";
 import { useReaderStore } from "../reader/store/reader-store";
 
 interface SearchPageProps {
@@ -87,10 +88,12 @@ const SearchPage = ({ onNavigateToReader }: SearchPageProps) => {
   }, [query, executeSearch]);
 
   const handleNavigate = (verse: BibleVerse) => {
-    const store = useReaderStore.getState();
-    store.setBook(verse.book);
-    store.setChapter(verse.chapter);
-    store.setPermalinkVerse(verse.verse);
+    const ref: VerseRef = {
+      book: verse.book,
+      chapter: verse.chapter,
+      verse: verse.verse,
+    };
+    useReaderStore.getState().goToVerse(ref);
     onNavigateToReader();
   };
 

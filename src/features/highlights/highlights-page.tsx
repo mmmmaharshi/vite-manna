@@ -13,6 +13,7 @@ import { useState } from "react";
 import type { Highlight } from "../../shared/bible";
 import { copyToClipboard } from "../../shared/lib/browser";
 import { formatReference } from "../../shared/lib/reference";
+import type { VerseRef } from "../../shared/lib/reference";
 import { useHighlights } from "../highlights/hooks/use-highlights";
 import { useReaderStore } from "../reader/store/reader-store";
 
@@ -28,11 +29,8 @@ const HighlightsPage = ({ onNavigateToReader }: HighlightsPageProps) => {
 
   const [pendingRemove, setPendingRemove] = useState<Highlight | null>(null);
 
-  const navigateToVerse = (book: number, chapter: number, verse: number) => {
-    const store = useReaderStore.getState();
-    store.setBook(book);
-    store.setChapter(chapter);
-    store.setPermalinkVerse(verse);
+  const navigateToVerse = (ref: VerseRef) => {
+    useReaderStore.getState().goToVerse(ref);
     onNavigateToReader();
   };
 
@@ -98,7 +96,11 @@ const HighlightsPage = ({ onNavigateToReader }: HighlightsPageProps) => {
                     type="button"
                     className="min-w-0 flex-1 text-left"
                     onClick={() =>
-                      navigateToVerse(hl.book, hl.chapter, hl.verse)
+                      navigateToVerse({
+                        book: hl.book,
+                        chapter: hl.chapter,
+                        verse: hl.verse,
+                      })
                     }
                   >
                     <Typography className="text-accent text-sm font-medium">

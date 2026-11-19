@@ -7,8 +7,7 @@ import {
   setStoredFontSize,
   rememberChapter,
 } from "../../../shared/lib/persistence";
-
-const PENDING_BOOK_SAFETY_TIMEOUT = 15_000;
+import type { VerseRef } from "../../../shared/lib/reference";
 
 export interface ReaderState {
   book: number;
@@ -17,14 +16,15 @@ export interface ReaderState {
   isBookSelectOpen: boolean;
   chaptersByBook: Record<number, number>;
   selectedVerseIds: number[];
-  isSelectionMode: boolean;
   permalinkVerse: number | null;
   fontSize: FontSize;
 
   setBook: (book: number) => void;
   setChapter: (chapter: number) => void;
+  goToVerse: (ref: VerseRef) => void;
   selectBook: (bookId: number) => void;
-  setBookSelectOpen: (open: boolean) => void;
+  openBookSelect: () => void;
+  closeBookSelect: () => void;
   clearPendingBook: () => void;
   toggleVerseSelection: (verseId: number) => void;
   clearVerseSelection: () => void;
@@ -32,6 +32,10 @@ export interface ReaderState {
   setFontSize: (fontSize: FontSize) => void;
   reset: () => void;
 }
+
+/** Selection mode is derived: a non-empty selection is the mode. */
+export const selectIsSelectionMode = (state: ReaderState): boolean =>
+  state.selectedVerseIds.length > 0;
 
 const initial = loadInitialState();
 
@@ -47,15 +51,31 @@ export const useReaderStore = create<ReaderState>((set, get) => ({
     set({ isBookSelectOpen: false, pendingBook: null });
   },
   clearVerseSelection: () => {
-    if (!get().isSelectionMode && get().selectedVerseIds.length === 0) {
+    if (get().selectedVerseIds.length === 0) {
       return;
     }
 
-    set({ isSelectionMode: false, selectedVerseIds: [] });
+    set({ selectedVerseIds: [] });
+  },
+  closeBookSelect: () => {
+    // A pending book means a chapter-strip transition is in flight; it clears
+    // the pending book itself once the new chapters render.
+    if (get().pendingBook !== null) {
+      return;
+    }
+
+    set({ isBookSelectOpen: false });
   },
   fontSize: loadFontSize(),
+  goToVerse: (ref) => {
+    get().setBook(ref.book);
+    get().setChapter(ref.chapter);
+    get().setPermalinkVerse(ref.verse);
+  },
   isBookSelectOpen: false,
-  isSelectionMode: false,
+  openBookSelect: () => {
+    set({ isBookSelectOpen: true });
+  },
   pendingBook: null,
   permalinkVerse: initial.permalinkVerse,
   reset: () => {
@@ -66,7 +86,6 @@ export const useReaderStore = create<ReaderState>((set, get) => ({
       chaptersByBook: fresh.chaptersByBook,
       fontSize: loadFontSize(),
       isBookSelectOpen: false,
-      isSelectionMode: false,
       pendingBook: null,
       permalinkVerse: fresh.permalinkVerse,
       selectedVerseIds: [],
@@ -79,14 +98,6 @@ export const useReaderStore = create<ReaderState>((set, get) => ({
       permalinkVerse: null,
     });
     get().setBook(bookId);
-
-    setTimeout(() => {
-      const { pendingBook } = get();
-
-      if (pendingBook === bookId) {
-        set({ isBookSelectOpen: false, pendingBook: null });
-      }
-    }, PENDING_BOOK_SAFETY_TIMEOUT);
   },
   selectedVerseIds: [],
   setBook: (book) => {
@@ -95,26 +106,15 @@ export const useReaderStore = create<ReaderState>((set, get) => ({
     set({
       book,
       chapter: rememberChapter(chaptersByBook, book),
-      isSelectionMode: false,
       permalinkVerse: null,
       selectedVerseIds: [],
     });
-  },
-  setBookSelectOpen: (open) => {
-    if (get().pendingBook !== null) {
-      set({ isBookSelectOpen: true });
-
-      return;
-    }
-
-    set({ isBookSelectOpen: open });
   },
   setChapter: (chapter) => {
     const { book, chaptersByBook } = get();
 
     const next: Partial<ReaderState> = {
       chapter,
-      isSelectionMode: false,
       permalinkVerse: null,
       selectedVerseIds: [],
     };
@@ -137,21 +137,12 @@ export const useReaderStore = create<ReaderState>((set, get) => ({
     set({ permalinkVerse: verse });
   },
   toggleVerseSelection: (verseId) => {
-    const { selectedVerseIds, isSelectionMode } = get();
-
-    if (!isSelectionMode) {
-      set({ isSelectionMode: true, selectedVerseIds: [verseId] });
-
-      return;
-    }
-
-    const next = selectedVerseIds.includes(verseId)
-      ? selectedVerseIds.filter((id) => id !== verseId)
-      : [...selectedVerseIds, verseId];
+    const { selectedVerseIds } = get();
 
     set({
-      isSelectionMode: next.length > 0,
-      selectedVerseIds: next,
+      selectedVerseIds: selectedVerseIds.includes(verseId)
+        ? selectedVerseIds.filter((id) => id !== verseId)
+        : [...selectedVerseIds, verseId],
     });
   },
 }));

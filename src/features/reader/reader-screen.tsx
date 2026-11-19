@@ -21,7 +21,7 @@ import {
   useReaderSnapshot,
 } from "./hooks/use-reader-snapshot";
 import { useSwipeAndKeyboard } from "./hooks/use-swipe-and-keyboard";
-import { useReaderStore } from "./store/reader-store";
+import { selectIsSelectionMode, useReaderStore } from "./store/reader-store";
 import type { BibleBook, ReaderSnapshot } from "./types";
 import { useUrlSync } from "./use-url-sync";
 
@@ -61,7 +61,7 @@ const ReaderScreen = () => {
   const book = useReaderStore((state) => state.book);
   const chapter = useReaderStore((state) => state.chapter);
   const pendingBook = useReaderStore((state) => state.pendingBook);
-  const isSelectionMode = useReaderStore((state) => state.isSelectionMode);
+  const isSelectionMode = useReaderStore(selectIsSelectionMode);
   const setBook = useReaderStore((state) => state.setBook);
   const setChapter = useReaderStore((state) => state.setChapter);
   const selectBook = useReaderStore((state) => state.selectBook);
