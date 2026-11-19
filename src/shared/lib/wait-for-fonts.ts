@@ -1,5 +1,7 @@
 const FONT_WAIT_TIMEOUT_MS = 3000;
 
+// A sleep has no awaiting work to wrap: the executor only arms a timer.
+// Scoped off in oxlint.config.ts (promise/avoid-new) — see the note there.
 const delay = (ms: number) =>
   new Promise<void>((resolve) => {
     setTimeout(resolve, ms);

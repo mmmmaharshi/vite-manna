@@ -312,6 +312,7 @@ export const useAppShell = (): ShellStatus => {
     isSnapshotReady,
     loadError,
   };
+
   const bootReady = isBootReady(readiness);
 
   useEffect(() => {

@@ -99,6 +99,7 @@ const SearchPage = ({ onNavigateToReader }: SearchPageProps) => {
       chapter: verse.chapter,
       verse: verse.verse,
     };
+
     useReaderStore.getState().goToVerse(ref);
     onNavigateToReader();
   };
