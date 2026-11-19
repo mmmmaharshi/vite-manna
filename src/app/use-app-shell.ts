@@ -1,15 +1,10 @@
 import { useEffect, useState } from "react";
 
-import { setBooksCache } from "../features/reader/hooks/use-books";
-import { setPreloadedSnapshot } from "../features/reader/hooks/use-reader-snapshot";
+import { useBooks } from "../features/reader/hooks/use-books";
+import { useReaderSnapshot } from "../features/reader/hooks/use-reader-snapshot";
 import { useReaderStore } from "../features/reader/store/reader-store";
 import type { BibleStatus } from "../features/setup/hooks/use-bible-status";
 import { useBibleStatus } from "../features/setup/hooks/use-bible-status";
-import {
-  attachBookNames,
-  getReaderBootstrap,
-  getReaderSnapshot,
-} from "../shared/bible";
 import { waitForFonts } from "../shared/lib/wait-for-fonts";
 
 const MINIMUM_SPLASH_DURATION_MS = 500;
@@ -156,12 +151,27 @@ export const useAppShell = () => {
   const [areFontsReady, setAreFontsReady] = useState(false);
   const [isMinSplashElapsed, setIsMinSplashElapsed] = useState(false);
   const [downloadProgress, setDownloadProgress] = useState<number | null>(0);
-  const [loadError, setLoadError] = useState<string | null>(null);
+  const [downloadError, setDownloadError] = useState<string | null>(null);
   const [isBibleComplete, setIsBibleComplete] = useState(false);
-  const [areBooksReady, setAreBooksReady] = useState(false);
-  const [isSnapshotReady, setIsSnapshotReady] = useState(false);
 
   const bibleStatus = useBibleStatus();
+  const { books, hasLoadedBooks, reloadBooks } = useBooks(
+    bibleStatus === "ready" || isBibleComplete
+  );
+  const book = useReaderStore((state) => state.book);
+  const chapter = useReaderStore((state) => state.chapter);
+  const {
+    snapshot,
+    loadError: snapshotError,
+    retrySnapshot,
+  } = useReaderSnapshot(book, chapter, undefined, hasLoadedBooks);
+
+  const areBooksReady = hasLoadedBooks;
+  const isSnapshotReady = snapshot !== null;
+  const loadError =
+    downloadError ??
+    (areBooksReady && books.length === 0 ? READ_ERROR_MESSAGE : null) ??
+    snapshotError;
 
   useEffect(() => {
     let mounted = true;
@@ -217,7 +227,7 @@ export const useAppShell = () => {
         }
 
         if (mounted) {
-          setLoadError(DOWNLOAD_ERROR_MESSAGE);
+          setDownloadError(DOWNLOAD_ERROR_MESSAGE);
         }
       }
     };
@@ -229,98 +239,17 @@ export const useAppShell = () => {
     };
   }, [bibleStatus, loadError]);
 
-  useEffect(() => {
-    let mounted = true;
-
-    const loadBooks = async () => {
-      if (loadError !== null) {
-        return;
-      }
-
-      if (bibleStatus !== "ready" && !isBibleComplete) {
-        return;
-      }
-
-      if (areBooksReady) {
-        return;
-      }
-
-      try {
-        const { books: bookSummaries } = await getReaderBootstrap(1, 1);
-
-        if (!mounted) {
-          return;
-        }
-
-        const mapped = attachBookNames(bookSummaries);
-
-        setBooksCache(mapped);
-        setAreBooksReady(true);
-      } catch (error) {
-        if (import.meta.env.DEV) {
-          console.error("[Bible] Failed to load the book list", error);
-        }
-
-        if (mounted) {
-          setLoadError(READ_ERROR_MESSAGE);
-        }
-      }
-    };
-
-    void loadBooks();
-
-    return () => {
-      mounted = false;
-    };
-  }, [bibleStatus, isBibleComplete, areBooksReady, loadError]);
-
-  useEffect(() => {
-    let mounted = true;
-
-    const loadSnapshot = async () => {
-      if (loadError !== null) {
-        return;
-      }
-
-      if (!areBooksReady) {
-        return;
-      }
-
-      if (isSnapshotReady) {
-        return;
-      }
-
-      try {
-        const { book, chapter } = useReaderStore.getState();
-        const snapshot = await getReaderSnapshot(book, chapter);
-
-        if (!mounted) {
-          return;
-        }
-
-        setPreloadedSnapshot(snapshot);
-        setIsSnapshotReady(true);
-      } catch (error) {
-        if (import.meta.env.DEV) {
-          console.error("[Bible] Failed to load the reader snapshot", error);
-        }
-
-        if (mounted) {
-          setLoadError(READ_ERROR_MESSAGE);
-        }
-      }
-    };
-
-    void loadSnapshot();
-
-    return () => {
-      mounted = false;
-    };
-  }, [areBooksReady, isSnapshotReady, loadError]);
-
   const handleRetry = () => {
-    setLoadError(null);
+    setDownloadError(null);
     setDownloadProgress(0);
+
+    if (snapshot === null) {
+      retrySnapshot();
+    }
+
+    if (books.length === 0) {
+      reloadBooks();
+    }
   };
 
   const readiness: ShellReadiness = {

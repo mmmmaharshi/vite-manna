@@ -6,8 +6,6 @@ import type { ReaderSnapshot } from "../types";
 
 const MAX_SNAPSHOT_CACHE_SIZE = 8;
 
-let preloadedSnapshot: ReaderSnapshot | null = null;
-
 const snapshotCache = new Map<string, ReaderSnapshot>();
 
 const cacheKey = (book: number, chapter: number) => `${book}:${chapter}`;
@@ -27,24 +25,7 @@ const cacheSnapshot = (key: string, snapshot: ReaderSnapshot) => {
   snapshotCache.set(key, snapshot);
 };
 
-/**
- * Stages a snapshot for the first reader render.
- *
- * @param snapshot - The snapshot to serve once.
- * @returns Nothing.
- */
-export const setPreloadedSnapshot = (snapshot: ReaderSnapshot) => {
-  preloadedSnapshot = snapshot;
-};
-
-/**
- * Reads a prefetched snapshot from the in-memory cache.
- *
- * @param book - The book number.
- * @param chapter - The chapter number.
- * @returns The cached snapshot, or null on a miss.
- */
-export const getCachedSnapshot = (book: number, chapter: number) =>
+const getCachedSnapshot = (book: number, chapter: number) =>
   snapshotCache.get(cacheKey(book, chapter)) ?? null;
 
 /**
@@ -118,35 +99,24 @@ export interface ReaderSnapshotResult {
 }
 
 /**
- * Loads the chapter snapshot for the reader, serving staged or cached data
- * first and surfacing load failures with a retry.
+ * Loads the chapter snapshot for the reader, serving cached data first and
+ * surfacing load failures with a retry.
  *
  * @param book - The book number.
  * @param chapter - The chapter number.
  * @param chapterCount - The known chapter count, if any.
+ * @param enabled - Whether loading may start yet.
  * @returns The snapshot state and a retry action.
  */
 export const useReaderSnapshot = (
   book: number,
   chapter: number,
-  chapterCount?: number
+  chapterCount?: number,
+  enabled = true
 ) => {
-  const [snapshot, setSnapshot] = useState<ReaderSnapshot | null>(() => {
-    if (preloadedSnapshot !== null && preloadedSnapshot.book === book) {
-      const stored = preloadedSnapshot;
-      preloadedSnapshot = null;
-
-      return stored;
-    }
-
-    const cached = getCachedSnapshot(book, chapter);
-
-    if (cached !== null) {
-      return cached;
-    }
-
-    return null;
-  });
+  const [snapshot, setSnapshot] = useState<ReaderSnapshot | null>(() =>
+    getCachedSnapshot(book, chapter)
+  );
 
   const [loadError, setLoadError] = useState<string | null>(null);
 
@@ -154,6 +124,10 @@ export const useReaderSnapshot = (
     let cancelled = false;
 
     const load = async () => {
+      if (!enabled) {
+        return;
+      }
+
       try {
         const next = await getReaderSnapshot(book, chapter, chapterCount);
 
@@ -176,7 +150,7 @@ export const useReaderSnapshot = (
     return () => {
       cancelled = true;
     };
-  }, [book, chapter, chapterCount]);
+  }, [book, chapter, chapterCount, enabled]);
 
   return {
     loadError,

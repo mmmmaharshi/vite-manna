@@ -9,36 +9,32 @@ import type { BibleBook } from "../types";
 export interface UseBooksResult {
   books: BibleBook[];
   hasLoadedBooks: boolean;
+  reloadBooks: () => void;
 }
 
 let cachedBooks: BibleBook[] = [];
 let cachedLoaded = false;
 
 /**
- * Stages the book list outside React state for instant first paint.
+ * Loads the book list once per session, sharing one module cache.
  *
- * @param books - The books to stage.
- * @returns Nothing.
+ * @param enabled - Whether loading may start yet.
+ * @returns The books, their load state, and a retry action.
  */
-export const setBooksCache = (books: BibleBook[]) => {
-  cachedBooks = books;
-  cachedLoaded = true;
-};
-
-/**
- * Loads the book list, preferring the staged snapshot when the shell already fetched it.
- *
- * @returns The books and their load state.
- */
-export const useBooks = () => {
+export const useBooks = (enabled = true) => {
   const [books, setBooks] = useState<BibleBook[]>(cachedBooks);
   const [hasLoadedBooks, setHasLoadedBooks] = useState(cachedLoaded);
+  const [reloadToken, setReloadToken] = useState(0);
 
   useEffect(() => {
     let mounted = true;
 
     const load = async () => {
-      if (cachedLoaded) {
+      if (!enabled) {
+        return;
+      }
+
+      if (cachedLoaded && reloadToken === 0) {
         return;
       }
 
@@ -56,14 +52,16 @@ export const useBooks = () => {
         setBooks(mapped);
         setHasLoadedBooks(true);
       } catch (error) {
+        if (!mounted) {
+          return;
+        }
+
         if (import.meta.env.DEV) {
           console.error("[Bible] Unable to load books", error);
         }
 
-        if (mounted) {
-          cachedLoaded = true;
-          setHasLoadedBooks(true);
-        }
+        cachedLoaded = true;
+        setHasLoadedBooks(true);
       }
     };
 
@@ -72,7 +70,17 @@ export const useBooks = () => {
     return () => {
       mounted = false;
     };
-  }, []);
+  }, [enabled, reloadToken]);
 
-  return { books, hasLoadedBooks };
+  return {
+    books,
+    hasLoadedBooks,
+    reloadBooks: () => {
+      cachedBooks = [];
+      cachedLoaded = false;
+      setBooks([]);
+      setHasLoadedBooks(false);
+      setReloadToken((token) => token + 1);
+    },
+  };
 };
