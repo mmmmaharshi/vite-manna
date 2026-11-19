@@ -102,12 +102,12 @@ interface ChapterButtonProps {
   visibleChapter: number;
 }
 
-const ChapterButton = memo(function ChapterButton({
+const ChapterButtonView = ({
   activeChapterRef,
   chapterNumber,
   onSelectChapter,
   visibleChapter,
-}: ChapterButtonProps) {
+}: ChapterButtonProps) => {
   const isActive = visibleChapter === chapterNumber;
 
   return (
@@ -121,7 +121,9 @@ const ChapterButton = memo(function ChapterButton({
       {chapterNumber}
     </Button>
   );
-});
+};
+
+const ChapterButton = memo(ChapterButtonView);
 
 const ChapterStripComponent = ({
   chapters,

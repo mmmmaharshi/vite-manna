@@ -54,13 +54,45 @@ export const prefetchReaderSnapshot = async (
   }
 };
 
+interface SnapshotSinks {
+  setSnapshot: (snapshot: ReaderSnapshot | null) => void;
+  setLoadError: (error: string | null) => void;
+}
+
+/** Shared by the auto-load effect and the manual retry: both apply a fetched
+ * snapshot to explicit sinks instead of closing over component state. */
+const applySnapshot = (
+  next: ReaderSnapshot,
+  chapter: number,
+  sinks: SnapshotSinks
+) => {
+  sinks.setSnapshot(next);
+  sinks.setLoadError(null);
+
+  const { setChapter, clearPendingBook } = useReaderStore.getState();
+
+  if (next.chapter !== undefined && next.chapter !== chapter) {
+    setChapter(next.chapter);
+  }
+
+  if (useReaderStore.getState().pendingBook === next.book) {
+    clearPendingBook();
+  }
+};
+
+const SNAPSHOT_ERROR_MESSAGE = "Unable to load this chapter. Please try again.";
+
+const failSnapshot = (sinks: SnapshotSinks) => {
+  sinks.setSnapshot(null);
+  sinks.setLoadError(SNAPSHOT_ERROR_MESSAGE);
+  useReaderStore.getState().clearPendingBook();
+};
+
 export interface ReaderSnapshotResult {
   snapshot: ReaderSnapshot | null;
   loadError: string | null;
   retrySnapshot: () => void;
 }
-
-const SNAPSHOT_ERROR_MESSAGE = "Unable to load this chapter. Please try again.";
 
 export const useReaderSnapshot = (
   book: number,
@@ -83,60 +115,57 @@ export const useReaderSnapshot = (
 
     return null;
   });
+
   const [loadError, setLoadError] = useState<string | null>(null);
-  const [retryCount, setRetryCount] = useState(0);
 
   useEffect(() => {
-    let mounted = true;
+    let cancelled = false;
 
     const load = async () => {
       try {
         const next = await getReaderSnapshot(book, chapter, chapterCount);
 
-        if (!mounted) {
-          return;
-        }
-
-        cacheSnapshot(cacheKey(book, chapter), next);
-        setSnapshot(next);
-        setLoadError(null);
-
-        const { setChapter, clearPendingBook } = useReaderStore.getState();
-
-        if (next.chapter !== undefined && next.chapter !== chapter) {
-          setChapter(next.chapter);
-        }
-
-        if (useReaderStore.getState().pendingBook === next.book) {
-          clearPendingBook();
+        if (!cancelled) {
+          applySnapshot(next, chapter, { setLoadError, setSnapshot });
         }
       } catch (error) {
-        if (!mounted) {
-          return;
-        }
+        if (!cancelled) {
+          if (import.meta.env.DEV) {
+            console.error("[Bible] Unable to load reader snapshot", error);
+          }
 
-        if (import.meta.env.DEV) {
-          console.error("[Bible] Unable to load reader snapshot", error);
+          failSnapshot({ setLoadError, setSnapshot });
         }
-
-        setSnapshot(null);
-        setLoadError(SNAPSHOT_ERROR_MESSAGE);
-        useReaderStore.getState().clearPendingBook();
       }
     };
 
     void load();
 
     return () => {
-      mounted = false;
+      cancelled = true;
     };
-  }, [book, chapter, chapterCount, retryCount]);
+  }, [book, chapter, chapterCount]);
 
   return {
     loadError,
     retrySnapshot: () => {
       setLoadError(null);
-      setRetryCount((count) => count + 1);
+
+      const retry = async () => {
+        try {
+          const next = await getReaderSnapshot(book, chapter, chapterCount);
+
+          applySnapshot(next, chapter, { setLoadError, setSnapshot });
+        } catch (error) {
+          if (import.meta.env.DEV) {
+            console.error("[Bible] Unable to load reader snapshot", error);
+          }
+
+          failSnapshot({ setLoadError, setSnapshot });
+        }
+      };
+
+      void retry();
     },
     snapshot,
   };

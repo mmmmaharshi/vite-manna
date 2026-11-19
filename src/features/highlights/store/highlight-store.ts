@@ -45,6 +45,7 @@ export const useHighlightStore = create<HighlightStore>((set) => ({
       const filtered = state.highlights.filter(
         (h) => h.verseId !== highlight.verseId
       );
+
       const next = new Set(state.highlightedIds);
       next.add(highlight.verseId);
 

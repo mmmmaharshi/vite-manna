@@ -121,6 +121,7 @@ const ReaderScreen = () => {
 
     const currentIndex = chapters.indexOf(chapter);
     const prevChapter = currentIndex > 0 ? chapters[currentIndex - 1] : null;
+
     const nextChapter =
       currentIndex !== -1 && currentIndex < chapters.length - 1
         ? chapters[currentIndex + 1]
