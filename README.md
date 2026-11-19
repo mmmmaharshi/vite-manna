@@ -36,6 +36,21 @@ bun install && bun run dev
 | `bun run fix`     | Lint + format fix (Ultracite)   |
 | `bun run preview` | Preview the production build    |
 
+`vp` is the `vite-plus` runner behind those scripts (`bun run test` = `vp test run`).
+
+## Acceptance map (capability → test)
+
+| Capability (above) | Covered by |
+| --- | --- |
+| Read any book/chapter | `bible-repository.test` (snapshot, chapter clamp, bootstrap) |
+| Highlight one tap, yellow | `highlight-store.test`, `bible-repository.test` (upsert) |
+| Search all 66 books | `bible-repository.test` (empty query, 50-row limit) |
+| Share / permalink a verse | `reference.test`, `persistence.test` (URL round-trip) |
+| Font size S–2XL | `font-size.test`, `persistence.test` (stored size) |
+| Offline seed once | `initialize-bible.test` (download, batch, seed flag) |
+| Boot → reader / retry | `resolve-shell-status.test`, `reader-store.test` |
+| Cold-launch / search journeys | Not covered — no component or e2e harness yet |
+
 ## Stack
 
 React 19 · TypeScript 6 · Vite+ 1.3 (Vite 8) · HeroUI v3 · Tailwind v4 · Zustand · Dexie · React Router 8 · Workbox PWA · Google Sans

@@ -10,6 +10,7 @@ Bible reading app (manna) built with Vite+ and React 19. Offline-first: all data
 ## Commands
 
 - Run everything through the scripts in `package.json`.
+- `vp` is the `vite-plus` runner behind those scripts (`bun run test` = `vp test run`).
 
 ## Branching
 

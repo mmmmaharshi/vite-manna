@@ -25,12 +25,15 @@ Methodology borrowed from the blog: pick the 4 journeys that are 95% of activity
 - `VerseList`/`VerseActionBar` rebuilt `new Set(selectedVerseIds)` every render.
 - `ReaderScreen` recomputed `visibleChapters` every render.
 - `searchVerses` full-table scan via `.filter()` (acceptable for now; candidate for a dedicated index or prefix search).
-- `getVerses` sorts in memory (`sortBy`); candidate for compound index `[book+chapter+verse]`.
+- `getVerses` sorts in Dexie memory (`.sortBy`); candidate for compound index `[book+chapter+verse]`.
+- The snapshot prefetch cache grew without a bound.
 
 ## Fixes shipped
 
 - Memoized `selectedSet` in `VerseList` and `VerseActionBar`.
 - Memoized `visibleChapters` in `ReaderScreen`.
+- Prefetch adjacent chapters on chapter switch (was "Next", now shipped).
+- Snapshot cache capped at 8 entries with oldest-first eviction.
 - Tests + build green.
 
 ## Guardrails
@@ -42,7 +45,6 @@ Methodology borrowed from the blog: pick the 4 journeys that are 95% of activity
 ## Next (wacky ideas)
 
 - Stale-while-revalidate snapshot: keep old verses visible during navigation.
-- Prefetch adjacent chapters on hover/idle.
 - Static first-paint verse text in boot splash (like static composer).
 - 120 Hz frame budget check for scroll/streaming (N/A here; chapter scroll).
 - Cut sidebar (chapter strip) re-renders by memoizing chapter buttons.
