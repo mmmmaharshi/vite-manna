@@ -14,6 +14,13 @@ import type { Highlight } from "../../shared/bible";
 import { copyToClipboard } from "../../shared/lib/browser";
 import { formatReference } from "../../shared/lib/reference";
 import type { VerseRef } from "../../shared/lib/reference";
+import {
+  BottomSpacer,
+  Page,
+  PageHeader,
+  PageMessage,
+  PageSection,
+} from "../../shared/ui";
 import { useHighlights } from "../highlights/hooks/use-highlights";
 import { useReaderStore } from "../reader/store/reader-store";
 
@@ -44,51 +51,34 @@ const HighlightsPage = ({ onNavigateToReader }: HighlightsPageProps) => {
   };
 
   return (
-    <main id="main-content" className="flex h-dvh flex-col">
-      <Surface className="bg-surface sticky top-0 z-30 border border-b py-3">
-        <div className="page-shell mx-auto flex w-full flex-col gap-2 px-2">
-          <Typography.Heading level={1} className="text-xl">
-            Highlights
-          </Typography.Heading>
-        </div>
-      </Surface>
+    <Page>
+      <PageHeader title="Highlights" />
 
       <ScrollShadow hideScrollBar className="flex-1">
         {error !== null && (
-          <section
-            className="page-shell mx-auto flex w-full flex-col items-center gap-2 px-2 py-24 text-center"
-            role="alert"
-          >
-            <Typography className="text-danger text-base font-medium">
-              {error}
-            </Typography>
-            <Typography.Paragraph size="sm" color="muted">
-              Reopen this tab to try again
-            </Typography.Paragraph>
-          </section>
+          <PageMessage
+            title={error}
+            hint="Reopen this tab to try again"
+            tone="danger"
+            announce="alert"
+          />
         )}
 
         {loaded && highlights.length === 0 && (
-          <section className="page-shell mx-auto flex w-full flex-col items-center gap-4 px-2 py-24 text-center">
-            <Star
-              aria-hidden="true"
-              className="text-muted h-10 w-10 sm:h-12 sm:w-12"
-            />
-            <Typography className="text-base font-medium">
-              No highlights yet
-            </Typography>
-            <Typography.Paragraph size="sm" color="muted">
-              Select a verse and tap the highlight icon to highlight it
-            </Typography.Paragraph>
-          </section>
+          <PageMessage
+            title="No highlights yet"
+            hint="Select a verse and tap the highlight icon to highlight it"
+            icon={
+              <Star
+                aria-hidden="true"
+                className="text-muted h-10 w-10 sm:h-12 sm:w-12"
+              />
+            }
+          />
         )}
 
         {loaded && highlights.length > 0 && (
-          <section
-            className="page-shell mx-auto flex w-full flex-col gap-2 px-2 py-4"
-            aria-live="polite"
-            aria-atomic="true"
-          >
+          <PageSection live className="flex flex-col gap-2 py-4">
             {highlights.map((hl) => (
               <Surface key={hl.verseId} className={HIGHLIGHT_CARD_CLASSES}>
                 <div className="flex items-center gap-2">
@@ -167,22 +157,18 @@ const HighlightsPage = ({ onNavigateToReader }: HighlightsPageProps) => {
                 </Typography.Paragraph>
               </Surface>
             ))}
-          </section>
+          </PageSection>
         )}
 
         {!loaded && error === null && (
-          <section
-            className="page-shell mx-auto flex w-full flex-col items-center gap-3 px-2 py-24"
-            aria-live="polite"
-            aria-busy="true"
-          >
+          <PageMessage announce="live" className="gap-3">
             <div className="skeleton-shimmer h-32 w-full max-w-sm rounded-lg" />
             <div className="skeleton-shimmer h-20 w-full max-w-sm rounded-lg" />
             <div className="skeleton-shimmer h-20 w-full max-w-sm rounded-lg" />
-          </section>
+          </PageMessage>
         )}
 
-        <div className="h-[calc(4rem+env(safe-area-inset-bottom))]" />
+        <BottomSpacer />
       </ScrollShadow>
 
       <AlertDialog.Backdrop
@@ -240,7 +226,7 @@ const HighlightsPage = ({ onNavigateToReader }: HighlightsPageProps) => {
           </AlertDialog.Dialog>
         </AlertDialog.Container>
       </AlertDialog.Backdrop>
-    </main>
+    </Page>
   );
 };
 

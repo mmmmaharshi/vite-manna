@@ -1,16 +1,17 @@
 import { ChevronLeft, ChevronRight } from "@gravity-ui/icons";
-import {
-  Button,
-  ScrollShadow,
-  Skeleton,
-  Surface,
-  Typography,
-} from "@heroui/react";
+import { Button, ScrollShadow, Skeleton, Typography } from "@heroui/react";
 import { useEffect, useMemo, useRef } from "react";
 
 import { getContiguousChapterNumbers } from "../../shared/bible";
 import { cn } from "../../shared/lib/cn";
 import { formatReference } from "../../shared/lib/reference";
+import {
+  BottomSpacer,
+  Page,
+  PageHeader,
+  PageMessage,
+  PageSection,
+} from "../../shared/ui";
 import BookSelect from "./components/book-select";
 import ChapterStrip from "./components/chapter-strip";
 import VerseActionBar from "./components/verse-action-bar";
@@ -188,46 +189,47 @@ const ReaderScreen = () => {
   }
 
   return (
-    <main id="main-content" className="flex h-dvh flex-col">
-      <Surface className="sticky top-0 z-30 border border-b py-2.5 pt-3.5">
-        <div className="page-shell mx-auto flex w-full flex-col gap-2 px-2">
-          <div className="flex items-stretch gap-1">
-            <Button
-              variant="tertiary"
-              aria-label="Previous book"
-              size="sm"
-              isDisabled={isFirstBook}
-              onPress={handlePrevBook}
-              className="h-auto px-1.5"
-            >
-              <ChevronLeft className="h-4 w-4" />
-            </Button>
-            <BookSelect
-              books={books}
-              value={visibleBook}
-              visibleBookSummary={visibleBookSummary}
-              className="flex-1"
-            />
-            <Button
-              variant="tertiary"
-              aria-label="Next book"
-              isDisabled={isLastBook}
-              size="sm"
-              onPress={handleNextBook}
-              className="h-auto px-1.5"
-            >
-              <ChevronRight className="h-4 w-4" />
-            </Button>
-          </div>
-          <ChapterStrip
-            chapters={visibleChapters}
-            currentBook={visibleBook}
-            isReaderTransitioning={isReaderTransitioning}
-            onSelectChapter={setChapter}
-            visibleChapter={visibleChapter}
+    <Page>
+      <PageHeader
+        className="py-2.5 pt-3.5"
+        innerClassName="flex flex-col gap-2"
+      >
+        <div className="flex items-stretch gap-1">
+          <Button
+            variant="tertiary"
+            aria-label="Previous book"
+            size="sm"
+            isDisabled={isFirstBook}
+            onPress={handlePrevBook}
+            className="h-auto px-1.5"
+          >
+            <ChevronLeft className="h-4 w-4" />
+          </Button>
+          <BookSelect
+            books={books}
+            value={visibleBook}
+            visibleBookSummary={visibleBookSummary}
+            className="flex-1"
           />
+          <Button
+            variant="tertiary"
+            aria-label="Next book"
+            isDisabled={isLastBook}
+            size="sm"
+            onPress={handleNextBook}
+            className="h-auto px-1.5"
+          >
+            <ChevronRight className="h-4 w-4" />
+          </Button>
         </div>
-      </Surface>
+        <ChapterStrip
+          chapters={visibleChapters}
+          currentBook={visibleBook}
+          isReaderTransitioning={isReaderTransitioning}
+          onSelectChapter={setChapter}
+          visibleChapter={visibleChapter}
+        />
+      </PageHeader>
 
       <ScrollShadow ref={scrollRef} hideScrollBar className="flex-1">
         <Typography.Heading level={1} className="sr-only">
@@ -235,12 +237,9 @@ const ReaderScreen = () => {
             ? formatReference(selectedBookSummary.id, chapter)
             : "Bible Reader"}
         </Typography.Heading>
-        <section
+        <PageSection
           ref={verseSectionRef}
-          className={cn(
-            "page-shell mx-auto w-full px-2 py-4",
-            isSelectionMode && "pb-24"
-          )}
+          className={cn("py-4", isSelectionMode && "pb-24")}
           aria-label={
             selectedBookSummary
               ? formatReference(selectedBookSummary.id, chapter)
@@ -249,31 +248,25 @@ const ReaderScreen = () => {
         >
           {snapshot && <VerseList verses={snapshot.verses} />}
           {loadError !== null && snapshot === null && hasLoadedBooks && (
-            <div
-              className="flex flex-col items-center gap-3 py-16 text-center"
-              role="alert"
-            >
-              <Typography className="text-base font-medium">
-                {loadError}
-              </Typography>
+            <PageMessage title={loadError} tone="danger" announce="alert">
               <Button variant="primary" onPress={retrySnapshot}>
                 Retry
               </Button>
-            </div>
+            </PageMessage>
           )}
           {snapshot === null && loadError === null && hasLoadedBooks && (
-            <div className="flex flex-col gap-3" aria-busy="true">
+            <PageMessage announce="live" className="items-stretch gap-3">
               {SKELETON_LINES.map((width) => (
                 <Skeleton key={width} className={cn("h-5 rounded-lg", width)} />
               ))}
-            </div>
+            </PageMessage>
           )}
-        </section>
+        </PageSection>
 
         {snapshot && <VerseActionBar verses={snapshot.verses} />}
-        <div className="h-[calc(4rem+env(safe-area-inset-bottom))]" />
+        <BottomSpacer />
       </ScrollShadow>
-    </main>
+    </Page>
   );
 };
 

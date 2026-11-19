@@ -16,6 +16,7 @@ import {
   isFontSize,
 } from "../../shared/lib/font-size";
 import type { FontSize } from "../../shared/lib/font-size";
+import { BottomSpacer, Page, PageHeader, PageSection } from "../../shared/ui";
 import { useReaderStore } from "../reader/store/reader-store";
 
 const FONT_SIZE_LABELS: Record<FontSize, string> = {
@@ -34,17 +35,11 @@ const SettingsPage = () => {
   const setFontSize = useReaderStore((state) => state.setFontSize);
 
   return (
-    <main id="main-content" className="flex h-dvh flex-col">
-      <Surface className="bg-surface sticky top-0 z-30 border border-b py-3">
-        <div className="page-shell mx-auto w-full px-2">
-          <Typography.Heading level={1} className="text-xl">
-            Settings
-          </Typography.Heading>
-        </div>
-      </Surface>
+    <Page>
+      <PageHeader title="Settings" />
 
       <ScrollShadow hideScrollBar className="flex-1">
-        <section className="page-shell mx-auto flex w-full flex-col gap-2 px-2 py-4">
+        <PageSection className="flex flex-col gap-2 py-4">
           <Surface className="p-3">
             <div className="mb-2 flex items-center justify-between">
               <Typography className="text-sm font-medium">Font Size</Typography>
@@ -112,10 +107,10 @@ const SettingsPage = () => {
               GitHub
             </a>
           </Surface>
-        </section>
-        <div className="h-[calc(4rem+env(safe-area-inset-bottom))]" />
+        </PageSection>
+        <BottomSpacer />
       </ScrollShadow>
-    </main>
+    </Page>
   );
 };
 

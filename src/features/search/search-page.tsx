@@ -12,6 +12,13 @@ import { searchVerses } from "../../shared/bible";
 import type { BibleVerse } from "../../shared/bible";
 import { formatReference } from "../../shared/lib/reference";
 import type { VerseRef } from "../../shared/lib/reference";
+import {
+  BottomSpacer,
+  Page,
+  PageHeader,
+  PageMessage,
+  PageSection,
+} from "../../shared/ui";
 import { useReaderStore } from "../reader/store/reader-store";
 
 interface SearchPageProps {
@@ -97,17 +104,11 @@ const SearchPage = ({ onNavigateToReader }: SearchPageProps) => {
   };
 
   return (
-    <main id="main-content" className="flex h-dvh flex-col">
-      <Surface className="sticky top-0 z-30 border border-b py-3">
-        <div className="page-shell mx-auto w-full px-2">
-          <Typography.Heading level={1} className="text-xl">
-            Search
-          </Typography.Heading>
-        </div>
-      </Surface>
+    <Page>
+      <PageHeader title="Search" />
 
       <ScrollShadow hideScrollBar className="flex-1">
-        <div className="page-shell mx-auto w-full px-2 pt-2">
+        <PageSection className="pt-2">
           <SearchField
             value={query}
             onChange={handleQueryChange}
@@ -124,7 +125,7 @@ const SearchPage = ({ onNavigateToReader }: SearchPageProps) => {
               <SearchField.ClearButton />
             </SearchField.Group>
           </SearchField>
-        </div>
+        </PageSection>
 
         {status === "searching" && (
           <output className="flex justify-center py-8" aria-live="polite">
@@ -134,44 +135,35 @@ const SearchPage = ({ onNavigateToReader }: SearchPageProps) => {
 
         <div aria-live="polite" aria-atomic="true">
           {status === "idle" && (
-            <section className="page-shell mx-auto flex w-full flex-col items-center gap-2 px-2 py-24 text-center">
-              <Magnifier
-                aria-hidden="true"
-                className="text-muted h-10 w-10 sm:h-12 sm:w-12"
-              />
-              <Typography className="text-base font-medium">
-                Search Bible
-              </Typography>
-              <Typography.Paragraph size="sm" color="muted">
-                Search verses by keyword
-              </Typography.Paragraph>
-            </section>
+            <PageMessage
+              title="Search Bible"
+              hint="Search verses by keyword"
+              icon={
+                <Magnifier
+                  aria-hidden="true"
+                  className="text-muted h-10 w-10 sm:h-12 sm:w-12"
+                />
+              }
+            />
           )}
 
           {status === "error" && (
-            <section
-              className="page-shell mx-auto flex w-full flex-col items-center gap-2 px-2 py-24 text-center"
-              role="alert"
-            >
-              <Typography className="text-danger text-base font-medium">
-                {SEARCH_ERROR_MESSAGE}
-              </Typography>
-            </section>
+            <PageMessage
+              title={SEARCH_ERROR_MESSAGE}
+              tone="danger"
+              announce="alert"
+            />
           )}
 
           {status === "empty" && (
-            <section className="page-shell mx-auto flex w-full flex-col items-center gap-2 px-2 py-24 text-center">
-              <Typography className="text-base font-medium">
-                No results
-              </Typography>
-              <Typography.Paragraph size="sm" color="muted">
-                Try a different search term
-              </Typography.Paragraph>
-            </section>
+            <PageMessage
+              title="No results"
+              hint="Try a different search term"
+            />
           )}
 
           {results.length > 0 && (
-            <section className="page-shell mx-auto flex w-full flex-col gap-2 px-2 py-4">
+            <PageSection live className="flex flex-col gap-2 py-4">
               <Typography.Paragraph size="sm" color="muted" className="px-1">
                 {results.length} result{results.length === 1 ? "" : "s"}
               </Typography.Paragraph>
@@ -195,13 +187,13 @@ const SearchPage = ({ onNavigateToReader }: SearchPageProps) => {
                   </button>
                 </Surface>
               ))}
-            </section>
+            </PageSection>
           )}
         </div>
 
-        <div className="h-[calc(4rem+env(safe-area-inset-bottom))]" />
+        <BottomSpacer />
       </ScrollShadow>
-    </main>
+    </Page>
   );
 };
 
