@@ -21,6 +21,7 @@ export {
   getHighlights,
   getReaderBootstrap,
   getReaderSnapshot,
+  getVerses,
   isBibleSeeded,
   markBibleSeeded,
   putVerses,

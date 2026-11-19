@@ -31,10 +31,15 @@ interface HighlightsPageProps {
 const HIGHLIGHT_CARD_CLASSES =
   "flex flex-col gap-2 border-l-4 p-3 highlight-card";
 
+const HIGHLIGHTS_PAGE_SIZE = 50;
+
 const HighlightsPage = ({ onNavigateToReader }: HighlightsPageProps) => {
   const { error, highlights, remove, loaded } = useHighlights();
 
   const [pendingRemove, setPendingRemove] = useState<Highlight | null>(null);
+  const [visibleCount, setVisibleCount] = useState(HIGHLIGHTS_PAGE_SIZE);
+
+  const visibleHighlights = highlights.slice(0, visibleCount);
 
   const navigateToVerse = (ref: VerseRef) => {
     useReaderStore.getState().goToVerse(ref);
@@ -79,7 +84,11 @@ const HighlightsPage = ({ onNavigateToReader }: HighlightsPageProps) => {
 
         {loaded && highlights.length > 0 && (
           <PageSection live className="flex flex-col gap-2 py-4">
-            {highlights.map((hl) => (
+            <Typography.Paragraph size="sm" color="muted" className="px-1">
+              Showing {visibleHighlights.length} of {highlights.length}
+            </Typography.Paragraph>
+
+            {visibleHighlights.map((hl) => (
               <Surface key={hl.verseId} className={HIGHLIGHT_CARD_CLASSES}>
                 <div className="flex items-center gap-2">
                   <button
@@ -157,6 +166,17 @@ const HighlightsPage = ({ onNavigateToReader }: HighlightsPageProps) => {
                 </Typography.Paragraph>
               </Surface>
             ))}
+
+            {visibleHighlights.length < highlights.length && (
+              <Button
+                variant="tertiary"
+                onPress={() =>
+                  setVisibleCount((count) => count + HIGHLIGHTS_PAGE_SIZE)
+                }
+              >
+                Show more
+              </Button>
+            )}
           </PageSection>
         )}
 

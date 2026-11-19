@@ -129,7 +129,7 @@ const SettingsPage = () => {
                   Clear
                 </Button>
               </div>
-              <Typography className="text-muted text-xs">
+              <Typography className="text-muted break-anywhere text-xs">
                 Last crash: {lastCrash.message} ·{" "}
                 {new Date(lastCrash.time).toISOString()}
               </Typography>

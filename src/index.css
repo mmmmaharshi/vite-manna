@@ -45,6 +45,10 @@
   background-color: oklch(85% 0.12 95);
 }
 
+@utility break-anywhere {
+  overflow-wrap: anywhere;
+}
+
 /* Single-color highlight wash (see DEFAULT_HIGHLIGHT_COLOR). */
 @utility highlight {
   background-color: var(--highlight-yellow);

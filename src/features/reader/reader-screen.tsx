@@ -18,10 +18,8 @@ import ChapterStrip from "./components/chapter-strip";
 import VerseActionBar from "./components/verse-action-bar";
 import VerseList from "./components/verse-list";
 import { useBooks } from "./hooks/use-books";
-import {
-  prefetchReaderSnapshot,
-  useReaderSnapshot,
-} from "./hooks/use-reader-snapshot";
+import { usePrefetchAdjacent } from "./hooks/use-prefetch-adjacent";
+import { useReaderSnapshot } from "./hooks/use-reader-snapshot";
 import { useSwipeAndKeyboard } from "./hooks/use-swipe-and-keyboard";
 import { selectIsSelectionMode, useReaderStore } from "./store/reader-store";
 import type { ReaderSnapshot } from "./types";
@@ -37,6 +35,51 @@ const SKELETON_LINES = [
   "w-3/5",
   "w-19/20",
 ];
+
+interface ReaderStatusProps {
+  snapshot: ReaderSnapshot | null;
+  loadError: string | null;
+  hasLoadedBooks: boolean;
+  onRetry: () => void;
+}
+
+const ReaderStatus = ({
+  snapshot,
+  loadError,
+  hasLoadedBooks,
+  onRetry,
+}: ReaderStatusProps) => {
+  if (loadError !== null && snapshot === null && hasLoadedBooks) {
+    return (
+      <PageMessage title={loadError} tone="danger" announce="alert">
+        <Button variant="primary" onPress={onRetry}>
+          Retry
+        </Button>
+      </PageMessage>
+    );
+  }
+
+  if (snapshot === null && loadError === null && hasLoadedBooks) {
+    return (
+      <PageMessage announce="live" className="items-stretch gap-3">
+        {SKELETON_LINES.map((width) => (
+          <Skeleton key={width} className={cn("h-5 rounded-lg", width)} />
+        ))}
+      </PageMessage>
+    );
+  }
+
+  if (snapshot !== null && snapshot.verses.length === 0) {
+    return (
+      <PageMessage
+        title="No verses in this chapter"
+        hint="Try another chapter."
+      />
+    );
+  }
+
+  return null;
+};
 
 const resolveVisibleChapters = (
   isReaderTransitioning: boolean,
@@ -104,30 +147,7 @@ const ReaderScreen = () => {
     selectedBookSummary?.chapterCount
   );
 
-  useEffect(() => {
-    if (!selectedBookSummary) {
-      return;
-    }
-
-    const { chapterCount } = selectedBookSummary;
-    const chapters = snapshot?.chapters ?? [];
-
-    const currentIndex = chapters.indexOf(chapter);
-    const prevChapter = currentIndex > 0 ? chapters[currentIndex - 1] : null;
-
-    const nextChapter =
-      currentIndex !== -1 && currentIndex < chapters.length - 1
-        ? chapters[currentIndex + 1]
-        : null;
-
-    if (prevChapter !== null) {
-      void prefetchReaderSnapshot(book, prevChapter, chapterCount);
-    }
-
-    if (nextChapter !== null) {
-      void prefetchReaderSnapshot(book, nextChapter, chapterCount);
-    }
-  }, [book, chapter, selectedBookSummary, snapshot]);
+  usePrefetchAdjacent(book, chapter, selectedBookSummary, snapshot);
 
   const visibleBook = pendingBook ?? snapshot?.book ?? book;
 
@@ -241,20 +261,12 @@ const ReaderScreen = () => {
           }
         >
           {snapshot && <VerseList verses={snapshot.verses} />}
-          {loadError !== null && snapshot === null && hasLoadedBooks && (
-            <PageMessage title={loadError} tone="danger" announce="alert">
-              <Button variant="primary" onPress={retrySnapshot}>
-                Retry
-              </Button>
-            </PageMessage>
-          )}
-          {snapshot === null && loadError === null && hasLoadedBooks && (
-            <PageMessage announce="live" className="items-stretch gap-3">
-              {SKELETON_LINES.map((width) => (
-                <Skeleton key={width} className={cn("h-5 rounded-lg", width)} />
-              ))}
-            </PageMessage>
-          )}
+          <ReaderStatus
+            snapshot={snapshot}
+            loadError={loadError}
+            hasLoadedBooks={hasLoadedBooks}
+            onRetry={retrySnapshot}
+          />
         </PageSection>
 
         {snapshot && <VerseActionBar verses={snapshot.verses} />}

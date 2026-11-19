@@ -3,6 +3,7 @@ import { lazy, Suspense, useCallback, useState } from "react";
 import type { ReactNode } from "react";
 import { useSearchParams } from "react-router";
 
+import { WorstCaseBar } from "../features/debug/worst-case-bar";
 import { ReaderScreen } from "../features/reader";
 import { useReaderStore } from "../features/reader/store/reader-store";
 import InstallPrompt from "../features/update/install-prompt";
@@ -81,6 +82,7 @@ const TabLayout = () => {
           <UpdatePrompt />
         </div>
       </div>
+      {import.meta.env.DEV ? <WorstCaseBar /> : null}
     </div>
   );
 };
