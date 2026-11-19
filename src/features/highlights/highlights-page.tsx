@@ -29,7 +29,7 @@ interface HighlightsPageProps {
 }
 
 const HIGHLIGHT_CARD_CLASSES =
-  "flex flex-col gap-2 border-l-4 border-yellow-400/40 bg-yellow-200/70 p-3";
+  "flex flex-col gap-2 border-l-4 p-3 highlight-card";
 
 const HighlightsPage = ({ onNavigateToReader }: HighlightsPageProps) => {
   const { error, highlights, remove, loaded } = useHighlights();

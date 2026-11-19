@@ -6,8 +6,6 @@ import { fontSizeClass } from "../../../shared/lib/font-size";
 import { useHighlights } from "../../highlights/hooks/use-highlights";
 import { useReaderStore } from "../store/reader-store";
 
-import "./verseList.css";
-
 interface VerseListProps {
   verses: BibleVerse[];
 }

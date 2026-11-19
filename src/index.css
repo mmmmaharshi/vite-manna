@@ -45,6 +45,25 @@
   background-color: oklch(85% 0.12 95);
 }
 
+/* Single-color highlight wash (see DEFAULT_HIGHLIGHT_COLOR). */
+@utility highlight {
+  background-color: var(--highlight-yellow);
+}
+
+/* Highlight card: same yellow-200/70 + yellow-400/40 the palette gave. */
+@utility highlight-card {
+  border-color: color-mix(
+    in oklch,
+    var(--color-yellow-400, oklch(85.2% 0.199 91.936)) 40%,
+    transparent
+  );
+  background-color: color-mix(
+    in oklch,
+    var(--color-yellow-200, oklch(94.5% 0.129 101.54)) 70%,
+    transparent
+  );
+}
+
 @utility verse-row {
   content-visibility: auto;
   contain-intrinsic-size: auto 2.5rem;
@@ -110,6 +129,7 @@ html {
   /* Preserve pre-v3.2 tooltip timing */
   --tooltip-delay: 700ms;
   --tooltip-close-delay: 0ms;
+  --hl-dot-size: 6px;
 }
 
 :root,

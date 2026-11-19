@@ -1,9 +1,0 @@
-:root {
-  --hl-dot-size: 6px;
-}
-
-/* Single highlight color (see DEFAULT_HIGHLIGHT_COLOR): the strip washes the
-   verse row, the dot marks it in compact contexts. */
-.highlight {
-  background-color: var(--highlight-yellow);
-}
