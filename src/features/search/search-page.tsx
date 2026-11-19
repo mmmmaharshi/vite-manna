@@ -18,22 +18,27 @@ interface SearchPageProps {
   onNavigateToReader: () => void;
 }
 
+type SearchStatus = "idle" | "searching" | "error" | "empty" | "results";
+
+const SEARCH_ERROR_MESSAGE = "Search failed. Please try again.";
+
 const SearchPage = ({ onNavigateToReader }: SearchPageProps) => {
   const [query, setQuery] = useState("");
   const [results, setResults] = useState<BibleVerse[]>([]);
-  const [searched, setSearched] = useState(false);
-  const [searching, setSearching] = useState(false);
-  const [error, setError] = useState<string | null>(null);
+  const [status, setStatus] = useState<SearchStatus>("idle");
   const timerRef = useRef<ReturnType<typeof setTimeout> | null>(null);
   const requestIdRef = useRef(0);
 
   const handleQueryChange = (value: string) => {
     setQuery(value);
-    setError(null);
 
     if (!value.trim()) {
       setResults([]);
-      setSearched(false);
+      setStatus("idle");
+    } else if (status === "error") {
+      // The failed query is gone; show the last good state instead of
+      // flashing the prompt while the debounce is pending.
+      setStatus(results.length > 0 ? "results" : "empty");
     }
   };
 
@@ -42,8 +47,7 @@ const SearchPage = ({ onNavigateToReader }: SearchPageProps) => {
     const requestId = requestIdRef.current + 1;
 
     requestIdRef.current = requestId;
-    setSearching(true);
-    setError(null);
+    setStatus("searching");
 
     try {
       const verses = await searchVerses(q);
@@ -53,19 +57,14 @@ const SearchPage = ({ onNavigateToReader }: SearchPageProps) => {
       }
 
       setResults(verses);
-      setSearched(true);
+      setStatus(verses.length > 0 ? "results" : "empty");
     } catch {
       if (requestIdRef.current !== requestId) {
         return;
       }
 
-      setError("Search failed. Please try again.");
       setResults([]);
-      setSearched(true);
-    }
-
-    if (requestIdRef.current === requestId) {
-      setSearching(false);
+      setStatus("error");
     }
   }, []);
 
@@ -114,8 +113,7 @@ const SearchPage = ({ onNavigateToReader }: SearchPageProps) => {
             onChange={handleQueryChange}
             onClear={() => {
               setResults([]);
-              setSearched(false);
-              setError(null);
+              setStatus("idle");
             }}
             fullWidth
             aria-label="Search verses"
@@ -128,14 +126,14 @@ const SearchPage = ({ onNavigateToReader }: SearchPageProps) => {
           </SearchField>
         </div>
 
-        {searching && (
+        {status === "searching" && (
           <output className="flex justify-center py-8" aria-live="polite">
             <Spinner aria-label="Searching" />
           </output>
         )}
 
         <div aria-live="polite" aria-atomic="true">
-          {!searched && !searching && (
+          {status === "idle" && (
             <section className="page-shell mx-auto flex w-full flex-col items-center gap-2 px-2 py-24 text-center">
               <Magnifier
                 aria-hidden="true"
@@ -150,18 +148,18 @@ const SearchPage = ({ onNavigateToReader }: SearchPageProps) => {
             </section>
           )}
 
-          {searched && error !== null && (
+          {status === "error" && (
             <section
               className="page-shell mx-auto flex w-full flex-col items-center gap-2 px-2 py-24 text-center"
               role="alert"
             >
               <Typography className="text-danger text-base font-medium">
-                {error}
+                {SEARCH_ERROR_MESSAGE}
               </Typography>
             </section>
           )}
 
-          {searched && error === null && results.length === 0 && !searching && (
+          {status === "empty" && (
             <section className="page-shell mx-auto flex w-full flex-col items-center gap-2 px-2 py-24 text-center">
               <Typography className="text-base font-medium">
                 No results
