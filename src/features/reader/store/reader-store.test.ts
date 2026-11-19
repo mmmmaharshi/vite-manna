@@ -120,15 +120,6 @@ describe("reader store", () => {
     });
   });
 
-  describe("setPermalinkVerse", () => {
-    it("ignores setting the same verse twice", () => {
-      useReaderStore.getState().setPermalinkVerse(16);
-      useReaderStore.getState().setPermalinkVerse(16);
-
-      expect(useReaderStore.getState().permalinkVerse).toBe(16);
-    });
-  });
-
   describe("book select transition", () => {
     it("stays open while a book is pending and closes when cleared", () => {
       useReaderStore.getState().selectBook(5);

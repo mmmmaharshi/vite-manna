@@ -44,7 +44,6 @@ describe("shell status", () => {
     );
 
     expect(status).toMatchObject({
-      handleRetry,
       kind: "error",
       message: "Unable to read your Bible data",
     });

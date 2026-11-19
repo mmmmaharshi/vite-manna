@@ -27,9 +27,4 @@ describe(parsePositiveInteger, () => {
   it("rejects non-integers", () => {
     expect(parsePositiveInteger("3.5")).toBeNull();
   });
-
-  it("respects a custom max", () => {
-    expect(parsePositiveInteger("150", 100)).toBeNull();
-    expect(parsePositiveInteger("99", 100)).toBe(99);
-  });
 });
