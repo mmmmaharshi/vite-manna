@@ -1,21 +1,45 @@
 import type { BibleVerse, ChapterCounts } from "../../shared/bible";
 
-interface BibleResponse {
-  Book: {
-    Chapter: {
-      Verse: {
-        Verse: string;
-        Verseid: number;
-      }[];
-    }[];
-  }[];
+interface BibleVerseRow {
+  Verse: string;
+  Verseid: number;
 }
 
+interface BibleChapter {
+  Verse: BibleVerseRow[];
+}
+
+interface BibleBookShape {
+  Chapter: BibleChapter[];
+}
+
+interface BibleResponse {
+  Book: BibleBookShape[];
+}
+
+const isRecord = (value: unknown): value is Record<string, unknown> =>
+  typeof value === "object" && value !== null;
+
+const isVerseRow = (value: unknown): value is BibleVerseRow => {
+  if (!isRecord(value)) {
+    return false;
+  }
+
+  return typeof value.Verse === "string" && typeof value.Verseid === "number";
+};
+
+const isChapter = (value: unknown): value is BibleChapter =>
+  isRecord(value) &&
+  Array.isArray(value.Verse) &&
+  value.Verse.every(isVerseRow);
+
+const isBook = (value: unknown): value is BibleBookShape =>
+  isRecord(value) &&
+  Array.isArray(value.Chapter) &&
+  value.Chapter.every(isChapter);
+
 const isBibleResponse = (value: unknown): value is BibleResponse =>
-  typeof value === "object" &&
-  value !== null &&
-  "Book" in value &&
-  Array.isArray(value.Book);
+  isRecord(value) && Array.isArray(value.Book) && value.Book.every(isBook);
 
 export const parseBibleResponse = (json: string): BibleResponse => {
   const parsed: unknown = JSON.parse(json);

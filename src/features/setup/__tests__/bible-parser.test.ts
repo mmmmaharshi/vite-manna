@@ -47,6 +47,32 @@ describe(readBible, () => {
     expect(() => parseBibleResponse("null")).toThrow("unexpected shape");
   });
 
+  it("rejects books whose chapters are not arrays", () => {
+    expect(() =>
+      parseBibleResponse(JSON.stringify({ Book: [{ Chapter: {} }] }))
+    ).toThrow("unexpected shape");
+  });
+
+  it("rejects chapters whose verses are not arrays", () => {
+    expect(() =>
+      parseBibleResponse(
+        JSON.stringify({ Book: [{ Chapter: [{ Verse: {} }] }] })
+      )
+    ).toThrow("unexpected shape");
+  });
+
+  it("rejects verse rows with a bad shape", () => {
+    const missingText = JSON.stringify({
+      Book: [{ Chapter: [{ Verse: [{ Verseid: 1 }] }] }],
+    });
+    const badId = JSON.stringify({
+      Book: [{ Chapter: [{ Verse: [{ Verse: "x", Verseid: "1" }] }] }],
+    });
+
+    expect(() => parseBibleResponse(missingText)).toThrow("unexpected shape");
+    expect(() => parseBibleResponse(badId)).toThrow("unexpected shape");
+  });
+
   it("rejects invalid JSON", () => {
     expect(() => parseBibleResponse("{")).toThrow(/JSON/u);
   });

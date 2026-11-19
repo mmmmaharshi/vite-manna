@@ -21,6 +21,46 @@ export type HighlightColor = "yellow" | "green" | "blue" | "pink" | "orange";
 
 export const DEFAULT_HIGHLIGHT_COLOR: HighlightColor = "yellow";
 
+/** Pre-v12 rows were written by older app versions, so verify the fields the
+ * migration reads instead of crashing mid-upgrade on a corrupt row. */
+const asHighlightColor = (value: unknown): HighlightColor =>
+  value === "green" ||
+  value === "blue" ||
+  value === "pink" ||
+  value === "orange" ||
+  value === "yellow"
+    ? value
+    : DEFAULT_HIGHLIGHT_COLOR;
+
+const numberOr = (value: unknown, fallback: number) =>
+  typeof value === "number" ? value : fallback;
+
+const isRecord = (value: unknown): value is Record<string, unknown> =>
+  typeof value === "object" && value !== null;
+
+const asMigratableHighlight = (row: unknown): Highlight | null => {
+  if (!isRecord(row)) {
+    return null;
+  }
+
+  const { verseId, updatedAt } = row;
+
+  if (typeof verseId !== "number" || typeof updatedAt !== "number") {
+    return null;
+  }
+
+  return {
+    book: numberOr(row.book, 0),
+    chapter: numberOr(row.chapter, 0),
+    color: asHighlightColor(row.color),
+    createdAt: numberOr(row.createdAt, updatedAt),
+    text: typeof row.text === "string" ? row.text : "",
+    updatedAt,
+    verse: numberOr(row.verse, 0),
+    verseId,
+  };
+};
+
 export interface Highlight {
   verseId: number;
   book: number;
@@ -53,10 +93,16 @@ class BibleDB extends Dexie {
         const latestByVerse = new Map<number, Highlight>();
 
         for (const row of rows) {
-          const prev = latestByVerse.get(row.verseId);
+          const highlight = asMigratableHighlight(row);
 
-          if (prev === undefined || row.updatedAt > prev.updatedAt) {
-            latestByVerse.set(row.verseId, row);
+          if (highlight === null) {
+            continue;
+          }
+
+          const prev = latestByVerse.get(highlight.verseId);
+
+          if (prev === undefined || highlight.updatedAt > prev.updatedAt) {
+            latestByVerse.set(highlight.verseId, highlight);
           }
         }
 
@@ -78,7 +124,17 @@ class BibleDB extends Dexie {
       .stores({ highlights: "verseId, updatedAt" })
       .upgrade(async (tx) => {
         const rows = await tx.table("highlightsV12").toArray();
-        await tx.table("highlights").bulkPut(rows);
+        const valid: Highlight[] = [];
+
+        for (const row of rows) {
+          const highlight = asMigratableHighlight(row);
+
+          if (highlight !== null) {
+            valid.push(highlight);
+          }
+        }
+
+        await tx.table("highlights").bulkPut(valid);
       });
     this.version(15).stores({ highlightsV12: null });
   }
