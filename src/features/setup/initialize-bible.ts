@@ -9,6 +9,12 @@ import { parseBibleResponse, readBible } from "./bible-parser";
 const BIBLE_URL = "/bible.json";
 const BATCH_SIZE = 1000;
 
+/**
+ * Downloads the Bible JSON once, then stores it in IndexedDB in batches.
+ *
+ * @param onProgress - Receives download and save progress.
+ * @returns True once the Bible is seeded.
+ */
 export const initializeBible = async (
   onProgress?: (progress: number | null) => void
 ) => {
@@ -35,7 +41,6 @@ export const initializeBible = async (
   let received = 0;
   const chunks: Uint8Array[] = [];
 
-  // Recursive instead of a while loop so no `await` sits inside a loop body.
   const readStream = async () => {
     const { done, value } = await reader.read();
 
@@ -53,7 +58,6 @@ export const initializeBible = async (
     await readStream();
   };
 
-  // Compressed responses carry no content-length, so the bar stays indeterminate.
   onProgress?.(total > 0 ? 0 : null);
   await readStream();
 
@@ -86,7 +90,7 @@ export const initializeBible = async (
     await saveBatch(start + BATCH_SIZE);
   };
 
-  // Only after a good download and parse, so a failure never destroys the old data.
+  // WARNING: seed only after a good download and parse, or a failure destroys the old data.
   await clearBibleSeed();
   onProgress?.(90);
   await saveBatch(0);

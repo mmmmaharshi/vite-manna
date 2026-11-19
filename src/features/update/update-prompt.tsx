@@ -15,9 +15,6 @@ const UpdatePrompt = () => {
     },
   });
 
-  // The browser only looks for a new worker on a navigation, and an installed
-  // app is usually resumed rather than navigated, so ask for a check ourselves
-  // whenever the app opens or comes back to the foreground.
   useEffect(() => {
     if (registration === null) {
       return;

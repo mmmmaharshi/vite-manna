@@ -43,14 +43,11 @@ const SearchPage = ({ onNavigateToReader }: SearchPageProps) => {
       setResults([]);
       setStatus("idle");
     } else if (status === "error") {
-      // The failed query is gone; show the last good state instead of
-      // flashing the prompt while the debounce is pending.
       setStatus(results.length > 0 ? "results" : "empty");
     }
   };
 
   const executeSearch = useCallback(async (q: string) => {
-    // Answers that arrive after a newer search started are dropped.
     const requestId = requestIdRef.current + 1;
 
     requestIdRef.current = requestId;

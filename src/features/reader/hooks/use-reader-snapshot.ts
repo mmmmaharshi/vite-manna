@@ -4,8 +4,6 @@ import { getReaderSnapshot } from "../../../shared/bible";
 import { useReaderStore } from "../store/reader-store";
 import type { ReaderSnapshot } from "../types";
 
-/** The prefetch layer is a best-effort read-ahead, so it stays small and
- * evicts the oldest entry instead of growing with every chapter visited. */
 const MAX_SNAPSHOT_CACHE_SIZE = 8;
 
 let preloadedSnapshot: ReaderSnapshot | null = null;
@@ -29,13 +27,35 @@ const cacheSnapshot = (key: string, snapshot: ReaderSnapshot) => {
   snapshotCache.set(key, snapshot);
 };
 
+/**
+ * Stages a snapshot for the first reader render.
+ *
+ * @param snapshot - The snapshot to serve once.
+ * @returns Nothing.
+ */
 export const setPreloadedSnapshot = (snapshot: ReaderSnapshot) => {
   preloadedSnapshot = snapshot;
 };
 
+/**
+ * Reads a prefetched snapshot from the in-memory cache.
+ *
+ * @param book - The book number.
+ * @param chapter - The chapter number.
+ * @returns The cached snapshot, or null on a miss.
+ */
 export const getCachedSnapshot = (book: number, chapter: number) =>
   snapshotCache.get(cacheKey(book, chapter)) ?? null;
 
+/**
+ * Prefetches a chapter snapshot in the background; failures are ignored
+ * because the reader hook surfaces load failures itself.
+ *
+ * @param book - The book number.
+ * @param chapter - The chapter number.
+ * @param chapterCount - The known chapter count, if any.
+ * @returns A promise that resolves once the prefetch settles.
+ */
 export const prefetchReaderSnapshot = async (
   book: number,
   chapter: number,
@@ -47,10 +67,12 @@ export const prefetchReaderSnapshot = async (
     return;
   }
 
-  try {
-    cacheSnapshot(key, await getReaderSnapshot(book, chapter, chapterCount));
-  } catch {
-    // Prefetch is best-effort; the reader hook below surfaces load failures.
+  const next = await getReaderSnapshot(book, chapter, chapterCount).catch(
+    () => null
+  );
+
+  if (next !== null) {
+    cacheSnapshot(key, next);
   }
 };
 
@@ -59,8 +81,6 @@ interface SnapshotSinks {
   setLoadError: (error: string | null) => void;
 }
 
-/** Shared by the auto-load effect and the manual retry: both apply a fetched
- * snapshot to explicit sinks instead of closing over component state. */
 const applySnapshot = (
   next: ReaderSnapshot,
   chapter: number,
@@ -88,12 +108,24 @@ const failSnapshot = (sinks: SnapshotSinks) => {
   useReaderStore.getState().clearPendingBook();
 };
 
+/**
+ * The snapshot state owned by the reader hook.
+ */
 export interface ReaderSnapshotResult {
   snapshot: ReaderSnapshot | null;
   loadError: string | null;
   retrySnapshot: () => void;
 }
 
+/**
+ * Loads the chapter snapshot for the reader, serving staged or cached data
+ * first and surfacing load failures with a retry.
+ *
+ * @param book - The book number.
+ * @param chapter - The chapter number.
+ * @param chapterCount - The known chapter count, if any.
+ * @returns The snapshot state and a retry action.
+ */
 export const useReaderSnapshot = (
   book: number,
   chapter: number,

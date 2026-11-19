@@ -4,7 +4,6 @@ import ultracite from "ultracite/oxfmt";
 import { VitePWA } from "vite-plugin-pwa";
 import { defineConfig, lazyPlugins } from "vite-plus";
 
-// https://vite.dev/config/
 export default defineConfig({
   build: {
     rollupOptions: {
@@ -25,7 +24,6 @@ export default defineConfig({
       },
     },
   },
-  // Same Oxfmt preset as `oxfmt.config.ts` so `vp check` and `ultracite fix` agree.
   fmt: {
     ...ultracite,
     ignorePatterns: [
@@ -37,15 +35,7 @@ export default defineConfig({
       "src/assets/fonts",
     ],
   },
-  /*
-   * A deliberate subset of the Oxlint presets in `oxlint.config.ts`.
-   * shortcut: `vp check` lints type-aware, and extending the presets here
-   * (`extends: [core, react, vitest, antiSlop, shadcn, gdp]`, which this schema
-   * does support) surfaces ~40 type-aware violations — strict-boolean-expressions,
-   * no-misused-promises, promise-function-async, no-confusing-void-expression —
-   * that the app does not satisfy yet. Replace this list with the presets once
-   * they are fixed.
-   */
+  // WARNING: keep this reduced lint subset until the ~40 type-aware violations the full presets surface here are fixed.
   lint: {
     categories: {
       correctness: "warn",

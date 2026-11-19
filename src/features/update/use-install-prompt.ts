@@ -13,13 +13,21 @@ const isBeforeInstallPromptEvent = (
 ): event is BeforeInstallPromptEvent =>
   "prompt" in event && "userChoice" in event;
 
+/**
+ * Tracks PWA install availability and dismissal.
+ *
+ * @returns The install prompt state and actions.
+ */
 export const useInstallPrompt = () => {
   const [deferredPrompt, setDeferredPrompt] =
     useState<BeforeInstallPromptEvent | null>(null);
 
   const [dismissed, setDismissed] = useLocalStorage(DISMISS_KEY, false);
 
-  const isStandalone = window.matchMedia("(display-mode: standalone)").matches;
+  const isStandalone =
+    typeof window === "undefined"
+      ? false
+      : window.matchMedia("(display-mode: standalone)").matches;
 
   useEffect(() => {
     const handler = (event: Event) => {

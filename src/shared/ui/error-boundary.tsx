@@ -28,7 +28,6 @@ class ErrorBoundary extends Component<ErrorBoundaryProps, ErrorBoundaryState> {
       console.error("[ErrorBoundary]", error, info.componentStack, this.state);
     }
 
-    // No backend to report to: persist the crash so Settings can show it.
     recordLastCrash(error.message, info.componentStack ?? undefined);
   }
 

@@ -154,8 +154,6 @@ const VerseActionBarInnerComponent = ({ verses }: VerseActionBarProps) => {
     void deleteHighlights(selectedVerses);
   };
 
-  // Share + highlight always render; copy-link needs a single verse and remove
-  // needs every selected verse highlighted.
   const visibleButtonCount =
     (singleSelectedVerse === null ? 0 : 1) +
     2 +

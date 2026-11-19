@@ -9,6 +9,9 @@ import {
 } from "../../../shared/lib/persistence";
 import type { VerseRef } from "../../../shared/lib/reference";
 
+/**
+ * The reader navigation and selection state.
+ */
 export interface ReaderState {
   book: number;
   chapter: number;
@@ -33,12 +36,20 @@ export interface ReaderState {
   reset: () => void;
 }
 
-/** Selection mode is derived: a non-empty selection is the mode. */
+/**
+ * Whether the reader is in verse-selection mode.
+ *
+ * @param state - The reader state.
+ * @returns True when at least one verse is selected.
+ */
 export const selectIsSelectionMode = (state: ReaderState) =>
   state.selectedVerseIds.length > 0;
 
 const initial = loadInitialState();
 
+/**
+ * The reader navigation and selection store.
+ */
 export const useReaderStore = create<ReaderState>((set, get) => ({
   book: initial.book,
   chapter: initial.chapter,
@@ -58,8 +69,7 @@ export const useReaderStore = create<ReaderState>((set, get) => ({
     set({ selectedVerseIds: [] });
   },
   closeBookSelect: () => {
-    // A pending book means a chapter-strip transition is in flight; it clears
-    // the pending book itself once the new chapters render.
+    // WARNING: a pending book means a transition is in flight; the strip clears it.
     if (get().pendingBook !== null) {
       return;
     }

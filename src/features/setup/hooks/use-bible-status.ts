@@ -2,8 +2,16 @@ import { useEffect, useState } from "react";
 
 import { isBibleSeeded } from "../../../shared/bible";
 
+/**
+ * The Bible seed status.
+ */
 export type BibleStatus = "checking" | "ready" | "missing";
 
+/**
+ * Tracks whether the Bible database is seeded.
+ *
+ * @returns `"checking"`, `"ready"`, or `"missing"`.
+ */
 export const useBibleStatus = () => {
   const [status, setStatus] = useState<BibleStatus>("checking");
 

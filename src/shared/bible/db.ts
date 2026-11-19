@@ -1,6 +1,9 @@
 import { Dexie } from "dexie";
 import type { Table } from "dexie";
 
+/**
+ * A stored Bible verse.
+ */
 export interface BibleVerse {
   id: number;
   book: number;
@@ -9,6 +12,9 @@ export interface BibleVerse {
   text: string;
 }
 
+/**
+ * A key-value metadata row.
+ */
 export interface MetaEntry {
   key: string;
   value: unknown;
@@ -18,14 +24,18 @@ export interface MetaEntry {
 export type ChapterCounts = [number, number][];
 
 /** The product highlights in one color; rows carry the value so older installs
- * keep working with no migration. */
+ * keep working with no migration.
+ *
+ * @remarks Kept as a named constant so the single color has one owner.
+ */
 export const DEFAULT_HIGHLIGHT_COLOR = "yellow";
 
-/** Pre-v12 rows were written by older app versions; skip rows whose keys are
- * unusable instead of crashing mid-upgrade on a corrupt row. */
 const isMigratableHighlight = (row: Highlight) =>
   Number.isInteger(row.verseId) && Number.isInteger(row.updatedAt);
 
+/**
+ * A stored highlight.
+ */
 export interface Highlight {
   verseId: number;
   book: number;

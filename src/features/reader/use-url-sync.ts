@@ -10,6 +10,11 @@ import {
 } from "../../shared/lib/reference";
 import { useReaderStore } from "./store/reader-store";
 
+/**
+ * Keeps the reader store, URL, and storage in sync both ways.
+ *
+ * @returns Nothing.
+ */
 export const useUrlSync = () => {
   const [searchParams, setSearchParams] = useSearchParams();
   const book = useReaderStore((state) => state.book);
@@ -55,8 +60,7 @@ export const useUrlSync = () => {
       next.set(URL_PARAM_VERSE, String(permalinkVerse));
     }
 
-    // A popstate navigation already carries these exact params, so writing
-    // them back would loop without this equality check.
+    // WARNING: removing this equality check reintroduces a popstate write-back loop.
     if (
       next.get(URL_PARAM_BOOK) === searchParams.get(URL_PARAM_BOOK) &&
       next.get(URL_PARAM_CHAPTER) === searchParams.get(URL_PARAM_CHAPTER) &&

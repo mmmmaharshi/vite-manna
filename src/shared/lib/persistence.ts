@@ -11,8 +11,6 @@ const STORAGE_KEY = "manna.reader-location";
 const FONT_SIZE_KEY = "manna.reader-font-size";
 const LAST_CRASH_KEY = "manna.last-crash";
 
-// localStorage throws in private mode and when the quota is full. Warn once so a
-// "my position keeps resetting" report is diagnosable instead of silent.
 let didWarnStorageFailure = false;
 
 const warnStorageFailure = (operation: string, reason: string) => {
@@ -59,6 +57,9 @@ interface StoredLocation {
 const isStoredLocation = (value: unknown): value is StoredLocation =>
   typeof value === "object" && value !== null;
 
+/**
+ * The reader state restored at boot.
+ */
 export interface ReaderInitState {
   book: number;
   chapter: number;
@@ -67,7 +68,6 @@ export interface ReaderInitState {
 }
 
 const parseStoredLocation = (raw: string | null) => {
-  // A missing key is a fresh install, not corruption: skip the parse warning.
   if (raw === null) {
     return null;
   }
@@ -116,6 +116,10 @@ const readUrlVerse = (search: string) =>
 /**
  * Pure so it can be tested without a browser: `search` is `location.search`
  * (with or without the leading `?`) and `storedRaw` is the raw localStorage value.
+ *
+ * @param search - The URL query string.
+ * @param storedRaw - The raw stored location value.
+ * @returns The resolved initial reader state.
  */
 export const resolveReaderLocation = (
   search: string,
@@ -153,15 +157,28 @@ export const resolveReaderLocation = (
   };
 };
 
+/**
+ * Reads the initial reader state from the URL and storage.
+ *
+ * @returns The resolved initial reader state.
+ */
 export const loadInitialState = () =>
   resolveReaderLocation(window.location.search, readStorage(STORAGE_KEY));
 
+/**
+ * The reader location persisted to storage.
+ */
 export interface StoredReaderLocation {
   book: number;
   chapter: number;
   chaptersByBook: Record<number, number>;
 }
 
+/**
+ * Persists the reader location.
+ *
+ * @returns Nothing.
+ */
 export const saveReaderLocation = ({
   book,
   chapter,
@@ -170,21 +187,42 @@ export const saveReaderLocation = ({
   writeStorage(STORAGE_KEY, JSON.stringify({ book, chapter, chaptersByBook }));
 };
 
+/**
+ * Loads the stored font size, defaulting to small.
+ *
+ * @returns The stored font size, or `"sm"`.
+ */
 export const loadFontSize = () => {
   const stored = readStorage(FONT_SIZE_KEY);
 
   return stored !== null && isFontSize(stored) ? stored : "sm";
 };
 
+/**
+ * Persists the font size choice.
+ *
+ * @param fontSize - The size token to store.
+ * @returns Nothing.
+ */
 export const setStoredFontSize = (fontSize: FontSize) => {
   writeStorage(FONT_SIZE_KEY, fontSize);
 };
 
+/**
+ * Recalls the last-read chapter of a book, defaulting to chapter one.
+ *
+ * @param chaptersByBook - The remembered chapter per book.
+ * @param book - The book number.
+ * @returns The chapter to open.
+ */
 export const rememberChapter = (
   chaptersByBook: Record<number, number>,
   book: number
 ) => chaptersByBook[book] ?? 1;
 
+/**
+ * A crash report persisted for on-device diagnostics.
+ */
 export interface LastCrash {
   message: string;
   detail?: string;
@@ -203,7 +241,12 @@ const isLastCrash = (value: unknown): value is LastCrash =>
     typeof value.detail === "string");
 
 /** Crash telemetry for an offline app with no backend: the boundary writes,
- * Settings reads, the user reports. */
+ * Settings reads, the user reports.
+ *
+ * @param message - The error message.
+ * @param detail - The component stack, if any.
+ * @returns Nothing.
+ */
 export const recordLastCrash = (message: string, detail?: string) => {
   writeStorage(
     LAST_CRASH_KEY,
@@ -211,6 +254,11 @@ export const recordLastCrash = (message: string, detail?: string) => {
   );
 };
 
+/**
+ * Reads the last persisted crash report, if any.
+ *
+ * @returns The crash report, or null when none was recorded.
+ */
 export const readLastCrash = () => {
   const raw = readStorage(LAST_CRASH_KEY);
 
@@ -235,6 +283,11 @@ export const readLastCrash = () => {
   return null;
 };
 
+/**
+ * Clears the persisted crash report.
+ *
+ * @returns Nothing.
+ */
 export const clearLastCrash = () => {
   removeStorage(LAST_CRASH_KEY);
 };

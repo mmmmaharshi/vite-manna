@@ -2,6 +2,9 @@ import { create } from "zustand";
 
 import type { Highlight } from "../../../shared/bible";
 
+/**
+ * The highlight list state.
+ */
 export interface HighlightStore {
   highlights: Highlight[];
   highlightedIds: Set<number>;
@@ -13,6 +16,9 @@ export interface HighlightStore {
   removeLocal: (verseId: number) => void;
 }
 
+/**
+ * The highlight list store.
+ */
 export const useHighlightStore = create<HighlightStore>((set) => ({
   error: null,
   highlightedIds: new Set(),

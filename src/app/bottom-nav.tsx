@@ -3,6 +3,9 @@ import { Button, Surface } from "@heroui/react";
 
 import { cn } from "../shared/lib/cn";
 
+/**
+ * The bottom navigation tab.
+ */
 export type TabId = "reader" | "search" | "highlights" | "settings";
 
 interface BottomNavProps {

@@ -17,6 +17,12 @@ interface UseSwipeAndKeyboardOptions {
   isBookSelectOpen: boolean;
 }
 
+/**
+ * Drives chapter navigation from touch swipes and arrow keys.
+ *
+ * @param options - The element, position, and callbacks.
+ * @returns Nothing.
+ */
 export const useSwipeAndKeyboard = ({
   elementRef,
   books,

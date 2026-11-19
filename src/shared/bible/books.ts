@@ -67,12 +67,24 @@ export const BIBLE_BOOK_NAMES = [
   "ప్రకటన గ్రంథము",
 ] as const;
 
+/**
+ * Looks up a book's Telugu name by number.
+ *
+ * @param book - The book number, starting at 1.
+ * @returns The Telugu book name.
+ */
 export const getBibleBookName = (book: number) =>
   BIBLE_BOOK_NAMES[book - 1] ?? `Book ${book}`;
 
 /** The Protestant canon lists the 39 Old Testament books first. */
 export const OLD_TESTAMENT_BOOK_COUNT = 39;
 
+/**
+ * Attaches Telugu names to book summaries.
+ *
+ * @param summaries - The summaries to name.
+ * @returns The summaries with their names.
+ */
 export const attachBookNames = <T extends { id: number }>(summaries: T[]) =>
   summaries.map((summary) => ({
     ...summary,

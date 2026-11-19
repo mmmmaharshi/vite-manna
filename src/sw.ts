@@ -7,11 +7,9 @@ declare let self: ServiceWorkerGlobalScope;
 
 precacheAndRoute(self.__WB_MANIFEST);
 
-// Otherwise every release keeps its own hashed files in the precache forever.
 cleanupOutdatedCaches();
 
-// Take over as soon as this worker is installed. Waiting for a tap left
-// installed apps pinned to the previous release's precached index.html.
+// WARNING: waiting for a tap left installed apps pinned to the previous release.
 self.addEventListener("install", () => {
   void self.skipWaiting();
 });

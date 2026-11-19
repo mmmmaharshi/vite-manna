@@ -25,14 +25,16 @@ const PROGRESS_CAP = 95;
 
 const BOOT_SPLASH_SELECTOR = "#boot-splash";
 
-// Kept at module scope: the React Compiler cannot lower `import()` expressions
-// that appear inside a component.
+// WARNING: moving this import into a component breaks the React Compiler build.
 const loadInitializeBible = async () => {
   const setup = await import("../features/setup");
 
   return setup.initializeBible;
 };
 
+/**
+ * The boot UI state.
+ */
 export type ShellStatus =
   | { kind: "splash" }
   | {
@@ -60,6 +62,9 @@ const progressMessage = (progress: number | null) => {
   return PROGRESS_MESSAGE_SAVING;
 };
 
+/**
+ * The inputs that determine the boot UI state.
+ */
 export interface ShellReadiness {
   bibleStatus: BibleStatus;
   loadError: string | null;
@@ -80,13 +85,27 @@ type BootInputs = Pick<
   | "isSnapshotReady"
 >;
 
+/**
+ * Whether every boot gate has passed.
+ *
+ * @param inputs - The boot inputs.
+ * @returns True when the reader can mount.
+ */
 export const isBootReady = (inputs: BootInputs) =>
   (inputs.bibleStatus === "ready" || inputs.isBibleComplete) &&
   inputs.areFontsReady &&
   inputs.areBooksReady &&
   inputs.isSnapshotReady;
 
-/** Pure so the boot routing (error paths included) is unit-testable. */
+/**
+ * Maps boot inputs to the screen the shell should show.
+ *
+ * Pure so the boot routing (including error paths) is unit-testable.
+ *
+ * @param readiness - The boot inputs.
+ * @param handleRetry - The retry action for error and progress states.
+ * @returns The shell status.
+ */
 export const resolveShellStatus = (
   readiness: ShellReadiness,
   handleRetry: () => void
@@ -109,8 +128,6 @@ export const resolveShellStatus = (
   }
 
   if (bibleStatus === "missing" && isPreparing) {
-    // The bar holds its last value once the download is done, so it never drops
-    // back to the indeterminate slide while the books and snapshot load.
     return {
       handleRetry,
       kind: "progress",
@@ -128,6 +145,11 @@ export const resolveShellStatus = (
   return { kind: "ready" };
 };
 
+/**
+ * Orchestrates boot: fonts, seeding, books, the first snapshot, and the splash timer.
+ *
+ * @returns The current shell status.
+ */
 export const useAppShell = () => {
   const [areFontsReady, setAreFontsReady] = useState(false);
   const [isMinSplashElapsed, setIsMinSplashElapsed] = useState(false);
@@ -177,7 +199,6 @@ export const useAppShell = () => {
             return;
           }
 
-          // `null` means the response had no content-length, so the bar runs indeterminate.
           setDownloadProgress(
             nextProgress === null
               ? null
@@ -234,7 +255,6 @@ export const useAppShell = () => {
         setBooksCache(mapped);
         setAreBooksReady(true);
       } catch (error) {
-        // Without surfacing this the reader would sit on an empty state forever.
         if (import.meta.env.DEV) {
           console.error("[Bible] Failed to load the book list", error);
         }
@@ -279,7 +299,6 @@ export const useAppShell = () => {
         setPreloadedSnapshot(snapshot);
         setIsSnapshotReady(true);
       } catch (error) {
-        // Without surfacing this the reader would show its skeleton forever.
         if (import.meta.env.DEV) {
           console.error("[Bible] Failed to load the reader snapshot", error);
         }

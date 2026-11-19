@@ -3,8 +3,7 @@ import ultracite from "ultracite/oxfmt";
 
 export default defineConfig({
   ...ultracite,
-  // Project-specific exclusions the Ultracite preset doesn't cover: vendored
-  // skills/agent state, static data, and the hand-minified critical CSS.
+  // WARNING: keep these ignores; `fix` must not rewrite hand-minified CSS or vendored state.
   ignorePatterns: [
     ...(ultracite.ignorePatterns ?? []),
     "**/.agents",

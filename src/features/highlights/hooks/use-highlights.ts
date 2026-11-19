@@ -11,6 +11,11 @@ import { useHighlightStore } from "../store/highlight-store";
 
 export const HIGHLIGHTS_LOAD_ERROR = "Unable to load highlights.";
 
+/**
+ * Loads highlight state and exposes add/remove actions backed by IndexedDB.
+ *
+ * @returns The highlight state and actions.
+ */
 export const useHighlights = () => {
   const highlights = useHighlightStore((s) => s.highlights);
   const highlightedIds = useHighlightStore((s) => s.highlightedIds);
@@ -36,7 +41,6 @@ export const useHighlights = () => {
           hydrate(hlList);
         }
       } catch {
-        // Without this the Highlights tab would sit on its loading placeholder forever.
         if (mounted) {
           setError(HIGHLIGHTS_LOAD_ERROR);
         }

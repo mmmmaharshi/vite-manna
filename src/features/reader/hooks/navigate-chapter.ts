@@ -1,5 +1,14 @@
 import type { BibleBook } from "../types";
 
+/**
+ * Steps one chapter forward or back across book boundaries.
+ *
+ * @param books - The books with their chapter counts.
+ * @param book - The current book number.
+ * @param chapter - The current chapter number.
+ * @param direction - The step direction.
+ * @returns The destination, or null past either end.
+ */
 export const navigateChapter = (
   books: BibleBook[],
   book: number,

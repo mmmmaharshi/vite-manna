@@ -101,6 +101,7 @@ const SettingsPage = () => {
               className="text-muted hover:text-foreground mt-2 inline-flex items-center gap-1 text-xs transition-colors"
             >
               <svg
+                aria-hidden="true"
                 className="h-3.5 w-3.5"
                 viewBox="0 0 16 16"
                 fill="currentColor"
@@ -130,7 +131,7 @@ const SettingsPage = () => {
               </div>
               <Typography className="text-muted text-xs">
                 Last crash: {lastCrash.message} ·{" "}
-                {new Date(lastCrash.time).toLocaleString()}
+                {new Date(lastCrash.time).toISOString()}
               </Typography>
             </Surface>
           )}

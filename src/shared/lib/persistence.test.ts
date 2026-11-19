@@ -160,7 +160,7 @@ describe("storage failures", () => {
   });
 
   it("warns once and falls back when localStorage is unavailable", async () => {
-    const warn = vi.spyOn(console, "warn").mockReturnValue();
+    const warn = vi.spyOn(console, "warn");
 
     vi.stubGlobal("localStorage", {
       getItem: () => {
@@ -172,7 +172,6 @@ describe("storage failures", () => {
     });
     vi.stubGlobal("window", { location: { search: "" } });
 
-    // A fresh module instance, so the warn-once flag has not been set yet.
     vi.resetModules();
     const persistence = await import("./persistence");
 

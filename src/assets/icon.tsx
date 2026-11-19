@@ -1,6 +1,5 @@
 import type { SVGProps } from "react";
 
-// Open book and a manna drop. Single colour (currentColor) so it follows the theme.
 const IconSVG = (props: SVGProps<SVGSVGElement>) => (
   <svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 64 64" {...props}>
     <path

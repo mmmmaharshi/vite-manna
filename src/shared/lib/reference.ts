@@ -5,7 +5,14 @@ export const URL_PARAM_BOOK = "book";
 export const URL_PARAM_CHAPTER = "chapter";
 export const URL_PARAM_VERSE = "verse";
 
-/** `యోహాను 3`, or `యోహాను 3:16` when a verse is given. */
+/**
+ * Formats a reference: `యోహాను 3`, or `యోహాను 3:16` when a verse is given.
+ *
+ * @param book - The book number.
+ * @param chapter - The chapter number.
+ * @param verse - The verse number, if any.
+ * @returns The formatted reference.
+ */
 export const formatReference = (
   book: number,
   chapter: number,
@@ -22,7 +29,14 @@ export interface VerseRef {
   verse: number;
 }
 
-/** A link to a verse on the current origin, without any hash or stale params. */
+/**
+ * A link to a verse on the current origin, without any hash or stale params.
+ *
+ * @param book - The book number.
+ * @param chapter - The chapter number.
+ * @param verse - The verse number.
+ * @returns The absolute permalink URL.
+ */
 export const buildPermalinkUrl = (
   book: number,
   chapter: number,

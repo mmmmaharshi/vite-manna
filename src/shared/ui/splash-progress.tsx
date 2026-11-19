@@ -16,10 +16,8 @@ const getInitialAnimationDelay = () => {
   return `-${performance.now() % INDETERMINATE_DURATION_MS}ms`;
 };
 
-// Computed once at module load so every mount shares the same animation phase.
 const INITIAL_ANIMATION_DELAY = getInitialAnimationDelay();
 
-// The phase rides in a custom property so no inline style carries a raw value.
 const INDETERMINATE_STYLE: CSSProperties & { "--splash-delay": string } = {
   "--splash-delay": INITIAL_ANIMATION_DELAY,
 };

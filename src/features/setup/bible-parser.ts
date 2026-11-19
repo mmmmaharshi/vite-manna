@@ -46,6 +46,12 @@ const isBibleResponse = (value: unknown): value is BibleResponse =>
   Array.isArray(value.Book) &&
   value.Book.every(isBook);
 
+/**
+ * Parses and validates the downloaded Bible JSON.
+ *
+ * @param json - The raw response text.
+ * @returns The validated Bible response.
+ */
 export const parseBibleResponse = (json: string) => {
   const parsed: unknown = JSON.parse(json);
 
@@ -59,6 +65,9 @@ export const parseBibleResponse = (json: string) => {
 /**
  * Flattens the nested JSON into rows. Book, chapter and verse numbers come from
  * position, so the first book is 1 and the first verse of a chapter is 1.
+ *
+ * @param bible - The validated Bible response.
+ * @returns The chapter counts and the verse rows.
  */
 export const readBible = (bible: BibleResponse) => {
   const verses: BibleVerse[] = [];

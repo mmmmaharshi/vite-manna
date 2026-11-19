@@ -3,7 +3,11 @@ import type { ReactNode, Ref } from "react";
 
 import { cn } from "../lib/cn";
 
-/** Full-screen page frame every tab shares. */
+/**
+ * Full-screen page frame every tab shares.
+ *
+ * @returns The page element.
+ */
 export const Page = ({ children }: { children: ReactNode }) => (
   <main id="main-content" className="flex h-dvh flex-col">
     {children}
@@ -17,7 +21,11 @@ interface PageHeaderProps {
   innerClassName?: string;
 }
 
-/** Sticky header band. Title pages pass `title`; the reader passes controls. */
+/**
+ * Sticky header band. Title pages pass `title`; the reader passes controls.
+ *
+ * @returns The header element.
+ */
 export const PageHeader = ({
   title,
   children,
@@ -49,7 +57,11 @@ interface PageSectionProps {
   ref?: Ref<HTMLElement>;
 }
 
-/** Width-constrained content band inside a page. */
+/**
+ * Width-constrained content band inside a page.
+ *
+ * @returns The section element.
+ */
 export const PageSection = ({
   children,
   className,
@@ -77,7 +89,11 @@ interface PageMessageProps {
   className?: string;
 }
 
-/** Centered empty / error / loading state. */
+/**
+ * Centered empty / error / loading state.
+ *
+ * @returns The message element.
+ */
 export const PageMessage = ({
   title,
   hint,
@@ -116,7 +132,11 @@ export const PageMessage = ({
   </section>
 );
 
-/** Reserves room for the bottom nav so last rows stay reachable. */
+/**
+ * Reserves room for the bottom nav so last rows stay reachable.
+ *
+ * @returns The spacer element.
+ */
 export const BottomSpacer = () => (
   <div className="h-[calc(4rem+env(safe-area-inset-bottom))]" />
 );
