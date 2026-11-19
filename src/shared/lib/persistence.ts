@@ -58,8 +58,13 @@ const isStoredLocation = (value: unknown): value is StoredLocation =>
   typeof value === "object" && value !== null;
 
 const parseStoredLocation = (raw: string | null): StoredLocation | null => {
+  // A missing key is a fresh install, not corruption: skip the parse warning.
+  if (raw === null) {
+    return null;
+  }
+
   try {
-    const parsed: unknown = JSON.parse(raw ?? "");
+    const parsed: unknown = JSON.parse(raw);
 
     return isStoredLocation(parsed) ? parsed : null;
   } catch (error) {
