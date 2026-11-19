@@ -46,7 +46,7 @@ const isBibleResponse = (value: unknown): value is BibleResponse =>
   Array.isArray(value.Book) &&
   value.Book.every(isBook);
 
-export const parseBibleResponse = (json: string): BibleResponse => {
+export const parseBibleResponse = (json: string) => {
   const parsed: unknown = JSON.parse(json);
 
   if (!isBibleResponse(parsed)) {

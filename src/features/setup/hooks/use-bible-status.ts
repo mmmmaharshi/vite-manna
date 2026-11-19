@@ -4,7 +4,7 @@ import { isBibleSeeded } from "../../../shared/bible";
 
 export type BibleStatus = "checking" | "ready" | "missing";
 
-export const useBibleStatus = (): BibleStatus => {
+export const useBibleStatus = () => {
   const [status, setStatus] = useState<BibleStatus>("checking");
 
   useEffect(() => {

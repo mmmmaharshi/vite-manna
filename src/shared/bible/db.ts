@@ -23,7 +23,7 @@ export const DEFAULT_HIGHLIGHT_COLOR = "yellow";
 
 /** Pre-v12 rows were written by older app versions; skip rows whose keys are
  * unusable instead of crashing mid-upgrade on a corrupt row. */
-const isMigratableHighlight = (row: Highlight): boolean =>
+const isMigratableHighlight = (row: Highlight) =>
   Number.isInteger(row.verseId) && Number.isInteger(row.updatedAt);
 
 export interface Highlight {

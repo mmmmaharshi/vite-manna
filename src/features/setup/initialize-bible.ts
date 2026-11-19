@@ -36,7 +36,7 @@ export const initializeBible = async (
   const chunks: Uint8Array[] = [];
 
   // Recursive instead of a while loop so no `await` sits inside a loop body.
-  const readStream = async (): Promise<void> => {
+  const readStream = async () => {
     const { done, value } = await reader.read();
 
     if (done) {
@@ -72,7 +72,7 @@ export const initializeBible = async (
     parseBibleResponse(new TextDecoder().decode(bytes))
   );
 
-  const saveBatch = async (start: number): Promise<void> => {
+  const saveBatch = async (start: number) => {
     if (start >= verses.length) {
       return;
     }

@@ -41,7 +41,7 @@ interface StubResponse {
   status: number;
 }
 
-const responseWith = (contentLength?: number): StubResponse => ({
+const responseWith = (contentLength?: number) => ({
   body: new ReadableStream<Uint8Array>({
     start(controller) {
       controller.enqueue(new TextEncoder().encode(BIBLE_JSON));

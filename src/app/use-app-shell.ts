@@ -80,7 +80,7 @@ type BootInputs = Pick<
   | "isSnapshotReady"
 >;
 
-export const isBootReady = (inputs: BootInputs): boolean =>
+export const isBootReady = (inputs: BootInputs) =>
   (inputs.bibleStatus === "ready" || inputs.isBibleComplete) &&
   inputs.areFontsReady &&
   inputs.areBooksReady &&
@@ -90,7 +90,7 @@ export const isBootReady = (inputs: BootInputs): boolean =>
 export const resolveShellStatus = (
   readiness: ShellReadiness,
   handleRetry: () => void
-): ShellStatus => {
+) => {
   const {
     bibleStatus,
     loadError,
@@ -128,7 +128,7 @@ export const resolveShellStatus = (
   return { kind: "ready" };
 };
 
-export const useAppShell = (): ShellStatus => {
+export const useAppShell = () => {
   const [areFontsReady, setAreFontsReady] = useState(false);
   const [isMinSplashElapsed, setIsMinSplashElapsed] = useState(false);
   const [downloadProgress, setDownloadProgress] = useState<number | null>(0);

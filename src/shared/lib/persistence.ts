@@ -66,7 +66,7 @@ export interface ReaderInitState {
   permalinkVerse: number | null;
 }
 
-const parseStoredLocation = (raw: string | null): StoredLocation | null => {
+const parseStoredLocation = (raw: string | null) => {
   // A missing key is a fresh install, not corruption: skip the parse warning.
   if (raw === null) {
     return null;
@@ -120,7 +120,7 @@ const readUrlVerse = (search: string) =>
 export const resolveReaderLocation = (
   search: string,
   storedRaw: string | null
-): ReaderInitState => {
+) => {
   const fromUrl = readUrlLocation(search);
   const permalinkVerse = readUrlVerse(search);
   const stored = parseStoredLocation(storedRaw);
@@ -153,7 +153,7 @@ export const resolveReaderLocation = (
   };
 };
 
-export const loadInitialState = (): ReaderInitState =>
+export const loadInitialState = () =>
   resolveReaderLocation(window.location.search, readStorage(STORAGE_KEY));
 
 export interface StoredReaderLocation {
@@ -170,7 +170,7 @@ export const saveReaderLocation = ({
   writeStorage(STORAGE_KEY, JSON.stringify({ book, chapter, chaptersByBook }));
 };
 
-export const loadFontSize = (): FontSize => {
+export const loadFontSize = () => {
   const stored = readStorage(FONT_SIZE_KEY);
 
   return stored !== null && isFontSize(stored) ? stored : "sm";
@@ -211,7 +211,7 @@ export const recordLastCrash = (message: string, detail?: string) => {
   );
 };
 
-export const readLastCrash = (): LastCrash | null => {
+export const readLastCrash = () => {
   const raw = readStorage(LAST_CRASH_KEY);
 
   if (raw === null) {

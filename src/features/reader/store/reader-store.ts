@@ -34,7 +34,7 @@ export interface ReaderState {
 }
 
 /** Selection mode is derived: a non-empty selection is the mode. */
-export const selectIsSelectionMode = (state: ReaderState): boolean =>
+export const selectIsSelectionMode = (state: ReaderState) =>
   state.selectedVerseIds.length > 0;
 
 const initial = loadInitialState();

@@ -98,7 +98,7 @@ export const useReaderSnapshot = (
   book: number,
   chapter: number,
   chapterCount?: number
-): ReaderSnapshotResult => {
+) => {
   const [snapshot, setSnapshot] = useState<ReaderSnapshot | null>(() => {
     if (preloadedSnapshot !== null && preloadedSnapshot.book === book) {
       const stored = preloadedSnapshot;

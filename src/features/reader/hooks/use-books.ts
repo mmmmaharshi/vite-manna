@@ -16,7 +16,7 @@ export const setBooksCache = (books: BibleBook[]) => {
   cachedLoaded = true;
 };
 
-export const useBooks = (): UseBooksResult => {
+export const useBooks = () => {
   const [books, setBooks] = useState<BibleBook[]>(cachedBooks);
   const [hasLoadedBooks, setHasLoadedBooks] = useState(cachedLoaded);
 

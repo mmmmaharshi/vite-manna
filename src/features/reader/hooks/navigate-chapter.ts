@@ -5,7 +5,7 @@ export const navigateChapter = (
   book: number,
   chapter: number,
   direction: "prev" | "next"
-): { book: number; chapter: number } | null => {
+) => {
   const bookIndex = books.findIndex((b) => b.id === book);
 
   if (bookIndex === -1) {
