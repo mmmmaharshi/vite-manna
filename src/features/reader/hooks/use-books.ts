@@ -1,6 +1,6 @@
 import { useEffect, useState } from "react";
 
-import { attachBookNames, getReaderBootstrap } from "../../../shared/bible";
+import { attachBookNames, getBookSummaries } from "../../../shared/bible";
 import type { NamedBook } from "../../../shared/bible";
 
 /**
@@ -39,7 +39,7 @@ export const useBooks = (enabled = true) => {
       }
 
       try {
-        const { books: bookSummaries } = await getReaderBootstrap(1, 1);
+        const bookSummaries = await getBookSummaries();
 
         if (!mounted) {
           return;

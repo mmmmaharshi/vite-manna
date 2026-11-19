@@ -21,8 +21,8 @@ import {
   PageMessage,
   PageSection,
 } from "../../shared/ui";
-import { useHighlights } from "../highlights/hooks/use-highlights";
 import { useReaderStore } from "../reader/store/reader-store";
+import { useHighlights } from "./hooks/use-highlights";
 
 interface HighlightsPageProps {
   onNavigateToReader: () => void;

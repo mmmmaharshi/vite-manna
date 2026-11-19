@@ -16,6 +16,7 @@ export {
 
 export {
   clearBibleSeed,
+  getBookSummaries,
   getContiguousChapterNumbers,
   getHighlights,
   getReaderBootstrap,

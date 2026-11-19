@@ -33,8 +33,8 @@ export const useUrlSync = () => {
       }
 
       const state = useReaderStore.getState();
-      state.setBook(nextBook);
-      state.setChapter(nextChapter);
+
+      state.goToChapter(nextBook, nextChapter);
 
       const nextVerse = parsePositiveInteger(params.get(URL_PARAM_VERSE));
 

@@ -48,7 +48,7 @@ bun install && bun run dev
 | Share / permalink a verse | `reference.test`, `persistence.test` (URL round-trip) |
 | Font size S–2XL | `font-size.test`, `persistence.test` (stored size) |
 | Offline seed once | `initialize-bible.test` (download, batch, seed flag) |
-| Boot → reader / retry | `resolve-shell-status.test`, `reader-store.test` |
+| Boot → reader / retry | `resolve-shell-status.test`, `reader-store.test`, `splash-contract.test` |
 | Cold-launch / search journeys | Not covered — no component or e2e harness yet |
 
 ## Stack

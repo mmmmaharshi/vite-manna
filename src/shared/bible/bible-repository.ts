@@ -95,6 +95,17 @@ export const getChapterNumbers = async (book: number) => {
 };
 
 /**
+ * Lists the books with their chapter counts, without loading any verses.
+ *
+ * @returns The book summaries in book order.
+ */
+export const getBookSummaries = async () => {
+  const counts = await readChapterCounts();
+
+  return counts.map(([id, chapterCount]) => ({ chapterCount, id }));
+};
+
+/**
  * Reads every verse of a chapter in verse order.
  *
  * @param book - The book number.
