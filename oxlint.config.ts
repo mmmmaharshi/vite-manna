@@ -8,7 +8,7 @@ import vitest from "ultracite/oxlint/vitest";
 
 export default defineConfig({
   env: core.env,
-  extends: [core, react, vitest, antiSlop, shadcn, gdp],
+  extends: [core, react, vitest, gdp, shadcn, antiSlop],
   ignorePatterns: [
     ...(core.ignorePatterns ?? []),
     "**/.agents",

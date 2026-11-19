@@ -1,71 +1,71 @@
 {
-  "version": 1,
+  "version": 2,
   "skills": {
     "accessibility": {
       "source": "addyosmani/web-quality-skills",
       "sourceType": "github",
       "skillPath": "skills/accessibility/SKILL.md",
-      "computedHash": "ebfa09617a2ac4fd64afd73267726b787145a8d14294df3f8802b462c91594ab"
+      "computedHash": ""
     },
     "best-practices": {
       "source": "addyosmani/web-quality-skills",
       "sourceType": "github",
       "skillPath": "skills/best-practices/SKILL.md",
-      "computedHash": "f84707a5ba30771f4c3e672846457e4b0ed4dff5fd268bf0fe6cd17583637671"
+      "computedHash": ""
     },
     "core-web-vitals": {
       "source": "addyosmani/web-quality-skills",
       "sourceType": "github",
       "skillPath": "skills/core-web-vitals/SKILL.md",
-      "computedHash": "4684e264c8e3dd529aefe97c3102814e3b63a9ea21a163d0f835ed506773e3f8"
+      "computedHash": ""
     },
     "heroui-migration": {
       "source": "heroui-inc/heroui",
       "sourceType": "github",
       "skillPath": "skills/heroui-migration/SKILL.md",
-      "computedHash": "9696b5cf0009120bfe03e00cc94c0e2defc1f5af981fc5bb10b1eeffa53e34cf"
+      "computedHash": "6c0697a287ed2b919c6f86e28c0b4754cba86042142226b75f159579737eb703"
     },
     "heroui-native": {
       "source": "heroui-inc/heroui",
       "sourceType": "github",
       "skillPath": "skills/heroui-native/SKILL.md",
-      "computedHash": "d2fc03a13d03678d40799726a144ba72ba1cb08126176ddbf0a0461c901aef29"
+      "computedHash": "a9e7c0901e37e25cc45cff1836f83a8a12208b8107b04cf9aa8c69422ba413c2"
     },
     "heroui-react": {
       "source": "heroui-inc/heroui",
       "sourceType": "github",
       "skillPath": "skills/heroui-react/SKILL.md",
-      "computedHash": "c9e1bb41fbc3cee782faae08bd465ae05cd685a6ed7cc3392464fdf29b3ab467"
+      "computedHash": "18227947d155e9d9f2ad0931e57e2b278e31739f1b2598488267e82f0cdd3065"
     },
     "performance": {
       "source": "addyosmani/web-quality-skills",
       "sourceType": "github",
       "skillPath": "skills/performance/SKILL.md",
-      "computedHash": "646931a3af896ae12a3cad3d762668cb6487fe3ab179daf8fdc974fb79acfe49"
+      "computedHash": ""
     },
     "seo": {
       "source": "addyosmani/web-quality-skills",
       "sourceType": "github",
       "skillPath": "skills/seo/SKILL.md",
-      "computedHash": "3d72168e266b759454b3e16028e7306ec716f21de6878cac7e98a0a3834ab5db"
+      "computedHash": ""
     },
     "ultracite": {
       "source": "haydenbleasel/ultracite",
       "sourceType": "github",
       "skillPath": "skills/ultracite/SKILL.md",
-      "computedHash": "bbbcab6a2840d8886de7b30c531cc2ff24d5ab741eb717072f8c87e02ed6bd93"
+      "computedHash": "52eac7a3ac5f3117d8d70f1058eed56403e9755fc93e0ba944c4c501fa560ba6"
     },
     "web-quality-audit": {
       "source": "addyosmani/web-quality-skills",
       "sourceType": "github",
       "skillPath": "skills/web-quality-audit/SKILL.md",
-      "computedHash": "10db799d6bff4fc98a4067aa04fdee2e9f34eaca1c42fd4207a89aafe644a6f0"
+      "computedHash": ""
     },
     "webapp-testing": {
       "source": "anthropics/skills",
       "sourceType": "github",
       "skillPath": "skills/webapp-testing/SKILL.md",
-      "computedHash": "3f14af7f5690695209c22fbf8c8d133769a86d64892602c09bb13f135e14e857"
+      "computedHash": ""
     }
   }
 }
