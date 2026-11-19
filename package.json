@@ -16,8 +16,8 @@
   "dependencies": {
     "@fontsource-variable/google-sans": "^5.3.1",
     "@gravity-ui/icons": "^2.21.0",
-    "@heroui/react": "^3.2.6",
-    "@heroui/styles": "^3.2.6",
+    "@heroui/react": "^3.2.7",
+    "@heroui/styles": "^3.2.7",
     "@internationalized/date": "^3.12.4",
     "@reactuses/core": "^6.4.2",
     "@tailwindcss/vite": "^4.3.3",
