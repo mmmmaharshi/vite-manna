@@ -1,4 +1,3 @@
-import { clamp } from "es-toolkit";
 import { memo } from "react";
 import type { CSSProperties } from "react";
 
@@ -31,7 +30,9 @@ interface SplashProgressProps {
 
 const SplashProgress = ({ value }: SplashProgressProps) => {
   const normalizedValue =
-    value === null || value === undefined ? null : clamp(value, 0, 100);
+    value === null || value === undefined
+      ? null
+      : Math.min(Math.max(value, 0), 100);
 
   const progressWidth =
     normalizedValue === null
