@@ -1,6 +1,6 @@
 import { useEffect, useState } from "react";
 
-import { getBibleBookName, getReaderBootstrap } from "../../../shared/bible";
+import { attachBookNames, getReaderBootstrap } from "../../../shared/bible";
 import type { BibleBook } from "../types";
 
 export interface UseBooksResult {
@@ -35,10 +35,7 @@ export const useBooks = (): UseBooksResult => {
           return;
         }
 
-        const mapped = bookSummaries.map((book) => ({
-          ...book,
-          name: getBibleBookName(book.id),
-        }));
+        const mapped = attachBookNames(bookSummaries);
 
         cachedBooks = mapped;
         cachedLoaded = true;

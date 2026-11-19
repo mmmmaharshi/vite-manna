@@ -69,3 +69,14 @@ export const BIBLE_BOOK_NAMES = [
 
 export const getBibleBookName = (book: number) =>
   BIBLE_BOOK_NAMES[book - 1] ?? `Book ${book}`;
+
+/** The Protestant canon lists the 39 Old Testament books first. */
+export const OLD_TESTAMENT_BOOK_COUNT = 39;
+
+export const attachBookNames = <T extends { id: number }>(
+  summaries: T[]
+): (T & { name: string })[] =>
+  summaries.map((summary) => ({
+    ...summary,
+    name: getBibleBookName(summary.id),
+  }));

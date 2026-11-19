@@ -1,7 +1,10 @@
 import { Header, ListBox, Select, Separator } from "@heroui/react";
 import { memo } from "react";
 
-import { getBibleBookName } from "../../../shared/bible";
+import {
+  OLD_TESTAMENT_BOOK_COUNT,
+  getBibleBookName,
+} from "../../../shared/bible";
 import { cn } from "../../../shared/lib/cn";
 import { useReaderStore } from "../store/reader-store";
 import type { BibleBook } from "../types";
@@ -12,8 +15,6 @@ interface BookSelectProps {
   visibleBookSummary: BibleBook | undefined;
   className?: string;
 }
-
-const OT_BOOK_COUNT = 39;
 
 const scrollSelectedBookIntoView = () => {
   requestAnimationFrame(() => {
@@ -53,8 +54,8 @@ const BookSelectComponent = ({
   const setBookSelectOpen = useReaderStore((state) => state.setBookSelectOpen);
   const selectBook = useReaderStore((state) => state.selectBook);
 
-  const otBooks = books.filter((b) => b.id <= OT_BOOK_COUNT);
-  const ntBooks = books.filter((b) => b.id > OT_BOOK_COUNT);
+  const otBooks = books.filter((b) => b.id <= OLD_TESTAMENT_BOOK_COUNT);
+  const ntBooks = books.filter((b) => b.id > OLD_TESTAMENT_BOOK_COUNT);
 
   return (
     <Select

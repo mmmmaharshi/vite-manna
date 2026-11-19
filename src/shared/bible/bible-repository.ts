@@ -36,7 +36,7 @@ export const clearBibleSeed = async () => {
   await db.meta.bulkDelete([META_CHAPTER_COUNTS, META_SEEDED]);
 };
 
-const getContiguousChapterNumbers = (chapterCount: number) =>
+export const getContiguousChapterNumbers = (chapterCount: number) =>
   Array.from({ length: chapterCount }, (_, index) => index + 1);
 
 export const getChapterNumbers = async (book: number) => {
@@ -118,13 +118,21 @@ export const searchVerses = (query: string) => {
     .toArray();
 };
 
-export const upsertHighlight = (
-  verseId: number,
-  book: number,
-  chapter: number,
-  verse: number,
-  text: string
-) =>
+export interface HighlightInput {
+  verseId: number;
+  book: number;
+  chapter: number;
+  verse: number;
+  text: string;
+}
+
+export const upsertHighlight = ({
+  verseId,
+  book,
+  chapter,
+  verse,
+  text,
+}: HighlightInput) =>
   db.highlights.put({
     book,
     chapter,

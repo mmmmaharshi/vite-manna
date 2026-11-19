@@ -8,6 +8,7 @@ import {
 } from "@heroui/react";
 import { useEffect, useMemo, useRef } from "react";
 
+import { getContiguousChapterNumbers } from "../../shared/bible";
 import { cn } from "../../shared/lib/cn";
 import { formatReference } from "../../shared/lib/reference";
 import BookSelect from "./components/book-select";
@@ -35,9 +36,6 @@ const SKELETON_LINES = [
   "w-19/20",
 ];
 
-const buildChapterNumbers = (chapterCount: number) =>
-  Array.from({ length: chapterCount }, (_, index) => index + 1);
-
 const resolveVisibleChapters = (
   isReaderTransitioning: boolean,
   visibleBookSummary: BibleBook | undefined,
@@ -48,11 +46,12 @@ const resolveVisibleChapters = (
   }
 
   if (isReaderTransitioning) {
-    return buildChapterNumbers(visibleBookSummary.chapterCount);
+    return getContiguousChapterNumbers(visibleBookSummary.chapterCount);
   }
 
   return (
-    snapshot?.chapters ?? buildChapterNumbers(visibleBookSummary.chapterCount)
+    snapshot?.chapters ??
+    getContiguousChapterNumbers(visibleBookSummary.chapterCount)
   );
 };
 

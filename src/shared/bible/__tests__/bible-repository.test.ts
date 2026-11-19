@@ -178,8 +178,20 @@ describe("bible repository", () => {
 
   describe(upsertHighlight, () => {
     it("stores one highlight per verse with the default color", async () => {
-      await upsertHighlight(7, 43, 3, 16, "For God so loved");
-      await upsertHighlight(7, 43, 3, 16, "For God so loved the world");
+      await upsertHighlight({
+        book: 43,
+        chapter: 3,
+        text: "For God so loved",
+        verse: 16,
+        verseId: 7,
+      });
+      await upsertHighlight({
+        book: 43,
+        chapter: 3,
+        text: "For God so loved the world",
+        verse: 16,
+        verseId: 7,
+      });
 
       const highlights = await getHighlights();
 

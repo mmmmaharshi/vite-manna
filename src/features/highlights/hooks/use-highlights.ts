@@ -53,13 +53,13 @@ export const useHighlights = () => {
   const add = useCallback(
     async (verse: BibleVerse) => {
       try {
-        await upsertHl(
-          verse.id,
-          verse.book,
-          verse.chapter,
-          verse.verse,
-          verse.text
-        );
+        await upsertHl({
+          book: verse.book,
+          chapter: verse.chapter,
+          text: verse.text,
+          verse: verse.verse,
+          verseId: verse.id,
+        });
         upsertLocal({
           book: verse.book,
           chapter: verse.chapter,

@@ -130,7 +130,7 @@ const VerseActionBarInnerComponent = ({ verses }: VerseActionBarProps) => {
 
   const handleHighlight = () => {
     const toHighlight = selectedVerses.filter(
-      (verse) => !highlightedMap.has(verse.id)
+      (verse) => !highlightedIds.has(verse.id)
     );
 
     clearVerseSelection();

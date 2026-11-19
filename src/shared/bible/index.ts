@@ -1,7 +1,11 @@
-export { getBibleBookName, BIBLE_BOOK_NAMES } from "./books";
+export {
+  getBibleBookName,
+  BIBLE_BOOK_NAMES,
+  OLD_TESTAMENT_BOOK_COUNT,
+  attachBookNames,
+} from "./books";
 
 export {
-  db,
   DEFAULT_HIGHLIGHT_COLOR,
   type BibleVerse,
   type ChapterCounts,
@@ -10,6 +14,7 @@ export {
 
 export {
   clearBibleSeed,
+  getContiguousChapterNumbers,
   getHighlights,
   getReaderBootstrap,
   getReaderSnapshot,

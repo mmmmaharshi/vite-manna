@@ -5,7 +5,7 @@ import { setPreloadedSnapshot } from "../features/reader/hooks/use-reader-snapsh
 import { useReaderStore } from "../features/reader/store/reader-store";
 import { useBibleStatus } from "../features/setup/hooks/use-bible-status";
 import {
-  getBibleBookName,
+  attachBookNames,
   getReaderBootstrap,
   getReaderSnapshot,
 } from "../shared/bible";
@@ -160,10 +160,7 @@ export const useAppShell = (): ShellStatus => {
           return;
         }
 
-        const mapped = bookSummaries.map((book) => ({
-          ...book,
-          name: getBibleBookName(book.id),
-        }));
+        const mapped = attachBookNames(bookSummaries);
 
         setBooksCache(mapped);
         setAreBooksReady(true);
