@@ -8,6 +8,7 @@ import {
   Tooltip,
   Typography,
 } from "@heroui/react";
+import { useState } from "react";
 
 import { cn } from "../../shared/lib/cn";
 import {
@@ -16,6 +17,7 @@ import {
   isFontSize,
 } from "../../shared/lib/font-size";
 import type { FontSize } from "../../shared/lib/font-size";
+import { clearLastCrash, readLastCrash } from "../../shared/lib/persistence";
 import { BottomSpacer, Page, PageHeader, PageSection } from "../../shared/ui";
 import { useReaderStore } from "../reader/store/reader-store";
 
@@ -33,6 +35,7 @@ const PREVIEW_TEXT =
 const SettingsPage = () => {
   const fontSize = useReaderStore((state) => state.fontSize);
   const setFontSize = useReaderStore((state) => state.setFontSize);
+  const [lastCrash, setLastCrash] = useState(readLastCrash);
 
   return (
     <Page>
@@ -107,6 +110,30 @@ const SettingsPage = () => {
               GitHub
             </a>
           </Surface>
+
+          {lastCrash !== null && (
+            <Surface className="p-3">
+              <div className="mb-2 flex items-center justify-between">
+                <Typography className="text-sm font-medium">
+                  Diagnostics
+                </Typography>
+                <Button
+                  variant="tertiary"
+                  size="sm"
+                  onPress={() => {
+                    clearLastCrash();
+                    setLastCrash(null);
+                  }}
+                >
+                  Clear
+                </Button>
+              </div>
+              <Typography className="text-muted text-xs">
+                Last crash: {lastCrash.message} ·{" "}
+                {new Date(lastCrash.time).toLocaleString()}
+              </Typography>
+            </Surface>
+          )}
         </PageSection>
         <BottomSpacer />
       </ScrollShadow>

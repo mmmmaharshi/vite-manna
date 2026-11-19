@@ -9,6 +9,7 @@ import {
 
 const STORAGE_KEY = "manna.reader-location";
 const FONT_SIZE_KEY = "manna.reader-font-size";
+const LAST_CRASH_KEY = "manna.last-crash";
 
 // localStorage throws in private mode and when the quota is full. Warn once so a
 // "my position keeps resetting" report is diagnosable instead of silent.
@@ -41,11 +42,22 @@ const writeStorage = (key: string, value: string) => {
   }
 };
 
+const removeStorage = (key: string) => {
+  try {
+    localStorage.removeItem(key);
+  } catch (error) {
+    warnStorageFailure("remove", String(error));
+  }
+};
+
 interface StoredLocation {
   book?: number;
   chapter?: number;
   chaptersByBook?: Record<string, number>;
 }
+
+const isRecord = (value: unknown): value is Record<string, unknown> =>
+  typeof value === "object" && value !== null;
 
 export interface ReaderInitState {
   book: number;
@@ -55,7 +67,7 @@ export interface ReaderInitState {
 }
 
 const isStoredLocation = (value: unknown): value is StoredLocation =>
-  typeof value === "object" && value !== null;
+  isRecord(value);
 
 const parseStoredLocation = (raw: string | null): StoredLocation | null => {
   // A missing key is a fresh install, not corruption: skip the parse warning.
@@ -175,3 +187,60 @@ export const rememberChapter = (
   chaptersByBook: Record<number, number>,
   book: number
 ) => chaptersByBook[book] ?? 1;
+
+export interface LastCrash {
+  message: string;
+  detail?: string;
+  time: number;
+}
+
+const isLastCrash = (value: unknown): value is LastCrash => {
+  if (!isRecord(value)) {
+    return false;
+  }
+
+  const { message, time, detail } = value;
+
+  return (
+    typeof message === "string" &&
+    typeof time === "number" &&
+    (detail === undefined || typeof detail === "string")
+  );
+};
+
+/** Crash telemetry for an offline app with no backend: the boundary writes,
+ * Settings reads, the user reports. */
+export const recordLastCrash = (message: string, detail?: string) => {
+  writeStorage(
+    LAST_CRASH_KEY,
+    JSON.stringify({ detail, message, time: Date.now() })
+  );
+};
+
+export const readLastCrash = (): LastCrash | null => {
+  const raw = readStorage(LAST_CRASH_KEY);
+
+  if (raw === null) {
+    return null;
+  }
+
+  try {
+    const parsed: unknown = JSON.parse(raw);
+
+    return isLastCrash(parsed)
+      ? {
+          detail: parsed.detail,
+          message: parsed.message,
+          time: parsed.time,
+        }
+      : null;
+  } catch (error) {
+    warnStorageFailure("parse", String(error));
+  }
+
+  return null;
+};
+
+export const clearLastCrash = () => {
+  removeStorage(LAST_CRASH_KEY);
+};

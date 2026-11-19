@@ -2,6 +2,8 @@ import { Button, Typography } from "@heroui/react";
 import { Component, useState } from "react";
 import type { ErrorInfo, ReactNode } from "react";
 
+import { clearLastCrash, recordLastCrash } from "../lib/persistence";
+
 interface ErrorBoundaryProps {
   children: ReactNode;
   onReset: () => void;
@@ -25,6 +27,9 @@ class ErrorBoundary extends Component<ErrorBoundaryProps, ErrorBoundaryState> {
     if (import.meta.env.DEV) {
       console.error("[ErrorBoundary]", error, info.componentStack, this.state);
     }
+
+    // No backend to report to: persist the crash so Settings can show it.
+    recordLastCrash(error.message, info.componentStack ?? undefined);
   }
 
   render() {
@@ -61,7 +66,10 @@ const ErrorBoundaryWithReset = ({ children }: { children: ReactNode }) => {
   return (
     <ErrorBoundary
       key={resetKey}
-      onReset={() => setResetKey((current) => current + 1)}
+      onReset={() => {
+        clearLastCrash();
+        setResetKey((current) => current + 1);
+      }}
     >
       {children}
     </ErrorBoundary>

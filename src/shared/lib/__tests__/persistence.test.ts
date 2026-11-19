@@ -8,8 +8,11 @@ import {
 } from "vite-plus/test";
 
 import {
+  clearLastCrash,
   loadFontSize,
   loadInitialState,
+  readLastCrash,
+  recordLastCrash,
   resolveReaderLocation,
   saveReaderLocation,
   setStoredFontSize,
@@ -27,7 +30,11 @@ const createStorage = () => {
   const entries = new Map<string, string>();
 
   return {
+    clear: () => entries.clear(),
     getItem: (key: string) => entries.get(key) ?? null,
+    removeItem: (key: string) => {
+      entries.delete(key);
+    },
     setItem: (key: string, value: string) => {
       entries.set(key, value);
     },
@@ -176,5 +183,51 @@ describe("storage failures", () => {
     expect(persistence.resolveReaderLocation("", "not json").book).toBe(1);
 
     expect(warn).toHaveBeenCalledOnce();
+  });
+});
+
+describe("last crash", () => {
+  beforeEach(() => {
+    vi.stubGlobal("localStorage", createStorage());
+    vi.stubGlobal("window", { location: { search: "" } });
+  });
+
+  afterEach(() => {
+    vi.unstubAllGlobals();
+  });
+
+  it("returns null when nothing was recorded", () => {
+    expect(readLastCrash()).toBeNull();
+  });
+
+  it("round-trips the crash report", () => {
+    recordLastCrash("boom", "at render");
+
+    const crash = readLastCrash();
+
+    expect(crash).toMatchObject({ detail: "at render", message: "boom" });
+    expect(typeof crash?.time).toBe("number");
+  });
+
+  it("ignores a corrupt payload", () => {
+    localStorage.setItem("manna.last-crash", "{nope");
+
+    expect(readLastCrash()).toBeNull();
+  });
+
+  it("ignores a payload with the wrong shape", () => {
+    localStorage.setItem(
+      "manna.last-crash",
+      JSON.stringify({ message: 42, time: "now" })
+    );
+
+    expect(readLastCrash()).toBeNull();
+  });
+
+  it("clears the recorded crash", () => {
+    recordLastCrash("boom");
+    clearLastCrash();
+
+    expect(readLastCrash()).toBeNull();
   });
 });
