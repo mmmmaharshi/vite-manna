@@ -21,39 +21,10 @@ export type ChapterCounts = [number, number][];
  * keep working with no migration. */
 export const DEFAULT_HIGHLIGHT_COLOR = "yellow";
 
-/** Pre-v12 rows were written by older app versions, so verify the fields the
- * migration reads instead of crashing mid-upgrade on a corrupt row. */
-const asStringOr = (value: unknown, fallback: string) =>
-  typeof value === "string" ? value : fallback;
-
-const numberOr = (value: unknown, fallback: number) =>
-  typeof value === "number" ? value : fallback;
-
-const isRecord = (value: unknown): value is Record<string, unknown> =>
-  typeof value === "object" && value !== null;
-
-const asMigratableHighlight = (row: unknown): Highlight | null => {
-  if (!isRecord(row)) {
-    return null;
-  }
-
-  const { verseId, updatedAt } = row;
-
-  if (typeof verseId !== "number" || typeof updatedAt !== "number") {
-    return null;
-  }
-
-  return {
-    book: numberOr(row.book, 0),
-    chapter: numberOr(row.chapter, 0),
-    color: asStringOr(row.color, DEFAULT_HIGHLIGHT_COLOR),
-    createdAt: numberOr(row.createdAt, updatedAt),
-    text: typeof row.text === "string" ? row.text : "",
-    updatedAt,
-    verse: numberOr(row.verse, 0),
-    verseId,
-  };
-};
+/** Pre-v12 rows were written by older app versions; skip rows whose keys are
+ * unusable instead of crashing mid-upgrade on a corrupt row. */
+const isMigratableHighlight = (row: Highlight): boolean =>
+  Number.isInteger(row.verseId) && Number.isInteger(row.updatedAt);
 
 export interface Highlight {
   verseId: number;
@@ -83,20 +54,18 @@ class BibleDB extends Dexie {
     this.version(12)
       .stores({ highlightsV12: "verseId, updatedAt" })
       .upgrade(async (tx) => {
-        const rows = await tx.table("highlights").toArray();
+        const rows = await tx.table<Highlight>("highlights").toArray();
         const latestByVerse = new Map<number, Highlight>();
 
         for (const row of rows) {
-          const highlight = asMigratableHighlight(row);
-
-          if (highlight === null) {
+          if (!isMigratableHighlight(row)) {
             continue;
           }
 
-          const prev = latestByVerse.get(highlight.verseId);
+          const prev = latestByVerse.get(row.verseId);
 
-          if (prev === undefined || highlight.updatedAt > prev.updatedAt) {
-            latestByVerse.set(highlight.verseId, highlight);
+          if (prev === undefined || row.updatedAt > prev.updatedAt) {
+            latestByVerse.set(row.verseId, row);
           }
         }
 
@@ -117,16 +86,8 @@ class BibleDB extends Dexie {
     this.version(14)
       .stores({ highlights: "verseId, updatedAt" })
       .upgrade(async (tx) => {
-        const rows = await tx.table("highlightsV12").toArray();
-        const valid: Highlight[] = [];
-
-        for (const row of rows) {
-          const highlight = asMigratableHighlight(row);
-
-          if (highlight !== null) {
-            valid.push(highlight);
-          }
-        }
+        const rows = await tx.table<Highlight>("highlightsV12").toArray();
+        const valid = rows.filter(isMigratableHighlight);
 
         await tx.table("highlights").bulkPut(valid);
       });

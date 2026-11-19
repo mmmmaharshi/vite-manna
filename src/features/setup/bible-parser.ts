@@ -9,37 +9,42 @@ interface BibleChapter {
   Verse: BibleVerseRow[];
 }
 
-interface BibleBookShape {
+interface BibleBookJson {
   Chapter: BibleChapter[];
 }
 
 interface BibleResponse {
-  Book: BibleBookShape[];
+  Book: BibleBookJson[];
 }
 
-const isRecord = (value: unknown): value is Record<string, unknown> =>
-  typeof value === "object" && value !== null;
-
-const isVerseRow = (value: unknown): value is BibleVerseRow => {
-  if (!isRecord(value)) {
-    return false;
-  }
-
-  return typeof value.Verse === "string" && typeof value.Verseid === "number";
-};
+const isVerseRow = (value: unknown): value is BibleVerseRow =>
+  typeof value === "object" &&
+  value !== null &&
+  "Verse" in value &&
+  "Verseid" in value &&
+  typeof value.Verse === "string" &&
+  typeof value.Verseid === "number";
 
 const isChapter = (value: unknown): value is BibleChapter =>
-  isRecord(value) &&
+  typeof value === "object" &&
+  value !== null &&
+  "Verse" in value &&
   Array.isArray(value.Verse) &&
   value.Verse.every(isVerseRow);
 
-const isBook = (value: unknown): value is BibleBookShape =>
-  isRecord(value) &&
+const isBook = (value: unknown): value is BibleBookJson =>
+  typeof value === "object" &&
+  value !== null &&
+  "Chapter" in value &&
   Array.isArray(value.Chapter) &&
   value.Chapter.every(isChapter);
 
 const isBibleResponse = (value: unknown): value is BibleResponse =>
-  isRecord(value) && Array.isArray(value.Book) && value.Book.every(isBook);
+  typeof value === "object" &&
+  value !== null &&
+  "Book" in value &&
+  Array.isArray(value.Book) &&
+  value.Book.every(isBook);
 
 export const parseBibleResponse = (json: string): BibleResponse => {
   const parsed: unknown = JSON.parse(json);

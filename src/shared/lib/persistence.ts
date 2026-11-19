@@ -56,7 +56,7 @@ interface StoredLocation {
   chaptersByBook?: Record<string, number>;
 }
 
-const isRecord = (value: unknown): value is Record<string, unknown> =>
+const isStoredLocation = (value: unknown): value is StoredLocation =>
   typeof value === "object" && value !== null;
 
 export interface ReaderInitState {
@@ -65,9 +65,6 @@ export interface ReaderInitState {
   chaptersByBook: Record<number, number>;
   permalinkVerse: number | null;
 }
-
-const isStoredLocation = (value: unknown): value is StoredLocation =>
-  isRecord(value);
 
 const parseStoredLocation = (raw: string | null): StoredLocation | null => {
   // A missing key is a fresh install, not corruption: skip the parse warning.
@@ -194,19 +191,16 @@ export interface LastCrash {
   time: number;
 }
 
-const isLastCrash = (value: unknown): value is LastCrash => {
-  if (!isRecord(value)) {
-    return false;
-  }
-
-  const { message, time, detail } = value;
-
-  return (
-    typeof message === "string" &&
-    typeof time === "number" &&
-    (detail === undefined || typeof detail === "string")
-  );
-};
+const isLastCrash = (value: unknown): value is LastCrash =>
+  typeof value === "object" &&
+  value !== null &&
+  "message" in value &&
+  "time" in value &&
+  typeof value.message === "string" &&
+  typeof value.time === "number" &&
+  (!("detail" in value) ||
+    value.detail === undefined ||
+    typeof value.detail === "string");
 
 /** Crash telemetry for an offline app with no backend: the boundary writes,
  * Settings reads, the user reports. */
