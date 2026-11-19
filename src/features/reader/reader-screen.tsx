@@ -3,6 +3,7 @@ import { Button, ScrollShadow, Skeleton, Typography } from "@heroui/react";
 import { useEffect, useMemo, useRef } from "react";
 
 import { getContiguousChapterNumbers } from "../../shared/bible";
+import type { NamedBook } from "../../shared/bible";
 import { cn } from "../../shared/lib/cn";
 import { formatReference } from "../../shared/lib/reference";
 import {
@@ -23,7 +24,7 @@ import {
 } from "./hooks/use-reader-snapshot";
 import { useSwipeAndKeyboard } from "./hooks/use-swipe-and-keyboard";
 import { selectIsSelectionMode, useReaderStore } from "./store/reader-store";
-import type { NamedBook } from "../../shared/bible"; import type { ReaderSnapshot } from "./types";
+import type { ReaderSnapshot } from "./types";
 import { useUrlSync } from "./use-url-sync";
 
 const SKELETON_LINES = [

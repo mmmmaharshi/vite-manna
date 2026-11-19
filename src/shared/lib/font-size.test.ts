@@ -14,6 +14,9 @@ describe(isFontSize, () => {
 describe(fontSizeClass, () => {
   it("maps every size to a text size class", () => {
     expect(fontSizeClass("sm")).toBe("text-sm");
+    expect(fontSizeClass("base")).toBe("text-base");
+    expect(fontSizeClass("lg")).toBe("text-lg");
+    expect(fontSizeClass("xl")).toBe("text-xl");
     expect(fontSizeClass("2xl")).toBe("text-2xl");
   });
 });

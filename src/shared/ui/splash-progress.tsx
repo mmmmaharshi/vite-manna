@@ -2,14 +2,7 @@ import { memo } from "react";
 import type { CSSProperties } from "react";
 
 import { cn } from "../lib/cn";
-
-/** Splash bar geometry shared with the static boot markup in index.html. */
-export const SPLASH_TRACK = {
-  barWidth: 56,
-  durationMs: 1150,
-  height: 4,
-  width: 160,
-} as const;
+import { SPLASH_TRACK } from "./splash-geometry";
 
 const INDETERMINATE_WIDTH = SPLASH_TRACK.width * 0.35;
 

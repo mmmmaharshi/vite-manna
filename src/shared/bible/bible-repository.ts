@@ -72,8 +72,8 @@ const readChapterSnapshot = async (
   const selectedChapter = clampChapter(chapters, chapter);
 
   return {
-    chapter: selectedChapter,
     chapters,
+    chapter: selectedChapter,
     verses:
       selectedChapter === undefined
         ? []

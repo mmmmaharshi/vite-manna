@@ -18,10 +18,12 @@ export const HIGHLIGHTS_LOAD_ERROR = "Unable to load highlights.";
  */
 export const useHighlights = () => {
   const highlights = useHighlightStore((s) => s.highlights);
+
   const highlightedIds = useMemo(
     () => new Set(highlights.map((highlight) => highlight.verseId)),
     [highlights]
   );
+
   const loaded = useHighlightStore((s) => s.loaded);
   const error = useHighlightStore((s) => s.error);
   const hydrate = useHighlightStore((s) => s.hydrate);

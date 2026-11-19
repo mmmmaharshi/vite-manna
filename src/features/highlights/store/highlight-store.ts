@@ -25,8 +25,8 @@ export const useHighlightStore = create<HighlightStore>((set) => ({
   hydrate: (highlights) => {
     set({
       error: null,
-      highlights,
       loaded: true,
+      highlights,
     });
   },
   loaded: false,

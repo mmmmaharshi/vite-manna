@@ -158,11 +158,14 @@ export const useAppShell = () => {
   const [isBibleComplete, setIsBibleComplete] = useState(false);
 
   const bibleStatus = useBibleStatus();
+
   const { books, hasLoadedBooks, reloadBooks } = useBooks(
     bibleStatus === "ready" || isBibleComplete
   );
+
   const book = useReaderStore((state) => state.book);
   const chapter = useReaderStore((state) => state.chapter);
+
   const {
     snapshot,
     loadError: snapshotError,
@@ -171,10 +174,11 @@ export const useAppShell = () => {
 
   const areBooksReady = hasLoadedBooks;
   const isSnapshotReady = snapshot !== null;
-  const loadError =
-    downloadError ??
-    (areBooksReady && books.length === 0 ? READ_ERROR_MESSAGE : null) ??
-    snapshotError;
+
+  const booksError =
+    areBooksReady && books.length === 0 ? READ_ERROR_MESSAGE : null;
+
+  const loadError = downloadError ?? booksError ?? snapshotError;
 
   useEffect(() => {
     let mounted = true;

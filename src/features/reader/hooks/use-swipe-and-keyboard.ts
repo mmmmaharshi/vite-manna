@@ -26,6 +26,7 @@ export const useSwipeAndKeyboard = ({
   const isSelectionMode = useReaderStore(selectIsSelectionMode);
   const isBookSelectOpen = useReaderStore((state) => state.isBookSelectOpen);
   const goToChapter = useReaderStore((state) => state.goToChapter);
+
   const touchStart = useRef<{ x: number; y: number; time: number } | null>(
     null
   );

@@ -13,6 +13,7 @@ import {
   loadInitialState,
   readLastCrash,
   recordLastCrash,
+  rememberChapter,
   resolveReaderLocation,
   saveReaderLocation,
   setStoredFontSize,
@@ -228,5 +229,12 @@ describe("last crash", () => {
     clearLastCrash();
 
     expect(readLastCrash()).toBeNull();
+  });
+});
+
+describe(rememberChapter, () => {
+  it("recalls the stored chapter and defaults to one", () => {
+    expect(rememberChapter({ 43: 3 }, 43)).toBe(3);
+    expect(rememberChapter({}, 43)).toBe(1);
   });
 });

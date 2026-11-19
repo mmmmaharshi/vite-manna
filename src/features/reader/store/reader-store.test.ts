@@ -79,6 +79,25 @@ describe("reader store", () => {
     });
   });
 
+  describe("chapter memory", () => {
+    it("remembers the last chapter per book", () => {
+      useReaderStore.getState().setChapter(3);
+      useReaderStore.getState().setBook(2);
+      useReaderStore.getState().setBook(1);
+
+      expect(useReaderStore.getState().chapter).toBe(3);
+    });
+
+    it("clears the permalink and selection when the book changes", () => {
+      useReaderStore.getState().toggleVerseSelection(7);
+      useReaderStore.getState().setPermalinkVerse(16);
+      useReaderStore.getState().setBook(2);
+
+      expect(useReaderStore.getState().permalinkVerse).toBeNull();
+      expect(useReaderStore.getState().selectedVerseIds).toStrictEqual([]);
+    });
+  });
+
   describe("goToVerse", () => {
     it("moves to the verse in one step", () => {
       useReaderStore.getState().goToVerse({ book: 43, chapter: 3, verse: 16 });
@@ -88,6 +107,25 @@ describe("reader store", () => {
         chapter: 3,
         permalinkVerse: 16,
       });
+    });
+
+    it("moves across books without a selection", () => {
+      useReaderStore.getState().goToChapter(43, 3);
+
+      expect(useReaderStore.getState()).toMatchObject({
+        book: 43,
+        chapter: 3,
+        permalinkVerse: null,
+      });
+    });
+  });
+
+  describe("setPermalinkVerse", () => {
+    it("ignores setting the same verse twice", () => {
+      useReaderStore.getState().setPermalinkVerse(16);
+      useReaderStore.getState().setPermalinkVerse(16);
+
+      expect(useReaderStore.getState().permalinkVerse).toBe(16);
     });
   });
 
