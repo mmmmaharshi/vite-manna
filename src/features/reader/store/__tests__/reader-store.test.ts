@@ -7,10 +7,10 @@ import {
   vi,
 } from "vite-plus/test";
 
-type StoreApi = typeof import("../reader-store");
+import type * as ReaderStoreApi from "../reader-store";
 
-let useReaderStore: StoreApi["useReaderStore"];
-let selectIsSelectionMode: StoreApi["selectIsSelectionMode"];
+let useReaderStore: typeof ReaderStoreApi.useReaderStore;
+let selectIsSelectionMode: typeof ReaderStoreApi.selectIsSelectionMode;
 
 const createStorage = () => {
   const entries = new Map<string, string>();
@@ -23,92 +23,95 @@ const createStorage = () => {
   };
 };
 
-beforeAll(async () => {
-  vi.stubGlobal("window", { location: { search: "" } });
-  vi.stubGlobal("localStorage", createStorage());
+describe("reader store", () => {
+  beforeAll(async () => {
+    vi.stubGlobal("window", { location: { search: "" } });
+    vi.stubGlobal("localStorage", createStorage());
 
-  ({ selectIsSelectionMode, useReaderStore } = await import("../reader-store"));
-});
-
-beforeEach(() => {
-  useReaderStore.setState({
-    book: 1,
-    chapter: 1,
-    chaptersByBook: {},
-    fontSize: "sm",
-    isBookSelectOpen: false,
-    pendingBook: null,
-    permalinkVerse: null,
-    selectedVerseIds: [],
-  });
-});
-
-describe("verse selection", () => {
-  it("derives selection mode from the selected ids", () => {
-    expect(selectIsSelectionMode(useReaderStore.getState())).toBeFalsy();
-
-    useReaderStore.getState().toggleVerseSelection(7);
-
-    expect(selectIsSelectionMode(useReaderStore.getState())).toBeTruthy();
-    expect(useReaderStore.getState().selectedVerseIds).toStrictEqual([7]);
+    ({ selectIsSelectionMode, useReaderStore } =
+      await import("../reader-store"));
   });
 
-  it("toggles an already selected verse off and leaves the mode", () => {
-    useReaderStore.getState().toggleVerseSelection(7);
-    useReaderStore.getState().toggleVerseSelection(7);
-
-    expect(useReaderStore.getState().selectedVerseIds).toStrictEqual([]);
-    expect(selectIsSelectionMode(useReaderStore.getState())).toBeFalsy();
-  });
-
-  it("clears the whole selection at once", () => {
-    useReaderStore.getState().toggleVerseSelection(7);
-    useReaderStore.getState().toggleVerseSelection(9);
-    useReaderStore.getState().clearVerseSelection();
-
-    expect(useReaderStore.getState().selectedVerseIds).toStrictEqual([]);
-  });
-
-  it("drops the selection when navigating", () => {
-    useReaderStore.getState().toggleVerseSelection(7);
-    useReaderStore.getState().setChapter(2);
-
-    expect(useReaderStore.getState().selectedVerseIds).toStrictEqual([]);
-    expect(selectIsSelectionMode(useReaderStore.getState())).toBeFalsy();
-  });
-});
-
-describe("goToVerse", () => {
-  it("moves to the verse in one step", () => {
-    useReaderStore.getState().goToVerse({ book: 43, chapter: 3, verse: 16 });
-
-    expect(useReaderStore.getState()).toMatchObject({
-      book: 43,
-      chapter: 3,
-      permalinkVerse: 16,
-    });
-  });
-});
-
-describe("book select transition", () => {
-  it("stays open while a book is pending and closes when cleared", () => {
-    useReaderStore.getState().selectBook(5);
-
-    expect(useReaderStore.getState()).toMatchObject({
-      book: 5,
-      isBookSelectOpen: true,
-      pendingBook: 5,
-    });
-
-    useReaderStore.getState().closeBookSelect();
-
-    expect(useReaderStore.getState().isBookSelectOpen).toBeTruthy();
-
-    useReaderStore.getState().clearPendingBook();
-
-    expect(useReaderStore.getState()).toMatchObject({
+  beforeEach(() => {
+    useReaderStore.setState({
+      book: 1,
+      chapter: 1,
+      chaptersByBook: {},
+      fontSize: "sm",
       isBookSelectOpen: false,
       pendingBook: null,
+      permalinkVerse: null,
+      selectedVerseIds: [],
+    });
+  });
+
+  describe("verse selection", () => {
+    it("derives selection mode from the selected ids", () => {
+      expect(selectIsSelectionMode(useReaderStore.getState())).toBeFalsy();
+
+      useReaderStore.getState().toggleVerseSelection(7);
+
+      expect(selectIsSelectionMode(useReaderStore.getState())).toBeTruthy();
+      expect(useReaderStore.getState().selectedVerseIds).toStrictEqual([7]);
+    });
+
+    it("toggles an already selected verse off and leaves the mode", () => {
+      useReaderStore.getState().toggleVerseSelection(7);
+      useReaderStore.getState().toggleVerseSelection(7);
+
+      expect(useReaderStore.getState().selectedVerseIds).toStrictEqual([]);
+      expect(selectIsSelectionMode(useReaderStore.getState())).toBeFalsy();
+    });
+
+    it("clears the whole selection at once", () => {
+      useReaderStore.getState().toggleVerseSelection(7);
+      useReaderStore.getState().toggleVerseSelection(9);
+      useReaderStore.getState().clearVerseSelection();
+
+      expect(useReaderStore.getState().selectedVerseIds).toStrictEqual([]);
+    });
+
+    it("drops the selection when navigating", () => {
+      useReaderStore.getState().toggleVerseSelection(7);
+      useReaderStore.getState().setChapter(2);
+
+      expect(useReaderStore.getState().selectedVerseIds).toStrictEqual([]);
+      expect(selectIsSelectionMode(useReaderStore.getState())).toBeFalsy();
+    });
+  });
+
+  describe("goToVerse", () => {
+    it("moves to the verse in one step", () => {
+      useReaderStore.getState().goToVerse({ book: 43, chapter: 3, verse: 16 });
+
+      expect(useReaderStore.getState()).toMatchObject({
+        book: 43,
+        chapter: 3,
+        permalinkVerse: 16,
+      });
+    });
+  });
+
+  describe("book select transition", () => {
+    it("stays open while a book is pending and closes when cleared", () => {
+      useReaderStore.getState().selectBook(5);
+
+      expect(useReaderStore.getState()).toMatchObject({
+        book: 5,
+        isBookSelectOpen: true,
+        pendingBook: 5,
+      });
+
+      useReaderStore.getState().closeBookSelect();
+
+      expect(useReaderStore.getState().isBookSelectOpen).toBeTruthy();
+
+      useReaderStore.getState().clearPendingBook();
+
+      expect(useReaderStore.getState()).toMatchObject({
+        isBookSelectOpen: false,
+        pendingBook: null,
+      });
     });
   });
 });

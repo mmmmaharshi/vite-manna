@@ -1,13 +1,11 @@
 import { beforeAll, describe, expect, it, vi } from "vite-plus/test";
 
-import type { ShellReadiness } from "../use-app-shell";
+import type * as AppShellApi from "../use-app-shell";
 
-type ShellApi = typeof import("../use-app-shell");
+let resolveShellStatus: typeof AppShellApi.resolveShellStatus;
+let ready: AppShellApi.ShellReadiness;
 
-let resolveShellStatus: ShellApi["resolveShellStatus"];
-let ready: ShellReadiness;
-
-const handleRetry = vi.fn();
+const handleRetry = vi.fn<() => void>();
 
 const createStorage = () => {
   const entries = new Map<string, string>();
@@ -20,37 +18,36 @@ const createStorage = () => {
   };
 };
 
-beforeAll(async () => {
-  vi.stubGlobal("window", { location: { search: "" } });
-  vi.stubGlobal("localStorage", createStorage());
+describe("shell status", () => {
+  beforeAll(async () => {
+    vi.stubGlobal("window", { location: { search: "" } });
+    vi.stubGlobal("localStorage", createStorage());
 
-  ({ resolveShellStatus } = await import("../use-app-shell"));
+    ({ resolveShellStatus } = await import("../use-app-shell"));
 
-  ready = {
-    areBooksReady: true,
-    areFontsReady: true,
-    bibleStatus: "ready",
-    downloadProgress: null,
-    isBibleComplete: false,
-    isMinSplashElapsed: true,
-    isSnapshotReady: true,
-    loadError: null,
-  };
-});
+    ready = {
+      areBooksReady: true,
+      areFontsReady: true,
+      bibleStatus: "ready",
+      downloadProgress: null,
+      isBibleComplete: false,
+      isMinSplashElapsed: true,
+      isSnapshotReady: true,
+      loadError: null,
+    };
+  });
 
-describe("resolveShellStatus", () => {
   it("routes load failures to the error screen", () => {
     const status = resolveShellStatus(
       { ...ready, loadError: "Unable to read your Bible data" },
       handleRetry
     );
 
-    expect(status.kind).toBe("error");
-
-    if (status.kind === "error") {
-      expect(status.message).toBe("Unable to read your Bible data");
-      expect(status.handleRetry).toBe(handleRetry);
-    }
+    expect(status).toMatchObject({
+      handleRetry,
+      kind: "error",
+      message: "Unable to read your Bible data",
+    });
   });
 
   it("prefers the error screen over the download progress", () => {
@@ -82,10 +79,10 @@ describe("resolveShellStatus", () => {
 
     expect(status.kind).toBe("progress");
 
-    if (status.kind === "progress") {
-      expect(status.progress).toBeNull();
-      expect(status.message).toBe("Downloading Bible data...");
-    }
+    expect(status).toMatchObject({
+      message: "Downloading Bible data...",
+      progress: null,
+    });
   });
 
   it("shows the download percentage while receiving", () => {

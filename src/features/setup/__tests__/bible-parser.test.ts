@@ -65,6 +65,7 @@ describe(readBible, () => {
     const missingText = JSON.stringify({
       Book: [{ Chapter: [{ Verse: [{ Verseid: 1 }] }] }],
     });
+
     const badId = JSON.stringify({
       Book: [{ Chapter: [{ Verse: [{ Verse: "x", Verseid: "1" }] }] }],
     });

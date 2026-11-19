@@ -206,7 +206,7 @@ describe("last crash", () => {
     const crash = readLastCrash();
 
     expect(crash).toMatchObject({ detail: "at render", message: "boom" });
-    expect(typeof crash?.time).toBe("number");
+    expect(crash?.time).toBeTypeOf("number");
   });
 
   it("ignores a corrupt payload", () => {
