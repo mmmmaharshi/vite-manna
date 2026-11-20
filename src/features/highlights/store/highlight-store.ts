@@ -6,10 +6,10 @@ import type { Highlight } from "../../../shared/bible";
  * The highlight list state.
  */
 export interface HighlightStore {
-  highlights: Highlight[];
+  highlights: Array<Highlight>;
   loaded: boolean;
   error: string | null;
-  hydrate: (highlights: Highlight[]) => void;
+  hydrate: (highlights: Array<Highlight>) => void;
   setError: (message: string | null) => void;
   upsertLocal: (highlight: Highlight) => void;
   removeLocal: (verseId: number) => void;

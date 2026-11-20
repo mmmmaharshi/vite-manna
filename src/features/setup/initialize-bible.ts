@@ -43,7 +43,7 @@ export const initializeBible = async (
   }
 
   let received = 0;
-  const chunks: Uint8Array[] = [];
+  const chunks: Array<Uint8Array> = [];
 
   const readStream = async () => {
     const { done, value } = await reader.read();

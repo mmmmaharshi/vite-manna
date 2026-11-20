@@ -21,7 +21,7 @@ export interface MetaEntry {
 }
 
 /** `[book, chapterCount]` pairs in book order, stored under the `chapterCounts` meta key. */
-export type ChapterCounts = [number, number][];
+export type ChapterCounts = Array<[number, number]>;
 
 /** The product highlights in one color; rows carry the value so older installs
  * keep working with no migration.

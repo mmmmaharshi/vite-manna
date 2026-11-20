@@ -6,15 +6,15 @@ interface BibleVerseRow {
 }
 
 interface BibleChapter {
-  Verse: BibleVerseRow[];
+  Verse: Array<BibleVerseRow>;
 }
 
 interface BibleBookJson {
-  Chapter: BibleChapter[];
+  Chapter: Array<BibleChapter>;
 }
 
 interface BibleResponse {
-  Book: BibleBookJson[];
+  Book: Array<BibleBookJson>;
 }
 
 const isVerseRow = (value: unknown): value is BibleVerseRow => {
@@ -77,7 +77,7 @@ export const parseBibleResponse = (json: string) => {
  * @returns The chapter counts and the verse rows.
  */
 export const readBible = (bible: BibleResponse) => {
-  const verses: BibleVerse[] = [];
+  const verses: Array<BibleVerse> = [];
   const chapterCounts: ChapterCounts = [];
 
   for (const [bookIndex, book] of bible.Book.entries()) {

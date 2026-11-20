@@ -15,7 +15,7 @@ export interface ReaderState {
   pendingBook: number | null;
   isBookSelectOpen: boolean;
   chaptersByBook: Record<number, number>;
-  selectedVerseIds: number[];
+  selectedVerseIds: Array<number>;
   permalinkVerse: number | null;
 
   setBook: (book: number) => void;

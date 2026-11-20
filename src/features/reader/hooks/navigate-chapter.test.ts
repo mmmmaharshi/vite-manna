@@ -3,7 +3,7 @@ import { describe, expect, it } from "vite-plus/test";
 import type { NamedBook } from "../../../shared/bible";
 import { navigateChapter } from "./navigate-chapter";
 
-const books: NamedBook[] = [
+const books: Array<NamedBook> = [
   { chapterCount: 2, id: 1, name: "One" },
   { chapterCount: 3, id: 2, name: "Two" },
 ];

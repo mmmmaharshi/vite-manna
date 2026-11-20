@@ -31,7 +31,7 @@ const SEARCH_ERROR_MESSAGE = "Search failed. Please try again.";
 
 const SearchPage = ({ onNavigateToReader }: SearchPageProps) => {
   const [query, setQuery] = useState("");
-  const [results, setResults] = useState<BibleVerse[]>([]);
+  const [results, setResults] = useState<Array<BibleVerse>>([]);
   const [status, setStatus] = useState<SearchStatus>("idle");
   const timerRef = useRef<ReturnType<typeof setTimeout> | null>(null);
   const requestIdRef = useRef(0);

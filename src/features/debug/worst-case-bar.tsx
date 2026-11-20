@@ -1,7 +1,7 @@
 import { useWorstCase } from "./use-worst-case";
 import type { WorstCaseMode } from "./use-worst-case";
 
-const SEGMENTS: { id: WorstCaseMode; label: string }[] = [
+const SEGMENTS: Array<{ id: WorstCaseMode; label: string }> = [
   { id: "demo", label: "Demo" },
   { id: "worst", label: "Worst case" },
   { id: "huge", label: "Huge" },

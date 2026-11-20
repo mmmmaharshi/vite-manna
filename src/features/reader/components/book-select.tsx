@@ -10,7 +10,7 @@ import { cn } from "../../../shared/lib/cn";
 import { useReaderStore } from "../store/reader-store";
 
 interface BookSelectProps {
-  books: NamedBook[];
+  books: Array<NamedBook>;
   value: number;
   visibleBookSummary: NamedBook | undefined;
   className?: string;

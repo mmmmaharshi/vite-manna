@@ -96,7 +96,7 @@ export interface NamedBook extends BookSummary {
  * @param summaries - The summaries to name.
  * @returns The summaries with their names.
  */
-export const attachBookNames = (summaries: BookSummary[]) =>
+export const attachBookNames = (summaries: Array<BookSummary>) =>
   summaries.map((summary) => ({
     ...summary,
     name: getBibleBookName(summary.id),

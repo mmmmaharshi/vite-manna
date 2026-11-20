@@ -5,7 +5,7 @@ import type { RefObject } from "react";
 import { useReaderStore } from "../store/reader-store";
 
 interface ChapterStripProps {
-  chapters: number[];
+  chapters: Array<number>;
   currentBook: number;
   isReaderTransitioning: boolean;
   onSelectChapter: (chapter: number) => void;

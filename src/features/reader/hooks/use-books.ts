@@ -2,17 +2,18 @@ import { useEffect, useState } from "react";
 
 import { attachBookNames, getBookSummaries } from "../../../shared/bible";
 import type { NamedBook } from "../../../shared/bible";
+import { recordLastCrash } from "../../../shared/lib/persistence";
 
 /**
  * The book list result.
  */
 export interface UseBooksResult {
-  books: NamedBook[];
+  books: Array<NamedBook>;
   hasLoadedBooks: boolean;
   reloadBooks: () => void;
 }
 
-let cachedBooks: NamedBook[] = [];
+let cachedBooks: Array<NamedBook> = [];
 let cachedLoaded = false;
 
 /**
@@ -22,7 +23,7 @@ let cachedLoaded = false;
  * @returns The books, their load state, and a retry action.
  */
 export const useBooks = (enabled = true) => {
-  const [books, setBooks] = useState<NamedBook[]>(cachedBooks);
+  const [books, setBooks] = useState<Array<NamedBook>>(cachedBooks);
   const [hasLoadedBooks, setHasLoadedBooks] = useState(cachedLoaded);
   const [reloadToken, setReloadToken] = useState(0);
 
@@ -56,9 +57,7 @@ export const useBooks = (enabled = true) => {
           return;
         }
 
-        if (import.meta.env.DEV) {
-          console.error("[Bible] Unable to load books", error);
-        }
+        recordLastCrash("Book list load failed", String(error));
 
         cachedLoaded = true;
         setHasLoadedBooks(true);

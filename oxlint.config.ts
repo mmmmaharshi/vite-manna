@@ -1,3 +1,4 @@
+import cloudflare from "@cloudflare/oxlint-config";
 import { defineConfig } from "oxlint";
 import antiSlop from "ultracite/oxlint/anti-slop";
 import core from "ultracite/oxlint/core";
@@ -31,19 +32,12 @@ export default defineConfig({
       specifier: "vite-plus/oxlint-plugin",
     },
     ...shadcn.jsPlugins,
+    ...(cloudflare.jsPlugins ?? []),
   ],
   settings: jsPluginSettings,
-  // WARNING: removing this override breaks `bun run check`; the sleep has no awaiting work to wrap.
-  overrides: [
-    {
-      files: ["src/shared/lib/wait-for-fonts.ts"],
-      rules: {
-        "promise/avoid-new": "off",
-      },
-    },
-  ],
   // WARNING: `vite`/`vitest` imports must go through `vite-plus`, or `vp lint` fails.
   rules: {
+    ...cloudflare.rules,
     "vite-plus/prefer-vite-plus-imports": "error",
   },
 });

@@ -18,11 +18,11 @@ import { useHighlights } from "../../highlights/hooks/use-highlights";
 import { selectIsSelectionMode, useReaderStore } from "../store/reader-store";
 
 interface VerseActionBarProps {
-  verses: BibleVerse[];
+  verses: Array<BibleVerse>;
 }
 
 const buildShareText = (
-  verses: BibleVerse[],
+  verses: Array<BibleVerse>,
   book: number,
   chapter: number
 ) => {
@@ -118,7 +118,7 @@ const VerseActionBarInnerComponent = ({ verses }: VerseActionBarProps) => {
     }
   };
 
-  const saveHighlights = async (verseList: BibleVerse[]) => {
+  const saveHighlights = async (verseList: Array<BibleVerse>) => {
     const results = await Promise.all(
       verseList.map((verse) => addHighlight(verse))
     );
@@ -137,7 +137,7 @@ const VerseActionBarInnerComponent = ({ verses }: VerseActionBarProps) => {
     void saveHighlights(toHighlight);
   };
 
-  const deleteHighlights = async (verseList: BibleVerse[]) => {
+  const deleteHighlights = async (verseList: Array<BibleVerse>) => {
     const results = await Promise.all(
       verseList.map((verse) => removeHighlight(verse.id))
     );

@@ -160,9 +160,7 @@ describe("storage failures", () => {
     vi.restoreAllMocks();
   });
 
-  it("warns once and falls back when localStorage is unavailable", async () => {
-    const warn = vi.spyOn(console, "warn");
-
+  it("falls back when localStorage is unavailable", async () => {
     vi.stubGlobal("localStorage", {
       getItem: () => {
         throw new Error("blocked");
@@ -181,8 +179,6 @@ describe("storage failures", () => {
     persistence.saveReaderLocation({ book: 1, chapter: 1, chaptersByBook: {} });
     persistence.setStoredFontSize("lg");
     expect(persistence.resolveReaderLocation("", "not json").book).toBe(1);
-
-    expect(warn).toHaveBeenCalledOnce();
   });
 });
 

@@ -8,7 +8,7 @@ import { useHighlights } from "../../highlights/hooks/use-highlights";
 import { useReaderStore } from "../store/reader-store";
 
 interface VerseListProps {
-  verses: BibleVerse[];
+  verses: Array<BibleVerse>;
 }
 
 const VerseListComponent = ({ verses }: VerseListProps) => {

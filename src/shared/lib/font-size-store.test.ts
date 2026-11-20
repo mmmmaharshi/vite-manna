@@ -1,8 +1,8 @@
 import { beforeAll, describe, expect, it, vi } from "vite-plus/test";
 
-import type * as FontSizeStoreApi from "./font-size-store";
+import type { useFontSizeStore as UseFontSizeStore } from "./font-size-store";
 
-let useFontSizeStore: typeof FontSizeStoreApi.useFontSizeStore;
+let useFontSizeStore: typeof UseFontSizeStore;
 
 const createStorage = () => {
   const entries = new Map<string, string>();

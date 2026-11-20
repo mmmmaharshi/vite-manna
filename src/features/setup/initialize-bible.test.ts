@@ -83,7 +83,7 @@ describe(initializeBible, () => {
       [2, 1],
     ]);
     stubFetch(responseWith());
-    const progress: (number | null)[] = [];
+    const progress: Array<number | null> = [];
 
     await expect(
       initializeBible((p) => progress.push(p))
@@ -95,7 +95,7 @@ describe(initializeBible, () => {
 
   it("reports determinate progress when the response has a content-length", async () => {
     stubFetch(responseWith(new TextEncoder().encode(BIBLE_JSON).length));
-    const progress: (number | null)[] = [];
+    const progress: Array<number | null> = [];
 
     await expect(
       initializeBible((p) => progress.push(p))
@@ -108,7 +108,7 @@ describe(initializeBible, () => {
 
   it("reports indeterminate progress without a content-length", async () => {
     stubFetch(responseWith());
-    const progress: (number | null)[] = [];
+    const progress: Array<number | null> = [];
 
     await initializeBible((p) => progress.push(p));
 

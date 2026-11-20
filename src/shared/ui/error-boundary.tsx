@@ -1,6 +1,6 @@
 import { Button, Typography } from "@heroui/react";
 import { Component, useState } from "react";
-import type { ErrorInfo, ReactNode } from "react";
+import type { ReactNode } from "react";
 
 import { clearLastCrash, recordLastCrash } from "../lib/persistence";
 
@@ -19,16 +19,10 @@ class ErrorBoundary extends Component<ErrorBoundaryProps, ErrorBoundaryState> {
     this.state = { hasError: false };
   }
 
-  static getDerivedStateFromError() {
+  static getDerivedStateFromError(error: Error) {
+    recordLastCrash(error.message);
+
     return { hasError: true };
-  }
-
-  componentDidCatch(error: Error, info: ErrorInfo) {
-    if (import.meta.env.DEV) {
-      console.error("[ErrorBoundary]", error, info.componentStack, this.state);
-    }
-
-    recordLastCrash(error.message, info.componentStack ?? undefined);
   }
 
   render() {

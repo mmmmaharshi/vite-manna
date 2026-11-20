@@ -19,7 +19,7 @@ const warnStorageFailure = (operation: string, reason: string) => {
   }
 
   didWarnStorageFailure = true;
-  console.warn(`[manna] localStorage ${operation} failed: ${reason}`);
+  recordLastCrash("Storage failure", `${operation}: ${reason}`);
 };
 
 const readStorage = (key: string) => {

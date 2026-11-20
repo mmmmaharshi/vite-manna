@@ -108,7 +108,9 @@ export const useSwipeAndKeyboard = ({
         return;
       }
 
-      const tag = e.target instanceof HTMLElement ? e.target.tagName : "";
+      const { target } = e;
+
+      const tag = target !== null && "tagName" in target ? target.tagName : "";
 
       if (tag === "INPUT" || tag === "TEXTAREA" || tag === "SELECT") {
         return;

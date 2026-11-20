@@ -61,12 +61,12 @@ export const clearBibleSeed = async () => {
 export const getContiguousChapterNumbers = (chapterCount: number) =>
   Array.from({ length: chapterCount }, (_, index) => index + 1);
 
-const clampChapter = (chapters: number[], chapter: number) =>
+const clampChapter = (chapters: Array<number>, chapter: number) =>
   chapters.includes(chapter) ? chapter : chapters[0];
 
 const readChapterSnapshot = async (
   book: number,
-  chapters: number[],
+  chapters: Array<number>,
   chapter: number
 ) => {
   const selectedChapter = clampChapter(chapters, chapter);
@@ -177,7 +177,8 @@ export const getReaderBootstrap = async (book: number, chapter: number) => {
  * @param verses - The verses to store.
  * @returns A promise that resolves once the verses are stored.
  */
-export const putVerses = (verses: BibleVerse[]) => db.verses.bulkPut(verses);
+export const putVerses = (verses: Array<BibleVerse>) =>
+  db.verses.bulkPut(verses);
 
 /**
  * Searches verse text across all books.

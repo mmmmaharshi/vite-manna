@@ -1,9 +1,14 @@
+import { recordLastCrash } from "./persistence";
+
 const FONT_WAIT_TIMEOUT_MS = 3000;
 
-const delay = (ms: number) =>
-  new Promise<void>((resolve) => {
-    setTimeout(resolve, ms);
-  });
+const delay = (ms: number) => {
+  const { promise, resolve } = Promise.withResolvers<undefined>();
+
+  setTimeout(() => resolve(undefined), ms);
+
+  return promise;
+};
 
 const APP_FONT_FACES = [
   '400 1em "Google Sans Variable"',
@@ -30,8 +35,6 @@ export const waitForFonts = async () => {
       delay(FONT_WAIT_TIMEOUT_MS),
     ]);
   } catch (error) {
-    if (import.meta.env.DEV) {
-      console.warn("[Fonts] Unable to preload fonts", error);
-    }
+    recordLastCrash("Font preload failed", String(error));
   }
 };

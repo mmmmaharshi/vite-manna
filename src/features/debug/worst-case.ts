@@ -31,7 +31,7 @@ export const WORST_HIGHLIGHT_COUNT = 150;
  * @returns The verses to seed.
  */
 export const pickUnseededVerses = (
-  verses: BibleVerse[],
+  verses: Array<BibleVerse>,
   highlightedIds: ReadonlySet<number>,
   count: number
 ) => verses.filter((verse) => !highlightedIds.has(verse.id)).slice(0, count);
@@ -47,7 +47,7 @@ const readIds = () => {
   }
 };
 
-const writeIds = (ids: number[]) => {
+const writeIds = (ids: Array<number>) => {
   localStorage.setItem(TAGGED_IDS_KEY, ids.join(","));
 };
 

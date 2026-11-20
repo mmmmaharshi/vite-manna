@@ -6,6 +6,6 @@ import type { BibleVerse } from "../../shared/bible";
 export interface ReaderSnapshot {
   book: number;
   chapter: number | undefined;
-  chapters: number[];
-  verses: BibleVerse[];
+  chapters: Array<number>;
+  verses: Array<BibleVerse>;
 }

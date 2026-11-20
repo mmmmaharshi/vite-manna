@@ -7,10 +7,13 @@ import {
   vi,
 } from "vite-plus/test";
 
-import type * as ReaderStoreApi from "./reader-store";
+import type {
+  selectIsSelectionMode as SelectIsSelectionMode,
+  useReaderStore as UseReaderStore,
+} from "./reader-store";
 
-let useReaderStore: typeof ReaderStoreApi.useReaderStore;
-let selectIsSelectionMode: typeof ReaderStoreApi.selectIsSelectionMode;
+let useReaderStore: typeof UseReaderStore;
+let selectIsSelectionMode: typeof SelectIsSelectionMode;
 
 const createStorage = () => {
   const entries = new Map<string, string>();

@@ -13,7 +13,7 @@ interface BottomNavProps {
   onTabChange: (tab: TabId) => void;
 }
 
-const TABS: { id: TabId; label: string; Icon: typeof Book }[] = [
+const TABS: Array<{ id: TabId; label: string; Icon: typeof Book }> = [
   { Icon: Book, id: "reader", label: "Reading" },
   { Icon: Magnifier, id: "search", label: "Search" },
   { Icon: Star, id: "highlights", label: "Highlights" },

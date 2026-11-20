@@ -1,9 +1,12 @@
 import { beforeAll, describe, expect, it, vi } from "vite-plus/test";
 
-import type * as AppShellApi from "./use-app-shell";
+import type {
+  resolveShellStatus as ResolveShellStatus,
+  ShellReadiness,
+} from "./use-app-shell";
 
-let resolveShellStatus: typeof AppShellApi.resolveShellStatus;
-let ready: AppShellApi.ShellReadiness;
+let resolveShellStatus: typeof ResolveShellStatus;
+let ready: ShellReadiness;
 
 const handleRetry = vi.fn<() => void>();
 

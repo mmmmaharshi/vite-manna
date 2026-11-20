@@ -1,6 +1,7 @@
 import { useEffect, useState } from "react";
 
 import { getReaderSnapshot } from "../../../shared/bible";
+import { recordLastCrash } from "../../../shared/lib/persistence";
 import { useReaderStore } from "../store/reader-store";
 import type { ReaderSnapshot } from "../types";
 
@@ -136,9 +137,7 @@ export const useReaderSnapshot = (
         }
       } catch (error) {
         if (!cancelled) {
-          if (import.meta.env.DEV) {
-            console.error("[Bible] Unable to load reader snapshot", error);
-          }
+          recordLastCrash("Reader snapshot failed", String(error));
 
           failSnapshot({ setLoadError, setSnapshot });
         }
@@ -164,9 +163,7 @@ export const useReaderSnapshot = (
 
           applySnapshot(next, chapter, { setLoadError, setSnapshot });
         } catch (error) {
-          if (import.meta.env.DEV) {
-            console.error("[Bible] Unable to load reader snapshot", error);
-          }
+          recordLastCrash("Reader snapshot retry failed", String(error));
 
           failSnapshot({ setLoadError, setSnapshot });
         }

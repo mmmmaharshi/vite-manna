@@ -10,7 +10,7 @@ import type { NamedBook } from "../../../shared/bible";
  * @returns The destination, or null past either end.
  */
 export const navigateChapter = (
-  books: NamedBook[],
+  books: Array<NamedBook>,
   book: number,
   chapter: number,
   direction: "prev" | "next"

@@ -5,6 +5,7 @@ import { useReaderSnapshot } from "../features/reader/hooks/use-reader-snapshot"
 import { useReaderStore } from "../features/reader/store/reader-store";
 import type { BibleStatus } from "../features/setup/hooks/use-bible-status";
 import { useBibleStatus } from "../features/setup/hooks/use-bible-status";
+import { recordLastCrash } from "../shared/lib/persistence";
 import { waitForFonts } from "../shared/lib/wait-for-fonts";
 
 const MINIMUM_SPLASH_DURATION_MS = 500;
@@ -229,9 +230,7 @@ export const useAppShell = () => {
           setIsBibleComplete(true);
         }
       } catch (error) {
-        if (import.meta.env.DEV) {
-          console.error("[Bible] Failed to initialize database", error);
-        }
+        recordLastCrash("Bible initialization failed", String(error));
 
         if (mounted) {
           setDownloadError(DOWNLOAD_ERROR_MESSAGE);

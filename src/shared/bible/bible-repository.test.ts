@@ -17,7 +17,7 @@ import {
 } from "./bible-repository";
 import { db } from "./db";
 
-const versesFor = (book: number, chapter: number, texts: string[]) =>
+const versesFor = (book: number, chapter: number, texts: Array<string>) =>
   texts.map((text, index) => ({
     book,
     chapter,

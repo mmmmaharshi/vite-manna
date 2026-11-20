@@ -1,6 +1,7 @@
 import { useEffect, useState } from "react";
 
 import { isBibleSeeded } from "../../../shared/bible";
+import { recordLastCrash } from "../../../shared/lib/persistence";
 
 /**
  * The Bible seed status.
@@ -26,9 +27,7 @@ export const useBibleStatus = () => {
           setStatus(seeded ? "ready" : "missing");
         }
       } catch (error) {
-        if (import.meta.env.DEV) {
-          console.error("[Bible] Unable to verify IndexedDB", error);
-        }
+        recordLastCrash("Bible status check failed", String(error));
 
         if (mounted) {
           setStatus("missing");
